@@ -103,6 +103,10 @@ import RoutesPage from "./pages/RoutesPage";
 import RegionsDetailsPage from "./pages/RegionsDetailsPage";
 import SubRegionsDetailsPage from "./pages/SubRegionsDetailsPage";
 import RoutesDetailsPage from "./pages/RoutesDetailsPage";
+import AddUsersPage from "./pages/AddUsersPage";
+import RolesListPage from "./pages/RolesListPage";
+import CreateRolePage from "./pages/CreateRolePage";
+
 
 function App() {
   return (
@@ -143,6 +147,9 @@ function App() {
         <Route exact path='/regions/:regionName' element={<RegionsDetailsPage />} />
         <Route exact path='/sub-regions/:sub-regionName' element={<SubRegionsDetailsPage />} />
         <Route exact path='/routes/:regionName' element={<RoutesDetailsPage />} />
+        <Route exact path='/add-users' element={<AddUsersPage/>} />
+        <Route exact path='/roles-list' element={<RolesListPage/>} />
+        <Route exact path='/create-role' element={<CreateRolePage/>} />
         <Route
           exact
           path='/code-generator-new'

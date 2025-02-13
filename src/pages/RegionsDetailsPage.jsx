@@ -11,7 +11,7 @@ const RegionsDetailsPage= () => {
         <MasterLayout>
 
           {/* Breadcrumb */}
-          <Breadcrumb title="regions" />
+          <Breadcrumb title="/Regions" />
 
             {/* RegionsDetailsLayer */}
           <RegionsDetailsLayer/>

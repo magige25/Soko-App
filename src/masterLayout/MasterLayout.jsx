@@ -259,6 +259,30 @@ const MasterLayout = ({ children }) => {
             </li>
 
             <li className='sidebar-menu-group-title'>Under Development</li>
+              {/* System Users */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon
+                  icon='flowbite:users-group-outline'
+                  className='menu-icon'
+                />
+                <span>System users</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/users-list'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Users
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
                {/* Regions Dropdown */}
             <li className='dropdown'>
               <Link to='#'>
@@ -311,7 +335,7 @@ const MasterLayout = ({ children }) => {
               </li>
 
              {/* Authentication Dropdown */}
-             <li className='dropdown'>
+            <li className='dropdown'>
               <Link to='#'>
                 <Icon icon='ri-shield-user-line' className='menu-icon' />
                 <span>Authentication</span>
@@ -351,6 +375,27 @@ const MasterLayout = ({ children }) => {
                   </NavLink>
                 </li>
               </ul>
+            </li>
+
+             {/* Roles */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon icon='ri-user-settings-line' className='menu-icon' />
+                  <span>Roles</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/roles-list'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Roles
+                  </NavLink>
+                </li>
+              </ul>  
             </li>
 
             <li className='sidebar-menu-group-title'>Application</li>
@@ -954,7 +999,7 @@ const MasterLayout = ({ children }) => {
             </li>
 
             {/* Users Dropdown */}
-            <li className='dropdown'>
+            {/* <li className='dropdown'>
               <Link to='#'>
                 <Icon
                   icon='flowbite:users-group-outline'
@@ -1008,7 +1053,7 @@ const MasterLayout = ({ children }) => {
                   </NavLink>
                 </li>
               </ul>
-            </li>
+            </li> */}
 
             {/* Role & Access Dropdown */}
             <li className='dropdown'>
