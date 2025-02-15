@@ -1,16 +1,16 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 const RegionsLayer = () => {
   const [regions, setRegions] = React.useState([
-    { name: "Nyanza", customers:"870", salesAgents: "65" },
-    { name: "Coastal", customers:"456", salesAgents: "34" },
-    { name: "Western", customers:"589", salesAgents: "48" },
-    { name: "Nairobi", customers:"965", salesAgents: "89" },
+    { name: "Nyanza", customers: "870", salesAgents: "65" },
+    { name: "Coastal", customers: "456", salesAgents: "34" },
+    { name: "Western", customers: "589", salesAgents: "48" },
+    { name: "Nairobi", customers: "965", salesAgents: "89" },
   ]);
 
-  const [editRegion, setEditRegion] = React.useState({ name: '', customers: 0, salesAgents: 0});
+  const [editRegion, setEditRegion] = React.useState({ name: '', customers: 0, salesAgents: 0 });
   const [regionToDelete, setRegionToDelete] = React.useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set items per page to 10
@@ -107,10 +107,10 @@ const RegionsLayer = () => {
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: 'visible' }}>
-              <table className="table table-borderless text-start small-text" style={{ width: '100%' }}> 
-                <thead className="table-light text-start small-text"> 
+              <table className="table table-borderless text-start small-text" style={{ width: '100%' }}>
+                <thead className="table-light text-start small-text">
                   <tr>
-                    <th className="text-start">#</th> 
+                    <th className="text-start">#</th>
                     <th className="text-start">Name</th>
                     <th className="text-start">Customers</th>
                     <th className="text-start">Sales Agents</th>
@@ -135,6 +135,7 @@ const RegionsLayer = () => {
                                 className="dropdown-item"
                                 to={`/regions/${region.name}`}
                                 state={{ region }}
+                                onClick={() => console.log("Link clicked:", region)} // Debugging
                               >
                                 View
                               </Link>
@@ -209,10 +210,10 @@ const RegionsLayer = () => {
             </div>
           </div>
         </div>
-        
 
+        {/* Add Region Modal */}
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-sm modal-dialog-centered">
+          <div className="modal-dialog modal-sm modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
@@ -233,6 +234,7 @@ const RegionsLayer = () => {
           </div>
         </div>
 
+        {/* Edit Region Modal */}
         <div className="modal fade" id="editModal" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
@@ -250,16 +252,6 @@ const RegionsLayer = () => {
                       placeholder="Enter Region Name"
                       value={editRegion.name}
                       onChange={(e) => setEditRegion({ ...editRegion, name: e.target.value })}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Region</label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Region Name"
-                      value={editRegion.region}
-                      onChange={(e) => setEditRegion({ ...editRegion, region: e.target.value })}
                     />
                   </div>
                   <div className="mb-3">
@@ -283,7 +275,7 @@ const RegionsLayer = () => {
                     />
                   </div>
                   <div className="d-flex justify-content-end gap-2">
-                    <button type="submit" className="btn btn-primary " data-bs-dismiss="modal">Save</button>
+                    <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
                   </div>
                 </form>
               </div>

@@ -106,6 +106,8 @@ import RoutesDetailsPage from "./pages/RoutesDetailsPage";
 import AddUsersPage from "./pages/AddUsersPage";
 import RolesListPage from "./pages/RolesListPage";
 import CreateRolePage from "./pages/CreateRolePage";
+import SuppliersPage from "./pages/SuppliersPage";
+import PaginationTablePage from "./pages/PaginationTablePage";
 
 
 function App() {
@@ -150,6 +152,8 @@ function App() {
         <Route exact path='/add-users' element={<AddUsersPage/>} />
         <Route exact path='/roles-list' element={<RolesListPage/>} />
         <Route exact path='/create-role' element={<CreateRolePage/>} />
+        <Route exact path='/suppliers' element={<SuppliersPage/>} />
+        <Route exact path='/pagination-table' element={< PaginationTablePage />} />
         <Route
           exact
           path='/code-generator-new'

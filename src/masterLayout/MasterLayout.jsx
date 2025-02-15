@@ -326,13 +326,37 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
-              {/* Stock Reconciliation */}
-              <li className='dropdown'>
-                <Link to='#'>
-                  <Icon icon='ri-file-search-line' className='menu-icon' />
-                    <span>Stock Reconciliation</span>
+              {/* Inventory Management */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon icon='ri-file-search-line' className='menu-icon' />
+                  <span>Inventory Management</span>
               </Link>
-              </li>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/suppliers'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Suppliers
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/invoices'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Invoices
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
 
              {/* Authentication Dropdown */}
             <li className='dropdown'>
