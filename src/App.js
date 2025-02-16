@@ -108,7 +108,9 @@ import RolesListPage from "./pages/RolesListPage";
 import CreateRolePage from "./pages/CreateRolePage";
 import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
-
+import PendingSuppliesPage from "./pages/PendingSuppliesPage";
+import UnpaidSuppliesPage from "./pages/UnpaidSuppliesPage";
+import CompletedSuppliesPage from "./pages/CompletedSuppliesPage"
 
 function App() {
   return (
@@ -154,6 +156,9 @@ function App() {
         <Route exact path='/create-role' element={<CreateRolePage/>} />
         <Route exact path='/suppliers' element={<SuppliersPage/>} />
         <Route exact path='/pagination-table' element={< PaginationTablePage />} />
+        <Route exact path='/pending-supplies' element={< PendingSuppliesPage />} />
+        <Route exact path='/unpaid-supplies' element={< UnpaidSuppliesPage />} />
+        <Route exact path='/completed-supplies' element={< CompletedSuppliesPage />} />
         <Route
           exact
           path='/code-generator-new'

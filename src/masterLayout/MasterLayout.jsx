@@ -326,11 +326,11 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
-              {/* Inventory Management */}
+              {/* Suppliers Management */}
             <li className='dropdown'>
               <Link to='#'>
                 <Icon icon='ri-file-search-line' className='menu-icon' />
-                  <span>Inventory Management</span>
+                  <span>Suppliers Management</span>
               </Link>
               <ul className='sidebar-submenu'>
                 <li>
@@ -340,19 +340,41 @@ const MasterLayout = ({ children }) => {
                       navData.isActive ? "active-page" : ""
                     }
                   >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
                     Suppliers
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
-                    to='/invoices'
+                    to='/pending-supplies'
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
                     }
                   >
                     <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Invoices
+                    Pending Supplies
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/unpaid-supplies'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Unpaid Supplies
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/completed-supplies'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Completed Supplies
                   </NavLink>
                 </li>
               </ul>

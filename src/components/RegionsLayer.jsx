@@ -58,6 +58,8 @@ const RegionsLayer = () => {
   return (
     <div className="page-wrapper">
       <div className="row">
+
+        {/* Add Region */}
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <button
@@ -72,6 +74,7 @@ const RegionsLayer = () => {
           </div>
         </div>
 
+        {/* statistics cards */}
         <div className="row g-2">
           {stats.map((item, index) => (
             <div className="col-lg-3 col-md-6 col-sm-12 d-flex" key={index}>
@@ -98,6 +101,7 @@ const RegionsLayer = () => {
           ))}
         </div>
 
+          {/* Regions table */}
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
           <div className="card-body">
             <div>
@@ -222,7 +226,9 @@ const RegionsLayer = () => {
                 </h6>
                 <form>
                   <div className="mb-3">
-                    <label className="form-label">Name</label>
+                    <label className="form-label">
+                      Region <span className="text-danger">*</span>
+                    </label>
                     <input type="text" className="form-control" placeholder="Enter Region Name" />
                   </div>
                   <div className="d-flex justify-content-end gap-2">

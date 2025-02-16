@@ -2,61 +2,62 @@ import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
-const SuppliersLayer = () => {
-  const [suppliers, setSuppliers] = useState( [
-    { name: "Apexio Company", email: "apexio@gmail.com", phoneNo: 756453475, paymentMethod: "Cash", status: "Active",  },
-    { name: "Joy Link Ventures", email: "joylink@gmail.com", phoneNo: 756453475, paymentMethod: "Bank", status: "Active"  },
-    { name: "Charmie Enterprises", email: "charmie@gmail.com", phoneNo: 756453475, paymentMethod: "Cash", status: "Active"  },
-    { name: "Customs Limited", email: "customs@gmail.com", phoneNo: 756453475, paymentMethod: "Paybill", status: "Inactive"  },
-    { name: "Plastic Company", email: "plastic@gmail.com", phoneNo: 756453475, paymentMethod: "Cash", status: "Active"  },
-    { name: "Wesa Ventures", email: "wesa@gmail.com", phoneNo: 756453475, paymentMethod: "Paybill", status: "Active"  },
-  ]);
+const PendingSuppliesLayer = () => {
+    const [pendingSupplies, setPendingSupplies] = useState( [
+        { name: "Apexio Company", orderNo: "ORD123", numberOfItems: "22", amount: 1025 , dateOrdered: "24 Jan 2025", status: "Received",  },
+        { name: "Joy Link Ventures", orderNo: "ORD123", numberOfItems: "11", amount: 455, dateOrdered: "24 Jan 2025", status: "Received"  },
+        { name: "Charmie Enterprises", orderNo: "ORD123", numberOfItems: "15", amount: 675, dateOrdered: "24 Jan 2025", status: "Received"  },
+        { name: "Customs Limited", orderNo: "ORD123", numberOfItems: "45", amount: 965, dateOrdered: "24 Jan 2025", status: "Not Received"  },
+        { name: "Plastic Company", orderNo: "ORD123", numberOfItems: "21", amount: 1500, dateOrdered: "24 Jan 2025", status: "Received"  },
+        { name: "Wesa Ventures", orderNo: "ORD123", numberOfItems: "90", amount: 755, dateOrdered: "24 Jan 2025", status: "Received"  },
+      ]);
 
-  const [editSupplier, setEditSupplier] = React.useState({ email: '', phoneNo: '', paymentMethod: '', status: '' });
-  const [newSupplier, setNewSupplier] = useState({ name: '', email: '', phoneNo: '', paymentMethod: '', status:'',  });
-  const [supplierToDelete, setSupplierToDelete] = React.useState(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+    const [editPendingSupplies, setEditPendingSupplies] = React.useState({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '',  status:'' });
+    const [newPendingSupplies, setNewPendingSupplies] = useState({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '',  status:'' });
+    const [pendingSuppliesToDelete, setPendingSuppliesToDelete] = React.useState(null);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(10);
 
-  const handleEditClick = (supplier) => {
-    setEditSupplier(supplier);
+    const handleEditClick = (PendingSupplies) => {
+    setEditPendingSupplies(PendingSupplies);
   };
 
-  const handleEditSubmit = (e) => {
+    const handleEditSubmit = (e) => {
     e.preventDefault();
-    const updatedSuppliers = suppliers.map((r) =>
-      r.name === editSupplier.name ? { ...r, ...editSupplier } : r
+    const updatedPendingSupplies = pendingSupplies.map((r) =>
+      r.name === editPendingSupplies.name ? { ...r, ...editPendingSupplies } : r
     );
-    setSuppliers(updatedSuppliers);
+    setPendingSupplies(updatedPendingSupplies);
   };
 
-  const handleDeleteClick = (supplier) => {
-    setSupplierToDelete(supplier);
+  const handleDeleteClick = (pendingSupplies) => {
+    setPendingSuppliesToDelete(pendingSupplies);
   };
 
   const handleDeleteConfirm = () => {
-    const updatedSuppliers = suppliers.filter((r) => r.name !== supplierToDelete.name);
-    setSuppliers(updatedSuppliers);
-    setSupplierToDelete(null);
+    const updatedPendingSupplies = pendingSupplies.filter((r) => r.name !== pendingSuppliesToDelete.name);
+    setPendingSupplies(updatedPendingSupplies);
+    setPendingSuppliesToDelete(null);
   };
 
-  const handleAddSupplier = (e) => {
+  const handleAddPendingSupplies = (e) => {
     e.preventDefault();
-    if (!newSupplier.name || !newSupplier.email || !newSupplier.paymentMethod) {
+    if (!newPendingSupplies.name || !newPendingSupplies.orderNo || !newPendingSupplies.numberOfItems) {
       alert("Please fill in all fields before saving.");
       return;
     }
-    const newSupplierData = {
-      name: newSupplier.name,
-      email: newSupplier.email,
-      phoneNo: newSupplier.phoneNo,
-      status: newSupplier.status,
-      paymentMethod: newSupplier.paymentMethod,
+    const newPendingSuppliesData = {
+      name: newPendingSupplies.name,
+      orderNo: newPendingSupplies.orderNo,
+      numberOfItems: newPendingSupplies.numberOfItems,
+      amount: newPendingSupplies.amount,
+      dateOrdered: newPendingSupplies.dateOrdered,
+      status: newPendingSupplies.status,
       
     };
-    setSuppliers([...suppliers, newSupplierData]);
-    setNewSupplier({ name: '', email: '', phoneNo: '', status: '', paymentMethod: '' }); // Reset form state
+    setPendingSupplies([...pendingSupplies, newPendingSuppliesData]);
+    setNewPendingSupplies({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '',  status:'' }); // Reset form state
     e.target.reset(); // Reset the form
   };
 
@@ -64,9 +65,9 @@ const SuppliersLayer = () => {
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = suppliers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = pendingSupplies.slice(indexOfFirstItem, indexOfLastItem);
 
-  const totalPages = Math.ceil(suppliers.length / itemsPerPage);
+  const totalPages = Math.ceil(pendingSupplies.length / itemsPerPage);
 
   // Handle page change
   const handlePageChange = (pageNumber) => {
@@ -77,7 +78,7 @@ const SuppliersLayer = () => {
     <div className="page-wrapper">
       <div className="row">
 
-        {/* Add Supplier */}
+        {/* Add Supply */}
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <button
@@ -87,12 +88,12 @@ const SuppliersLayer = () => {
               data-bs-target="#exampleModal"
             >
               <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Add Supplier
+              Add Pending Supply
             </button>
           </div>
         </div>
 
-        {/* Suppliers table */}
+        {/* Pending Supplies table */}
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
           <div className="card-body">
             <div>
@@ -107,22 +108,24 @@ const SuppliersLayer = () => {
                   <tr>
                     <th className="text-start">#</th>
                     <th className="text-start">Name</th>
-                    <th className="text-start">Email</th>
-                    <th className="text-start">Phone No.</th>
-                    <th className="text-start">Payment Method</th>
+                    <th className="text-start">Order No.</th>
+                    <th className="text-start">No. Of Items</th>
+                    <th className="text-start">Amount</th>
+                    <th className="text-start">Date Ordered</th>
                     <th className="text-start">Status</th>
                     <th className="text-start">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((supplier, index) => (
+                  {currentItems.map((PendingSupplies, index) => (
                     <tr key={index}>
                       <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
-                      <td className="text-start small-text">{supplier.name} Supplier</td>
-                      <td className="text-start small-text">{supplier.email}</td>
-                      <td className="text-start small-text">{supplier.phoneNo}</td>
-                      <td className="text-start small-text">{supplier.paymentMethod}</td>
-                      <td className="text-start small-text">{supplier.status}</td>
+                      <td className="text-start small-text">{PendingSupplies.name}</td>
+                      <td className="text-start small-text">{PendingSupplies.orderNo}</td>
+                      <td className="text-start small-text">{PendingSupplies.numberOfItems}</td>
+                      <td className="text-start small-text">{PendingSupplies.amount}</td>
+                      <td className="text-start small-text">{PendingSupplies.dateOrdered}</td>
+                      <td className="text-start small-text">{PendingSupplies.status}</td>
                       <td className="text-start small-text">
                         <div className="dropdown">
                           <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
@@ -132,9 +135,9 @@ const SuppliersLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/suppliers/${suppliers.name}`}
-                                state={{ supplier }}
-                                onClick={() => console.log("Link clicked:", supplier)} // Debugging
+                                to={`/Pending-supplies/${PendingSupplies.name}`}
+                                state={{ PendingSupplies }}
+                                onClick={() => console.log("Link clicked:", PendingSupplies)} // Debugging
                               >
                                 View
                               </Link>
@@ -145,7 +148,7 @@ const SuppliersLayer = () => {
                                 to="#"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editModal"
-                                onClick={() => handleEditClick(supplier)}
+                                onClick={() => handleEditClick(PendingSupplies)}
                               >
                                 Edit
                               </Link>
@@ -153,7 +156,7 @@ const SuppliersLayer = () => {
                             <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(supplier)}
+                                onClick={() => handleDeleteClick(PendingSupplies)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
@@ -172,7 +175,7 @@ const SuppliersLayer = () => {
             {/* Pagination */}
             <div className="d-flex justify-content-between align-items-start mt-3">
               <div className="text-muted">
-                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, suppliers.length)} of {suppliers.length} entries</span>
+                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, pendingSupplies.length)} of {pendingSupplies.length} entries</span>
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -210,16 +213,16 @@ const SuppliersLayer = () => {
           </div>
         </div>
 
-        {/* Add Supplier Modal */}
+        {/* Add Pending Supplies Modal */}
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Add Supplier
+                  Add Pending Supply
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </h6>
-                <form onSubmit={handleAddSupplier}>
+                <form onSubmit={handleAddPendingSupplies}>
                   <div className="mb-3">
                     <label className="form-label">
                       Name <span className="text-danger">*</span>
@@ -228,9 +231,9 @@ const SuppliersLayer = () => {
                       type="text"
                       className="form-control w-100"
                       name="name"
-                      placeholder="Enter Supplier Name"
-                      value={newSupplier.name}
-                      onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value })}
+                      placeholder="Enter Pending Supplies Name"
+                      value={newPendingSupplies.name}
+                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, name: e.target.value })}
                       required
                     />
                   </div>
@@ -241,10 +244,10 @@ const SuppliersLayer = () => {
                     <input
                       type="text"
                       className="form-control w-100"
-                      email="email"
+                      name="email"
                       placeholder="Enter Email"
-                      value={newSupplier.email}
-                      onChange={(e) => setNewSupplier({ ...newSupplier, email: e.target.value })}
+                      value={newPendingSupplies.email}
+                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, email: e.target.value })}
                       required
                     />
                   </div>
@@ -255,10 +258,10 @@ const SuppliersLayer = () => {
                     <input
                       type="number"
                       className="form-control w-100"
-                      phoneNo="phoneNo"
+                      name="phoneNo"
                       placeholder="Enter Phone Number"
-                      value={newSupplier.phoneNo}
-                      onChange={(e) => setNewSupplier({ ...newSupplier, phoneNo: e.target.value })}
+                      value={newPendingSupplies.phoneNo}
+                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, phoneNo: e.target.value })}
                       required
                     />
                   </div>
@@ -269,10 +272,10 @@ const SuppliersLayer = () => {
                     <input
                       type="text"
                       className="form-control w-100"
-                      status="status"
+                      name="status"
                       placeholder="Enter Status"
-                      value={newSupplier.status}
-                      onChange={(e) => setNewSupplier({ ...newSupplier, status: e.target.value })}
+                      value={newPendingSupplies.status}
+                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, status: e.target.value })}
                       required
                     />
                   </div>
@@ -286,7 +289,7 @@ const SuppliersLayer = () => {
                         style={{ cursor: "pointer" }}
                         onClick={() => setShowDropdown(!showDropdown)}
                       >
-                        <span>{newSupplier.paymentMethod || "Select Payment Method"}</span>
+                        <span>{newPendingSupplies.paymentMethod || "Select Payment Method"}</span>
                         <i className="dropdown-toggle ms-2"></i>
                       </div>
                       {showDropdown && (
@@ -297,7 +300,7 @@ const SuppliersLayer = () => {
                                 type="button"
                                 className="dropdown-item"
                                 onClick={() => {
-                                  setNewSupplier({ ...newSupplier, paymentMethod });
+                                  setNewPendingSupplies({ ...newPendingSupplies, paymentMethod });
                                   setShowDropdown(false);
                                 }}
                               >
@@ -318,74 +321,44 @@ const SuppliersLayer = () => {
           </div>
         </div>
 
-         {/* Edit Supplier Modal */}
+         {/* Edit Pending Supplies Modal */}
         <div className="modal fade" id="editModal" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Edit Supplier
+                  Edit Pending Supplies
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </h6>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-3">
-                    <label className="form-label">
-                      Name <span className="text-danger">*</span>
-                    </label>
+                    <label className="form-label">Pending Supplies Name</label>
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter Supplier Name"
-                      value={editSupplier.name}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, name: e.target.value })}
+                      placeholder="Enter Pending Supplies Name"
+                      value={editPendingSupplies.name}
+                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, name: e.target.value })}
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">
-                      Email <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Email"
-                      value={editSupplier.customers}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, customers: parseInt(e.target.value) || 0 })}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Phone No <span className="text-danger">*</span>
-                    </label>
+                    <label className="form-label">Customers</label>
                     <input
                       type="number"
                       className="form-control"
-                      placeholder="Enter Phone Number"
-                      value={editSupplier.salesAgents}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, salesAgents: parseInt(e.target.value) || 0 })}
+                      placeholder="Enter Number of Customers"
+                      value={editPendingSupplies.customers}
+                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, customers: parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">
-                      Payment Method <span className="text-danger">*</span>
-                    </label>
+                    <label className="form-label">Sales Agents</label>
                     <input
-                      type="text"
+                      type="number"
                       className="form-control"
-                      placeholder="Enter Payment Method"
-                      value={editSupplier.salesAgents}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, salesAgents: parseInt(e.target.value) || 0 })}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Status <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Status"
-                      value={editSupplier.salesAgents}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, salesAgents: parseInt(e.target.value) || 0 })}
+                      placeholder="Enter Number of Sales Agents"
+                      value={editPendingSupplies.salesAgents}
+                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, salesAgents: parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   <div className="d-flex justify-content-end gap-2">
@@ -403,11 +376,11 @@ const SuppliersLayer = () => {
             <div className="modal-content">
               <div className="modal-body pt-3 ps-18 pe-18">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h6 className="modal-title fs-6">Delete Supplier</h6>
+                  <h6 className="modal-title fs-6">Delete Pending Supplies</h6>
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <p className="pb-3 mb-0">
-                  Are you sure you want to delete the <strong>{supplierToDelete?.name}</strong> supplier permanently? This action cannot be undone.
+                  Are you sure you want to delete the <strong>{pendingSuppliesToDelete?.name}</strong> Pending Supply permanently? This action cannot be undone.
                 </p>
               </div>
               <div className="d-flex justify-content-end gap-2 px-12 pb-3">
@@ -422,4 +395,4 @@ const SuppliersLayer = () => {
   );
 };
 
-export default SuppliersLayer;
+export default PendingSuppliesLayer;

@@ -1,26 +1,51 @@
 import { Icon } from '@iconify/react/dist/iconify.js';
-import {React, useState}from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const UsersListLayer = () => {
-    const [query, setQuery] = useState('');
-    
-    return (
-        <div className="page-wrapper">
-             <div className="mb-8 mt-0 py-6 px-14 d-flex align-items-center flex-wrap gap-3 justify-content-end">
-                <Link
-                    to="/add-users"
-                    className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-                >
-                    <Icon
-                        icon="ic:baseline-plus"
-                        className="icon text-xl line-height-1"
-                    />
-                    Add New User
-                </Link>
-            </div>
-        <div className="card h-100 p-0 radius-12">
-              <div> <form className="navbar-search d-flex align-items-center justify-content-start p-12">
+  const [usersList] = useState([
+    { id: 1, name: 'Kathryn Murphy', email: 'osgoodwy@gmail.com', phone: '070100387', role: 'Manager', status: 'Active' },
+    { id: 2, name: 'Annette Black', email: 'redaniel@gmail.com', phone: '0722874194', role: 'Customer', status: 'Inactive' },
+    { id: 3, name: 'Ronald Richards', email: 'seannand@mail.ru', phone: '0785986523', role: 'Sales Person', status: 'Active' },
+    { id: 4, name: 'Eleanor Pena', email: 'miyokoto@mail.ru', phone: '0740113481', role: 'Manager', status: 'Active' },
+    { id: 5, name: 'Leslie Alexander', email: 'icadahli@gmail.com', phone: '0701038181', role: 'Sales Person', status: 'Inactive' },
+    { id: 6, name: 'Albert Flores', email: 'warn@mail.ru', phone: '0700033484', role: 'Sales Person', status: 'Active' },
+  ]);
+
+  const [query, setQuery] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = usersList.slice(indexOfFirstItem, indexOfLastItem);
+
+  const totalPages = Math.ceil(usersList.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  return (
+    <div className="page-wrapper">
+      <div className="row">
+        <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
+          <div className="ms-auto">
+            <Link
+              to="/add-users"
+              className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
+            >
+              <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
+              Add New User
+            </Link>
+          </div>
+        </div>
+
+        <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
+          <div className="card-body">
+            <div>
+              <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}>
                 <input
                   type='text'
                   name='search'
@@ -28,504 +53,117 @@ const UsersListLayer = () => {
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                 />
-                <Icon 
-                  icon='ion:search-outline' 
-                  className='icon ms-2' 
-                  style={{ width: '16px', height:'16px', cursor: 'pointer' }} 
-                />
-                </form>
-              </div>
-           
-            <div className="card-body p-24">
-                <div className="table-responsive scroll-sm">
-                    <table className="table table-borderless sm-table mb-0">
-                        <thead>
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Name</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Phone No.</th>
-                                <th scope="col">Role</th>
-                                <th scope="col" className="text-center">
-                                    Status
-                                </th>
-                                <th scope="col" className="text-center">
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>
-                                    <div className="d-flex align-items-center gap-10">1</div>
-                                </td>
-                                {/* <td>25 Jan 2024</td> */}
-                                <td>
-                                    <div className="d-flex align-items-center">
-                                        <Link className="hover-text-primary" to="#">
-                                    Kathryn Murphy
-                                    </Link>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className="text-md mb-0 fw-normal text-secondary-light">
-                                        osgoodwy@gmail.com
-                                    </span>
-                                </td>
-                                <td>070100387</td>
-                                <td>Manager</td>
-                                <td className="text-center">
-                                    <span className="bg-success-focus text-success-600 border-success-main px-24 py-4 radius-8 fw-medium text-sm">
-                                        Active
-                                    </span>
-                                </td>
-                                <td className="text-center">
-                                    <div className="dropdown">
-                                        <button
-                                            className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                        >
-                                            Action{" "}
-                                        </button>
-                                        <ul className="dropdown-menu">
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    View
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    Edit
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    Delete
-                                                </Link>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div className="d-flex align-items-center gap-10">
-                                        2
-                                    </div>
-                                </td>
-                                <td>
-                                    <div className="d-flex align-items-center">
-                                    <Link className="hover-text-primary" to="#">
-                                    Annette Black
-                                    </Link>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className="text-md mb-0 fw-normal text-secondary-light">
-                                        redaniel@gmail.com
-                                    </span>
-                                </td>
-                                <td>0722874194</td>
-                                <td> Customer</td>
-                                <td className="text-center">
-                                    <span className="bg-neutral-200 text-neutral-600 px-24 py-4 radius-8 fw-medium text-sm">
-                                        Inactive
-                                    </span>
-                                </td>
-                                <td className="text-center">
-                                    <div className="dropdown">
-                                        <button
-                                            className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                        >
-                                            Action{" "}
-                                        </button>
-                                        <ul className="dropdown-menu">
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    View
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    Edit
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    Delete
-                                                </Link>
-                                            </li>
-                                        </ul>
-                                    </div>    
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div className="d-flex align-items-center gap-10">
-                                        3
-                                    </div>
-                                </td>
-                                {/* <td>10 Feb 2024</td> */}
-                                <td>
-                                    <div className="d-flex align-items-center">
-                                    <Link className="hover-text-primary" to="#">
-                                    Ronald Richards
-                                    </Link>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className="text-md mb-0 fw-normal text-secondary-light">
-                                        seannand@mail.ru
-                                    </span>
-                                </td>
-                                <td>0785986523</td>
-                                <td>Sales Person</td>
-                                <td className="text-center">
-                                    <span className="bg-success-focus text-success-600 border-success-main px-24 py-4 radius-8 fw-medium text-sm">
-                                        Active
-                                    </span>
-                                </td>
-                                <td className="text-center">
-                                    <div className="dropdown">
-                                        <button
-                                            className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                        >
-                                            Action{" "}
-                                        </button>
-                                        <ul className="dropdown-menu">
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    View
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                 <Link
-                                                     className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                     to="#"
-                                                 >
-                                                     Edit
-                                                 </Link>
-                                            </li>
-                                            <li>
-                                                 <Link
-                                                     className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                     to="#"
-                                                 >
-                                                     Delete
-                                                 </Link>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div className="d-flex align-items-center gap-10">
-                                        4
-                                    </div>
-                                </td>
-                                {/* <td>10 Feb 2024</td> */}
-                                <td>
-                                    <div className="d-flex align-items-center">
-                                    <Link className="hover-text-primary" to="#">
-                                    Eleanor Pena
-                                    </Link>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className="text-md mb-0 fw-normal text-secondary-light">
-                                        miyokoto@mail.ru
-                                    </span>
-                                </td>
-                                <td>0740113481</td>
-                                <td>Manager</td>
-                                <td className="text-center">
-                                    <span className="bg-success-focus text-success-600 border-success-main px-24 py-4 radius-8 fw-medium text-sm">
-                                        Active
-                                    </span>
-                                </td>
-                                <td className="text-center">
-                                    <div className="dropdown">
-                                        <button
-                                            className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                        >
-                                            Action{" "}
-                                        </button>
-                                        <ul className="dropdown-menu">
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    View
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                 <Link
-                                                     className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                     to="#"
-                                                 >
-                                                     Edit
-                                                 </Link>
-                                            </li>
-                                            <li>
-                                                 <Link
-                                                     className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                     to="#"
-                                                 >
-                                                     Delete
-                                                 </Link>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div className="d-flex align-items-center gap-10">
-                                        5
-                                    </div>
-                                </td>
-                                {/* <td>15 March 2024</td> */}
-                                <td>
-                                    <div className="d-flex align-items-center">
-                                    <Link className="hover-text-primary" to="#">
-                                    Leslie Alexander
-                                    </Link>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span className="text-md mb-0 fw-normal text-secondary-light">
-                                        icadahli@gmail.com
-                                    </span>
-                                </td>
-                                <td>0701038181</td>
-                                <td>Sales Person</td>
-                                <td className="text-center">
-                                    <span className="bg-neutral-200 text-neutral-600 border-neutral-400 px-24 py-4 radius-8 fw-medium text-sm">
-                                        Inactive
-                                    </span>
-                                </td>
-                                <td className="text-center">
-                                <div className="dropdown">
-                                        <button
-                                            className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                        >
-                                            Action{" "}
-                                        </button>
-                                        <ul className="dropdown-menu">
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    View
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                 <Link
-                                                     className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                     to="#"
-                                                 >
-                                                     Edit
-                                                 </Link>
-                                            </li>
-                                            <li>
-                                                 <Link
-                                                     className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                     to="#"
-                                                 >
-                                                     Delete
-                                                 </Link>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <div className="d-flex align-items-center gap-10">
-                                        6
-                                    </div>
-                                </td>
-                                {/* <td>15 March 2024</td> */}
-                                <td>
-                                    <div className="d-flex align-items-center">
-                                    <Link className="hover-text-primary" to="#">
-                                    Albert Flores
-                                    </Link>
-                                    </div>
-                                </td>
-                                {/* <td>
-                                    <div className="d-flex align-items-center">
-                                        <img
-                                            src="assets/images/user-list/user-list6.png"
-                                            alt="Wowdash"
-                                            className="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden"
-                                        />
-                                        <div className="flex-grow-1">
-                                            <span className="text-md mb-0 fw-normal text-secondary-light">
-                                                Albert Flores
-                                            </span>
-                                        </div>
-                                    </div>
-                                </td> */}
-                                <td>
-                                    <span className="text-md mb-0 fw-normal text-secondary-light">
-                                        warn@mail.ru
-                                    </span>
-                                </td>
-                                <td>0700033484</td>
-                                <td>Sales Person</td>
-                                <td className="text-center">
-                                    <span className="bg-success-focus text-success-600 border-success-main px-24 py-4 radius-8 fw-medium text-sm">
-                                        Active
-                                    </span>
-                                </td>
-                                <td className="text-center">
-                                    <div className="dropdown">
-                                        <button
-                                            className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            aria-expanded="false"
-                                        >
-                                            Action{" "}
-                                        </button>
-                                        <ul className="dropdown-menu">
-                                            <li>
-                                                <Link
-                                                    className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                    to="#"
-                                                >
-                                                    View
-                                                </Link>
-                                            </li>
-                                            <li>
-                                                 <Link
-                                                     className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                     to="#"
-                                                 >
-                                                     Edit
-                                                 </Link>
-                                            </li>
-                                            <li>
-                                                 <Link
-                                                     className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                                                     to="#"
-                                                 >
-                                                     Delete
-                                                 </Link>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-24">
-                    <span>Showing 1 to 10 of 12 entries</span>
-                    <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center">
-                        <li className="page-item">
-                            <Link
-                                className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px  text-md"
-                                to="#"
-                            >
-                                <Icon icon="ep:d-arrow-left" className="" />
-                            </Link>
-                        </li>
-                        <li className="page-item">
-                            <Link
-                                className="page-link text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md bg-primary-600 text-white"
-                                to="#"
-                            >
-                                1
-                            </Link>
-                        </li>
-                        <li className="page-item">
-                            <Link
-                                className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
-                                to="#"
-                            >
-                                2
-                            </Link>
-                        </li>
-                        <li className="page-item">
-                            <Link
-                                className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md"
-                                to="#"
-                            >
-                                3
-                            </Link>
-                        </li>
-                        <li className="page-item">
-                            <Link
-                                className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md"
-                                to="#"
-                            >
-                                4
-                            </Link>
-                        </li>
-                        <li className="page-item">
-                            <Link
-                                className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md"
-                                to="#"
-                            >
-                                5
-                            </Link>
-                        </li>
-                        <li className="page-item">
-                            <Link
-                                className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px  text-md"
-                                to="#"
-                            >
-                                {" "}
-                                <Icon icon="ep:d-arrow-right" className="" />{" "}
-                            </Link>
-                        </li>
-                    </ul>
-                </div>
+                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
+              </form>
             </div>
-        </div>
-        </div>
+            <div className="table-responsive" style={{ overflow: 'visible' }}>
+              <table className="table table-borderless text-start small-text" style={{ width: '100%' }}>
+                <thead className="table-light text-start small-text">
+                  <tr>
+                    <th className="text-start">#</th>
+                    <th className="text-start">Name</th>
+                    <th className="text-start">Email</th>
+                    <th className="text-start">Phone No.</th>
+                    <th className="text-start">Role</th>
+                    <th className="text-start">Status</th>
+                    <th className="text-start">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {currentItems.map((user, index) => (
+                    <tr key={index}>
+                      <th scope="row" className="text-start small-text">{index + 1}</th>
+                      <td className="text-start small-text">{user.name}</td>
+                      <td className="text-start small-text">{user.email}</td>
+                      <td className="text-start small-text">{user.phone}</td>
+                      <td className="text-start small-text">{user.role}</td>
+                      <td className="text-start small-text">
+                        <span className={`bg-${user.status === 'Active' ? 'success-focus' : 'neutral-200'} text-${user.status === 'Active' ? 'success-600' : 'neutral-600'} px-24 py-4 radius-8 fw-medium text-sm`}>
+                          {user.status}
+                        </span>
+                      </td>
+                      <td className="text-start small-text">
+                        <div className="dropdown">
+                          <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
+                            Actions
+                          </button>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <Link
+                                className="dropdown-item"
+                                to={`/users/${user.id}`}
+                              >
+                                View
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                className="dropdown-item"
+                                to="#"
+                              >
+                                Edit
+                              </Link>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item text-danger"
+                                onClick={() => console.log("Delete user:", user.id)}
+                              >
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-    );
+            {/* Pagination */}
+            <div className="d-flex justify-content-between align-items-start mt-3">
+              <div className="text-muted">
+                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, usersList.length)} of {usersList.length} entries</span>
+              </div>
+              <nav aria-label="Page navigation">
+                <ul className="pagination mb-0">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      <Icon icon="ep:d-arrow-left" />
+                    </button>
+                  </li>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                      <button
+                        className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      <Icon icon="ep:d-arrow-right" />
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default UsersListLayer;

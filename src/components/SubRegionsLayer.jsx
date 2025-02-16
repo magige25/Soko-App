@@ -242,7 +242,9 @@ const SubRegionsLayer = () => {
                 </h6>
                 <form onSubmit={handleAddSubRegion}>
                   <div className="mb-3">
-                    <label className="form-label">Name</label>
+                    <label className="form-label">
+                      Name <span className="text-danger">*</span>
+                    </label>
                     <input 
                       type="text" 
                       className="form-control w-100" 
@@ -254,7 +256,9 @@ const SubRegionsLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Region</label>
+                    <label className="form-label">
+                      Region <span className="text-danger">*</span>
+                    </label>
                     <div className="position-relative">
                       <div
                         className="form-control d-flex justify-content-between align-items-center"
