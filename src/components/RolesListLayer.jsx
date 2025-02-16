@@ -40,18 +40,10 @@ const RolesListLayer = () => {
                           </div>
             <div className="card-body">
             </div>
-             
-            {/* <div className="card-body p-24"> */}
-                <div className="table-responsive scroll-sm">
+                <div className="table-responsive  scroll-sm" style={{ overflow: 'visible' }}>
                     <table className="table borderless-table sm-table mb-0">
                         <thead>
                             <tr>
-                                {/* <th scope="col">
-                                <div className="form-check style-check d-flex align-items-center">
-                                            <input className="form-check-input" type="checkbox"/>
-                                            <label className="form-check-label">SL</label>
-                                        </div>
-                                </th> */}
                                 <th scope="col">Name</th>
                                 <th scope="col">No. of Users</th>
                                 <th scope="col">Date Created</th>
@@ -62,12 +54,6 @@ const RolesListLayer = () => {
                         </thead>
                         <tbody>
                             <tr>
-                                {/* <th scope="row">
-                                <div className="form-check style-check d-flex align-items-center">
-                                        <input className="form-check-input" type="checkbox"/>
-                                        <label className="form-check-label">1</label>
-                                </div>
-                                </th> */}
                                 <td>Sales Person</td>
                                 <td>7</td>
                                 <td>24 Jan 2025</td>
@@ -113,12 +99,6 @@ const RolesListLayer = () => {
                                 </td>
                             </tr>
                             <tr>
-                                {/* <th scope="row">
-                                <div className="form-check style-check d-flex align-items-center">
-                                        <input className="form-check-input" type="checkbox"/>
-                                        <label className="form-check-label">2</label>
-                                </div>
-                                </th> */}
                                 <td>Manager</td>
                                 <td>22</td>
                                 <td>14 Feb 2025</td>
@@ -129,6 +109,7 @@ const RolesListLayer = () => {
                                         className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle"
                                         type="button"
                                         data-bs-toggle="dropdown"
+                                        
                                         aria-expanded="false"
                                     >
                                         {" "}
@@ -164,12 +145,6 @@ const RolesListLayer = () => {
                                 </td>
                             </tr>
                             <tr>
-                                {/* <th scope="row">
-                                <div className="form-check style-check d-flex align-items-center">
-                                        <input className="form-check-input" type="checkbox"/>
-                                        <label className="form-check-label">3</label>
-                                </div>
-                                </th> */}
                                 <td>Distributor</td>
                                 <td>27</td>
                                 <td>4 Jan 2025</td>
@@ -216,7 +191,6 @@ const RolesListLayer = () => {
                         </tbody>
                     </table>
                 </div>
-            {/* </div>       */}
         </div>
         </div>
         

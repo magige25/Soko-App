@@ -2,8 +2,31 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 import {React, useState}from 'react';
 import { Link } from 'react-router-dom';
 
+
+const usersData = [
+    { id: 1, name: "Kathryn Murphy", email: "osgoodwy@gmail.com", phone: "070100387", role: "Manager", status: "Active" },
+    { id: 2, name: "John Doe", email: "john@example.com", phone: "0712345678", role: "Admin", status: "Inactive" },
+    { id: 3, name: "Alice Johnson", email: "alice@gmail.com", phone: "0723456789", role: "User", status: "Active" },
+    { id: 4, name: "Bob Brown", email: "bob@example.com", phone: "0734567890", role: "Editor", status: "Pending" }
+  ];
+
 const UsersListLayer = () => {
     const [query, setQuery] = useState('');
+    const [users] = useState(usersData);
+
+    const filteredUsers = users.filter((user) =>
+    user.name.toLowerCase().includes(query.toLowerCase()) ||
+    user.email.toLowerCase().includes(query.toLowerCase()) ||
+    user.phone.includes(query) ||
+    user.role.toLowerCase().includes(query.toLowerCase())
+);
+
+    const handleSearch =() => {
+        if (query.trim() !== '') {
+            console.log('Searching for:', query);
+            // Perform search logic (e.g., filter items, send query to backend, etc.)
+        }
+    };
     
     return (
         <div className="page-wrapper">
@@ -19,23 +42,31 @@ const UsersListLayer = () => {
                     Add New User
                 </Link>
             </div>
-        <div className="card h-100 p-0 radius-12">
-              <div> <form className="navbar-search d-flex align-items-center justify-content-start p-12">
+            <div className="card h-100 p-0 radius-12">
+              <div> 
+                <form 
+                className="navbar-search d-flex align-items-center justify-content-start p-12"
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleSearch();
+                }}
+                >
                 <input
                   type='text'
                   name='search'
                   placeholder='Search'
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
+                  OnKeyDown={(e) => e.key === 'Enter' && handleSearch()}
                 />
                 <Icon 
                   icon='ion:search-outline' 
                   className='icon ms-2' 
-                  style={{ width: '16px', height:'16px', cursor: 'pointer' }} 
+                  style={{ width: '16px', height:'16px', cursor: 'pointer' }}
+                  onClick={handleSearch} 
                 />
                 </form>
               </div>
-           
             <div className="card-body p-24">
                 <div className="table-responsive scroll-sm">
                     <table className="table table-borderless sm-table mb-0">
@@ -46,37 +77,39 @@ const UsersListLayer = () => {
                                 <th scope="col">Email</th>
                                 <th scope="col">Phone No.</th>
                                 <th scope="col">Role</th>
-                                <th scope="col" className="text-center">
-                                    Status
-                                </th>
-                                <th scope="col" className="text-center">
-                                    Action
-                                </th>
+                                <th scope="col" className="text-center">Status</th>
+                                <th scope="col" className="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
+                            {/* {filteredUsers.leghth > 0 ? (
+                                filteredUsers.map((user, index) => (
+                                    <tr key={user.id}>
+                                        <td>{index + 1}</td>
+                                    </tr>
+                                ))
+                            )} */}
                             <tr>
                                 <td>
                                     <div className="d-flex align-items-center gap-10">1</div>
                                 </td>
-                                {/* <td>25 Jan 2024</td> */}
                                 <td>
                                     <div className="d-flex align-items-center">
                                         <Link className="hover-text-primary" to="#">
-                                    Kathryn Murphy
+                                    Kathryn Murphy {user.name}
                                     </Link>
                                     </div>
                                 </td>
                                 <td>
                                     <span className="text-md mb-0 fw-normal text-secondary-light">
-                                        osgoodwy@gmail.com
+                                        osgoodwy@gmail.com {user.mail}
                                     </span>
                                 </td>
-                                <td>070100387</td>
-                                <td>Manager</td>
+                                <td>070100387 {user.phone} </td>
+                                <td>{user.role}</td>
                                 <td className="text-center">
                                     <span className="bg-success-focus text-success-600 border-success-main px-24 py-4 radius-8 fw-medium text-sm">
-                                        Active
+                                        Active {user.status}
                                     </span>
                                 </td>
                                 <td className="text-center">
@@ -188,7 +221,6 @@ const UsersListLayer = () => {
                                         3
                                     </div>
                                 </td>
-                                {/* <td>10 Feb 2024</td> */}
                                 <td>
                                     <div className="d-flex align-items-center">
                                     <Link className="hover-text-primary" to="#">
@@ -253,7 +285,6 @@ const UsersListLayer = () => {
                                         4
                                     </div>
                                 </td>
-                                {/* <td>10 Feb 2024</td> */}
                                 <td>
                                     <div className="d-flex align-items-center">
                                     <Link className="hover-text-primary" to="#">
@@ -318,7 +349,6 @@ const UsersListLayer = () => {
                                         5
                                     </div>
                                 </td>
-                                {/* <td>15 March 2024</td> */}
                                 <td>
                                     <div className="d-flex align-items-center">
                                     <Link className="hover-text-primary" to="#">
@@ -383,7 +413,7 @@ const UsersListLayer = () => {
                                         6
                                     </div>
                                 </td>
-                                {/* <td>15 March 2024</td> */}
+                                
                                 <td>
                                     <div className="d-flex align-items-center">
                                     <Link className="hover-text-primary" to="#">
@@ -391,20 +421,6 @@ const UsersListLayer = () => {
                                     </Link>
                                     </div>
                                 </td>
-                                {/* <td>
-                                    <div className="d-flex align-items-center">
-                                        <img
-                                            src="assets/images/user-list/user-list6.png"
-                                            alt="Wowdash"
-                                            className="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden"
-                                        />
-                                        <div className="flex-grow-1">
-                                            <span className="text-md mb-0 fw-normal text-secondary-light">
-                                                Albert Flores
-                                            </span>
-                                        </div>
-                                    </div>
-                                </td> */}
                                 <td>
                                     <span className="text-md mb-0 fw-normal text-secondary-light">
                                         warn@mail.ru
@@ -463,8 +479,8 @@ const UsersListLayer = () => {
                     <span>Showing 1 to 10 of 12 entries</span>
                     <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center">
                         <li className="page-item">
-                            <Link
-                                className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px  text-md"
+                            <Link 
+                            className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px  text-md"
                                 to="#"
                             >
                                 <Icon icon="ep:d-arrow-left" className="" />
