@@ -18,6 +18,7 @@ const PendingSuppliesLayer = () => {
     const [showDropdown, setShowDropdown] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(10);
+  
 
     const handleEditClick = (PendingSupplies) => {
     setEditPendingSupplies(PendingSupplies);
@@ -60,7 +61,10 @@ const PendingSuppliesLayer = () => {
     setNewPendingSupplies({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '',  status:'' }); // Reset form state
     e.target.reset(); // Reset the form
   };
-
+// Function to format amount as dollars
+const formatAmount = (amount) => {
+  return `$${amount.toLocaleString()}`; // Adds a dollar sign and formats with commas
+};
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -123,7 +127,7 @@ const PendingSuppliesLayer = () => {
                       <td className="text-start small-text">{PendingSupplies.name}</td>
                       <td className="text-start small-text">{PendingSupplies.orderNo}</td>
                       <td className="text-start small-text">{PendingSupplies.numberOfItems}</td>
-                      <td className="text-start small-text">{PendingSupplies.amount}</td>
+                      <td className="text-start small-text">{formatAmount(PendingSupplies.amount)}</td>
                       <td className="text-start small-text">{PendingSupplies.dateOrdered}</td>
                       <td className="text-start small-text">{PendingSupplies.status}</td>
                       <td className="text-start small-text">
@@ -239,72 +243,86 @@ const PendingSuppliesLayer = () => {
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Email <span className="text-danger">*</span>
+                      Order NO. <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="text"
+                      type="alphanumeric"
                       className="form-control w-100"
-                      name="email"
-                      placeholder="Enter Email"
-                      value={newPendingSupplies.email}
-                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, email: e.target.value })}
+                      orderNo="order No"
+                      placeholder="Enter Order Number"
+                      value={newPendingSupplies.orderNo}
+                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, orderNo: e.target.value })}
                       required
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Phone No <span className="text-danger">*</span>
+                      Amount <span className="text-danger">*</span>
                     </label>
                     <input
                       type="number"
                       className="form-control w-100"
-                      name="phoneNo"
-                      placeholder="Enter Phone Number"
-                      value={newPendingSupplies.phoneNo}
-                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, phoneNo: e.target.value })}
+                      name="amountphone No"
+                      placeholder="Enter Amount"
+                      value={newPendingSupplies.amount}
+                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, amount: e.target.value })}
                       required
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Status <span className="text-danger">*</span>
+                      No. Of Items <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="text"
+                      type="number"
                       className="form-control w-100"
-                      name="status"
-                      placeholder="Enter Status"
-                      value={newPendingSupplies.status}
-                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, status: e.target.value })}
+                      name="Number Of Items"
+                      placeholder="Enter No. Of Items"
+                      value={newPendingSupplies.numberOfItems}
+                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, numberOfItems: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Date Ordered <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control w-100"
+                      name="date ordered"
+                      placeholder="Enter Date Ordered"
+                      value={newPendingSupplies.dateOrdered}
+                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, dateOrdered: e.target.value })}
                       required
                     />
                   </div>
                   <div className="mb-3">
                     <div className="position-relative">
                       <label className="form-label">
-                        Payment Method <span className="text-danger">*</span>
+                        Status <span className="text-danger">*</span>
                       </label>
                       <div
                         className="form-control d-flex justify-content-between align-items-center"
                         style={{ cursor: "pointer" }}
                         onClick={() => setShowDropdown(!showDropdown)}
                       >
-                        <span>{newPendingSupplies.paymentMethod || "Select Payment Method"}</span>
+                        <span>{newPendingSupplies.status || "Select Status"}</span>
                         <i className="dropdown-toggle ms-2"></i>
                       </div>
                       {showDropdown && (
                         <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
-                          {["Cash", "Bank", "Paybill"].map((paymentMethod, index) => (
+                          {["Received", "Not Received"].map((status, index) => (
                             <li key={index}>
                               <button
                                 type="button"
                                 className="dropdown-item"
                                 onClick={() => {
-                                  setNewPendingSupplies({ ...newPendingSupplies, paymentMethod });
+                                  setNewPendingSupplies({ ...newPendingSupplies, status });
                                   setShowDropdown(false);
                                 }}
                               >
-                                {paymentMethod}
+                                {status}
                               </button>
                             </li>
                           ))}
