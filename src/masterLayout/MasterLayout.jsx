@@ -326,10 +326,116 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
+            {/* Product Catalogue */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <i className='ri-book-3-fill' />
+                <span>Products Catalogue </span>
+              </Link>
+              <ul className='sidebar-submenu'>
+              <li>
+                  <NavLink
+                    to='/category'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Category
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/sub-category'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Sub Category
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/brands'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                   Brands
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/products'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Products
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+            {/* <li className='dropdown'>
+              <Link to='#'>
+                <i className='ri-book-3-fill' />
+                <span>Product Catalogue </span>
+              </Link>
+              <ul className='sidebar-menu'>
+                <li>
+                  <NavLink
+                    to='/categories'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Categories
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/sub-categories'
+                    className={(navData) => 
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Sub Categories
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/brands'
+                    className={(navData) => 
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Brands
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/products'
+                    className={(navData) => 
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Products
+                  </NavLink>
+                </li>
+              </ul>
+            </li> */}
+
               {/* Suppliers Management */}
             <li className='dropdown'>
               <Link to='#'>
-                <Icon icon='ri-file-search-line' className='menu-icon' />
+                <Icon icon='ri-clipboard-fill' className='menu-icon' />
                   <span>Suppliers Management</span>
               </Link>
               <ul className='sidebar-submenu'>

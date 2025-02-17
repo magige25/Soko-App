@@ -308,7 +308,9 @@ const SubRegionsLayer = () => {
                 </h6>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-3">
-                    <label className="form-label">Sub Region Name</label>
+                    <label className="form-label">
+                      Sub Region <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -318,7 +320,9 @@ const SubRegionsLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Region</label>
+                    <label className="form-label">
+                      Region <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -328,7 +332,9 @@ const SubRegionsLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Customers</label>
+                    <label className="form-label">
+                      Customer <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="number"
                       className="form-control"
@@ -338,7 +344,9 @@ const SubRegionsLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Sales Agents</label>
+                    <label className="form-label">
+                      Sales Agent <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="number"
                       className="form-control"
@@ -346,6 +354,9 @@ const SubRegionsLayer = () => {
                       value={editSubRegion.salesAgents}
                       onChange={(e) => setEditSubRegion({ ...editSubRegion, salesAgents: parseInt(e.target.value) || 0 })}
                     />
+                  </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary " data-bs-dismiss="modal">Save</button>

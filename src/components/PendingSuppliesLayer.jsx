@@ -3,28 +3,73 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
 const PendingSuppliesLayer = () => {
-    const [pendingSupplies, setPendingSupplies] = useState( [
-        { name: "Apexio Company", orderNo: "ORD123", numberOfItems: "22", amount: 1025 , dateOrdered: "24 Jan 2025", status: "Received",  },
-        { name: "Joy Link Ventures", orderNo: "ORD123", numberOfItems: "11", amount: 455, dateOrdered: "24 Jan 2025", status: "Received"  },
-        { name: "Charmie Enterprises", orderNo: "ORD123", numberOfItems: "15", amount: 675, dateOrdered: "24 Jan 2025", status: "Received"  },
-        { name: "Customs Limited", orderNo: "ORD123", numberOfItems: "45", amount: 965, dateOrdered: "24 Jan 2025", status: "Not Received"  },
-        { name: "Plastic Company", orderNo: "ORD123", numberOfItems: "21", amount: 1500, dateOrdered: "24 Jan 2025", status: "Received"  },
-        { name: "Wesa Ventures", orderNo: "ORD123", numberOfItems: "90", amount: 755, dateOrdered: "24 Jan 2025", status: "Received"  },
-      ]);
+  const [pendingSupplies, setPendingSupplies] = useState([
+    { name: "Apexio Company", orderNo: "ORD123", numberOfItems: "22", amount: 1025, dateOrdered: "2025-01-24", status: "Received" },
+    { name: "Joy Link Ventures", orderNo: "ORD123", numberOfItems: "11", amount: 455, dateOrdered: "2025-01-24", status: "Not Received" },
+    { name: "Charmie Enterprises", orderNo: "ORD123", numberOfItems: "15", amount: 675, dateOrdered: "2025-01-24", status: "Received" },
+    { name: "Customs Limited", orderNo: "ORD123", numberOfItems: "45", amount: 965, dateOrdered: "2025-01-24", status: "Not Received" },
+    { name: "Plastic Company", orderNo: "ORD123", numberOfItems: "21", amount: 1500, dateOrdered: "2025-01-24", status: "Not Received" },
+    { name: "Wesa Ventures", orderNo: "ORD123", numberOfItems: "90", amount: 755, dateOrdered: "2025-01-24", status: "Received" },
+  ]);
 
-    const [editPendingSupplies, setEditPendingSupplies] = React.useState({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '',  status:'' });
-    const [newPendingSupplies, setNewPendingSupplies] = useState({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '',  status:'' });
-    const [pendingSuppliesToDelete, setPendingSuppliesToDelete] = React.useState(null);
-    const [showDropdown, setShowDropdown] = useState(false);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(10);
-  
+  const [editPendingSupplies, setEditPendingSupplies] = useState({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '', status: '' });
+  const [newPendingSupplies, setNewPendingSupplies] = useState({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '', status: '' });
+  const [pendingSuppliesToDelete, setPendingSuppliesToDelete] = useState(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
 
-    const handleEditClick = (PendingSupplies) => {
-    setEditPendingSupplies(PendingSupplies);
+  // Function to format amount as dollars
+  const formatAmount = (amount) => {
+    return `$${Number(amount).toLocaleString()}`; // Convert to number and format with commas
   };
 
-    const handleEditSubmit = (e) => {
+  // Function to format the date as "24 Jan 2025"
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  // Handle input change for date
+  const handleDateChange = (e) => {
+    setNewPendingSupplies({ ...newPendingSupplies, dateOrdered: e.target.value });
+  };
+
+  // Handle form submission for adding new pending supplies
+  const handleAddPendingSupplies = (e) => {
+    e.preventDefault();
+    if (!newPendingSupplies.name || !newPendingSupplies.orderNo || !newPendingSupplies.numberOfItems) {
+      alert("Please fill in all fields before saving.");
+      return;
+    };
+    const newPendingSuppliesData = {
+      name: newPendingSupplies.name,
+      orderNo: newPendingSupplies.orderNo,
+      numberOfItems: newPendingSupplies.numberOfItems,
+      amount: newPendingSupplies.amount,
+      dateOrdered: newPendingSupplies.dateOrdered, // Store in YYYY-MM-DD format
+      status: newPendingSupplies.status,
+    };
+    setPendingSupplies([...pendingSupplies, newPendingSuppliesData]);
+    setNewPendingSupplies({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '', status: '' }); // Reset form state
+  };
+
+  // Handle modal hide event
+  const handleModalHide = () => {
+    setNewPendingSupplies({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '', status: '' });
+  };
+
+  // Handle edit click
+  const handleEditClick = (pendingSupplies) => {
+    setEditPendingSupplies(pendingSupplies);
+  };
+
+  // Handle edit submission
+  const handleEditSubmit = (e) => {
     e.preventDefault();
     const updatedPendingSupplies = pendingSupplies.map((r) =>
       r.name === editPendingSupplies.name ? { ...r, ...editPendingSupplies } : r
@@ -32,39 +77,17 @@ const PendingSuppliesLayer = () => {
     setPendingSupplies(updatedPendingSupplies);
   };
 
+  // Handle delete click
   const handleDeleteClick = (pendingSupplies) => {
     setPendingSuppliesToDelete(pendingSupplies);
   };
 
+  // Handle delete confirmation
   const handleDeleteConfirm = () => {
     const updatedPendingSupplies = pendingSupplies.filter((r) => r.name !== pendingSuppliesToDelete.name);
     setPendingSupplies(updatedPendingSupplies);
     setPendingSuppliesToDelete(null);
   };
-
-  const handleAddPendingSupplies = (e) => {
-    e.preventDefault();
-    if (!newPendingSupplies.name || !newPendingSupplies.orderNo || !newPendingSupplies.numberOfItems) {
-      alert("Please fill in all fields before saving.");
-      return;
-    }
-    const newPendingSuppliesData = {
-      name: newPendingSupplies.name,
-      orderNo: newPendingSupplies.orderNo,
-      numberOfItems: newPendingSupplies.numberOfItems,
-      amount: newPendingSupplies.amount,
-      dateOrdered: newPendingSupplies.dateOrdered,
-      status: newPendingSupplies.status,
-      
-    };
-    setPendingSupplies([...pendingSupplies, newPendingSuppliesData]);
-    setNewPendingSupplies({ name: '', orderNo: '', numberOfItems: '', amount: '', dateOrdered: '',  status:'' }); // Reset form state
-    e.target.reset(); // Reset the form
-  };
-// Function to format amount as dollars
-const formatAmount = (amount) => {
-  return `$${amount.toLocaleString()}`; // Adds a dollar sign and formats with commas
-};
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -81,7 +104,6 @@ const formatAmount = (amount) => {
   return (
     <div className="page-wrapper">
       <div className="row">
-
         {/* Add Supply */}
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
@@ -92,7 +114,7 @@ const formatAmount = (amount) => {
               data-bs-target="#exampleModal"
             >
               <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Add Pending Supply
+              Add  Supply
             </button>
           </div>
         </div>
@@ -121,15 +143,15 @@ const formatAmount = (amount) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((PendingSupplies, index) => (
+                  {currentItems.map((pendingSupply, index) => (
                     <tr key={index}>
                       <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
-                      <td className="text-start small-text">{PendingSupplies.name}</td>
-                      <td className="text-start small-text">{PendingSupplies.orderNo}</td>
-                      <td className="text-start small-text">{PendingSupplies.numberOfItems}</td>
-                      <td className="text-start small-text">{formatAmount(PendingSupplies.amount)}</td>
-                      <td className="text-start small-text">{PendingSupplies.dateOrdered}</td>
-                      <td className="text-start small-text">{PendingSupplies.status}</td>
+                      <td className="text-start small-text">{pendingSupply.name}</td>
+                      <td className="text-start small-text">{pendingSupply.orderNo}</td>
+                      <td className="text-start small-text">{pendingSupply.numberOfItems}</td>
+                      <td className="text-start small-text">{formatAmount(pendingSupply.amount)}</td>
+                      <td className="text-start small-text">{formatDate(pendingSupply.dateOrdered)}</td> {/* Format date here */}
+                      <td className="text-start small-text">{pendingSupply.status}</td>
                       <td className="text-start small-text">
                         <div className="dropdown">
                           <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
@@ -139,9 +161,8 @@ const formatAmount = (amount) => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/Pending-supplies/${PendingSupplies.name}`}
-                                state={{ PendingSupplies }}
-                                onClick={() => console.log("Link clicked:", PendingSupplies)} // Debugging
+                                to={`/pending-supplies/${pendingSupply.name}`}
+                                state={{ pendingSupply }}
                               >
                                 View
                               </Link>
@@ -152,7 +173,7 @@ const formatAmount = (amount) => {
                                 to="#"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editModal"
-                                onClick={() => handleEditClick(PendingSupplies)}
+                                onClick={() => handleEditClick(pendingSupply)}
                               >
                                 Edit
                               </Link>
@@ -160,7 +181,7 @@ const formatAmount = (amount) => {
                             <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(PendingSupplies)}
+                                onClick={() => handleDeleteClick(pendingSupply)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
@@ -218,12 +239,12 @@ const formatAmount = (amount) => {
         </div>
 
         {/* Add Pending Supplies Modal */}
-        <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true" onHide={handleModalHide}>
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Add Pending Supply
+                  Add Supply
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </h6>
                 <form onSubmit={handleAddPendingSupplies}>
@@ -243,29 +264,15 @@ const formatAmount = (amount) => {
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Order NO. <span className="text-danger">*</span>
+                      Order No. <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="alphanumeric"
+                      type="text"
                       className="form-control w-100"
-                      orderNo="order No"
+                      name="orderNo"
                       placeholder="Enter Order Number"
                       value={newPendingSupplies.orderNo}
                       onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, orderNo: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Amount <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      className="form-control w-100"
-                      name="amountphone No"
-                      placeholder="Enter Amount"
-                      value={newPendingSupplies.amount}
-                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, amount: e.target.value })}
                       required
                     />
                   </div>
@@ -276,10 +283,24 @@ const formatAmount = (amount) => {
                     <input
                       type="number"
                       className="form-control w-100"
-                      name="Number Of Items"
+                      name="numberOfItems"
                       placeholder="Enter No. Of Items"
                       value={newPendingSupplies.numberOfItems}
                       onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, numberOfItems: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Amount <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control w-100"
+                      name="amount"
+                      placeholder="Enter Amount"
+                      value={newPendingSupplies.amount}
+                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, amount: e.target.value })}
                       required
                     />
                   </div>
@@ -290,10 +311,10 @@ const formatAmount = (amount) => {
                     <input
                       type="date"
                       className="form-control w-100"
-                      name="date ordered"
+                      name="dateOrdered"
                       placeholder="Enter Date Ordered"
                       value={newPendingSupplies.dateOrdered}
-                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, dateOrdered: e.target.value })}
+                      onChange={handleDateChange}
                       required
                     />
                   </div>
@@ -330,6 +351,9 @@ const formatAmount = (amount) => {
                       )}
                     </div>
                   </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
+                  </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
                   </div>
@@ -339,18 +363,20 @@ const formatAmount = (amount) => {
           </div>
         </div>
 
-         {/* Edit Pending Supplies Modal */}
+        {/* Edit Pending Supplies Modal */}
         <div className="modal fade" id="editModal" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Edit Pending Supplies
+                  Edit  Supply
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </h6>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-3">
-                    <label className="form-label">Pending Supplies Name</label>
+                    <label className="form-label">
+                      Supplier Name <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -360,24 +386,68 @@ const formatAmount = (amount) => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Customers</label>
+                    <label className="form-label">
+                      Status <span className="text-danger">*</span>
+                    </label>
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
-                      placeholder="Enter Number of Customers"
-                      value={editPendingSupplies.customers}
-                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, customers: parseInt(e.target.value) || 0 })}
+                      placeholder="Enter Order Number"
+                      value={editPendingSupplies.orderNo}
+                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, orderNo: e.target.value })}
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Sales Agents</label>
+                    <label className="form-label">
+                      No. Of Items <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="number"
                       className="form-control"
-                      placeholder="Enter Number of Sales Agents"
-                      value={editPendingSupplies.salesAgents}
-                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, salesAgents: parseInt(e.target.value) || 0 })}
+                      placeholder="Enter No. Of Items"
+                      value={editPendingSupplies.numberOfItems}
+                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, numberOfItems: e.target.value })}
                     />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Amount <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Amount"
+                      value={editPendingSupplies.amount}
+                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, amount: e.target.value })}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Date Ordered <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      placeholder="Enter Date Ordered"
+                      value={editPendingSupplies.dateOrdered}
+                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, dateOrdered: e.target.value })}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                        Status <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-control"
+                      value={editPendingSupplies.status}
+                      onChange={(e) => setEditPendingSupplies({ ...editPendingSupplies, status: e.target.value })}
+                    >
+                      <option value="Received">Received</option>
+                      <option value="Not Received">Not Received</option>
+                    </select>
+                  </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>

@@ -2,64 +2,87 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
-const RegionsLayer = () => {
-  const [regions, setRegions] = React.useState([
-    { name: "Nyanza", customers: "870", salesAgents: "65" },
-    { name: "Coastal", customers: "456", salesAgents: "34" },
-    { name: "Western", customers: "589", salesAgents: "48" },
-    { name: "Nairobi", customers: "965", salesAgents: "89" },
+const BrandsLayer = () => {
+  const [products, setProducts] = useState([
+    { name: "HP Laptops", numberOfProducts: "24", date: "17 Feb 2025" },
+    { name: "Herman Miller", numberOfProducts: "12", date: "17 Feb 2025" },
+    { name: "Dior Beauty", numberOfProducts: "18", date: "17 Feb 2025" },
+    { name: "Nike", numberOfProducts: "35", date: "17 Feb 2025" },
   ]);
 
-  const [editRegion, setEditRegion] = React.useState({ name: '', customers: 0, salesAgents: 0 });
-  const [regionToDelete, setRegionToDelete] = React.useState(null);
+  const [editProduct, setEditProduct] = useState({ name: '', numberOfProducts: '', date: '' });
+  const [newProduct, setNewProduct] = useState({ name: '', numberOfProducts: '', date: '' });
+  const [productToDelete, setProductToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Set items per page to 10
+  const [itemsPerPage] = useState(10);
 
-  const handleEditClick = (region) => {
-    setEditRegion(region);
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
+  const handleDateChange = (e) => {
+    setEditProduct({ ...editProduct, date: e.target.value });
+  };
+
+  const handleAddProduct = (e) => {
+    e.preventDefault();
+    if (!newProduct.name.trim()) {
+      alert("Please fill in all fields before saving.");
+      return;
+    }
+    const newProductData = {
+      name: newProduct.name,
+      numberOfProducts: "0",
+      date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+    };
+    setProducts([...products, newProductData]);
+    setNewProduct({ name: '', numberOfProducts: '', date: '' });
+  };
+
+  const handleEditClick = (product) => {
+    console.log("Editing Product:", product);
+    setEditProduct(product);
   };
 
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    const updatedRegions = regions.map((r) =>
-      r.name === editRegion.name ? { ...r, ...editRegion } : r
+    console.log("Submitting edited product:", editProduct);
+
+    const updatedProducts = products.map((product) =>
+      product.name === editProduct.name ? { ...product, ...editProduct } : product
     );
-    setRegions(updatedRegions);
+
+    console.log("Updated products:", updatedProducts);
+    setProducts(updatedProducts);
+    setEditProduct({ name: '', numberOfProducts: '', date: '' });
   };
 
-  const handleDeleteClick = (region) => {
-    setRegionToDelete(region);
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product);
   };
 
   const handleDeleteConfirm = () => {
-    const updatedRegions = regions.filter((r) => r.name !== regionToDelete.name);
-    setRegions(updatedRegions);
-    setRegionToDelete(null);
+    const updatedProducts = products.filter((product) => product.name !== productToDelete.name);
+    setProducts(updatedProducts);
+    setProductToDelete(null);
   };
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = regions.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(regions.length / itemsPerPage);
-
+  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  const stats = [
-    { title: "Total Employees", count: 1007, icon: "mdi:account-group", color: "bg-dark" },
-    { title: "Active", count: 1007, icon: "mdi:account-check", color: "bg-success" },
-    { title: "Inactive", count: 1007, icon: "mdi:account-off", color: "bg-danger" },
-    { title: "New Joiners", count: 67, icon: "mdi:account-plus", color: "bg-info" },
-  ];
-
   return (
     <div className="page-wrapper">
       <div className="row">
-
-        {/* Add Region */}
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <button
@@ -69,45 +92,18 @@ const RegionsLayer = () => {
               data-bs-target="#exampleModal"
             >
               <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Add Region
+              Create Brand
             </button>
           </div>
         </div>
 
-        {/* statistics cards */}
-        <div className="row g-2">
-          {stats.map((item, index) => (
-            <div className="col-lg-3 col-md-6 col-sm-12 d-flex" key={index}>
-              <div className="card flex-fill full-width-card">
-                <div className="card-body d-flex align-items-center justify-content-between">
-                  <div className="d-flex align-items-center">
-                    <div className={`avatar avatar-lg ${item.color} rounded-circle d-flex align-items-center justify-content-center`}>
-                      <Icon icon={item.icon} width="24" height="24" className="text-white" />
-                    </div>
-                    <div className="ms-2">
-                      <p className="fs-8 fw-medium mb-1 text-truncate">{item.title}</p>
-                      <h6 className="mb-0 fs-8 fw-bold">{item.count}</h6>
-                    </div>
-                  </div>
-                  <div className="stat-change">
-                    <span className="badge bg-light text-dark px-1 py-1 d-flex align-items-center gap-1">
-                      <Icon icon="mdi:trending-up" className="text-xs text-success" />
-                      <small className="fs-8">+19.01%</small>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-          {/* Regions table */}
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
+        {/* Products table */}
+        <div className="card shadow-sm mt-3 fullwidth-card" style={{ width: '100%' }}>
           <div className="card-body">
             <div>
               <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}>
                 <input type='text' name='search' placeholder='Search' />
-                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
+                  <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: 'visible' }}>
@@ -116,18 +112,18 @@ const RegionsLayer = () => {
                   <tr>
                     <th className="text-start">#</th>
                     <th className="text-start">Name</th>
-                    <th className="text-start">Customers</th>
-                    <th className="text-start">Sales Agents</th>
+                    <th className="text-start">No. of Products</th>
+                    <th className="text-start">Date Created</th>
                     <th className="text-start">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((region, index) => (
+                  {currentItems.map((product, index) => (
                     <tr key={index}>
                       <th scope="row" className="text-start small-text">{index + 1}</th>
-                      <td className="text-start small-text">{region.name} Region</td>
-                      <td className="text-start small-text">{region.customers}</td>
-                      <td className="text-start small-text">{region.salesAgents}</td>
+                      <td className="text-start small-text">{product.name}</td>
+                      <td className="text-start small-text">{product.numberOfProducts}</td>
+                      <td className="text-start small-text">{formatDate(product.date)}</td>
                       <td className="text-start small-text">
                         <div className="dropdown">
                           <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
@@ -137,9 +133,9 @@ const RegionsLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/regions/${region.name}`}
-                                state={{ region }}
-                                onClick={() => console.log("Link clicked:", region)} // Debugging
+                                to={`/product/${product.name}`}
+                                state={{ product }}
+                                onClick={() => console.log("Link clicked:", product)}
                               >
                                 View
                               </Link>
@@ -150,7 +146,7 @@ const RegionsLayer = () => {
                                 to="#"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editModal"
-                                onClick={() => handleEditClick(region)}
+                                onClick={() => handleEditClick(product)}
                               >
                                 Edit
                               </Link>
@@ -158,7 +154,7 @@ const RegionsLayer = () => {
                             <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(region)}
+                                onClick={() => handleDeleteClick(product)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
@@ -177,7 +173,7 @@ const RegionsLayer = () => {
             {/* Pagination */}
             <div className="d-flex justify-content-between align-items-start mt-3">
               <div className="text-muted">
-                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, regions.length)} of {regions.length} entries</span>
+                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, products.length)} of {products.length} entries</span>
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -215,24 +211,32 @@ const RegionsLayer = () => {
           </div>
         </div>
 
-        {/* Add Region Modal */}
+        {/* Create Brand Modal */}
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-sm modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Add Region
+                  Create Brand
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </h6>
-                <form>
+                <form onSubmit={handleAddProduct}>
                   <div className="mb-3">
                     <label className="form-label">
-                      Region <span className="text-danger">*</span>
+                      Name <span className="text-danger">*</span>
                     </label>
-                    <input type="text" className="form-control" placeholder="Enter Region Name" />
+                    <input
+                      type="text"
+                      className="form-control w-100"
+                      name="name"
+                      placeholder="Enter Brand Name"
+                      value={newProduct.name}
+                      onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
+                      required
+                    />
                   </div>
                   <div className="d-flex justify-content-end gap-2">
-                    <button type="submit" className="btn btn-primary">Save</button>
+                    <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
                   </div>
                 </form>
               </div>
@@ -240,50 +244,54 @@ const RegionsLayer = () => {
           </div>
         </div>
 
-        {/* Edit Region Modal */}
+        {/* Edit Product Modal */}
         <div className="modal fade" id="editModal" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Edit Region
+                  Edit Product
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </h6>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-3">
                     <label className="form-label">
-                      Region Name <span className="text-danger">*</span>
+                      Product Name <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter Region Name"
-                      value={editRegion.name}
-                      onChange={(e) => setEditRegion({ ...editRegion, name: e.target.value })}
+                      placeholder="Enter Product Name"
+                      value={editProduct.name}
+                      onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Customer <span className="text-danger">*</span>
+                      Number of Products <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
-                      placeholder="Enter Number of Customers"
-                      value={editRegion.customers}
-                      onChange={(e) => setEditRegion({ ...editRegion, customers: parseInt(e.target.value) || 0 })}
+                      placeholder="Enter Number of Sub Products"
+                      value={editProduct.numberOfProducts}
+                      onChange={(e) => setEditProduct({ ...editProduct, numberOfProducts: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Sales Agent <span className="text-danger">*</span>
+                      Date Created <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="number"
-                      className="form-control"
-                      placeholder="Enter Number of Sales Agents"
-                      value={editRegion.salesAgents}
-                      onChange={(e) => setEditRegion({ ...editRegion, salesAgents: parseInt(e.target.value) || 0 })}
+                      type="date"
+                      className="form-control w-100"
+                      name="date"
+                      placeholder="Enter Date Created"
+                      value={editProduct.date}
+                      onChange={handleDateChange}
+                      required
                     />
                   </div>
                   <div className="text-muted small mt-3">
@@ -304,11 +312,11 @@ const RegionsLayer = () => {
             <div className="modal-content">
               <div className="modal-body pt-3 ps-18 pe-18">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h6 className="modal-title fs-6">Delete Region</h6>
+                  <h6 className="modal-title fs-6">Delete Product</h6>
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <p className="pb-3 mb-0">
-                  Are you sure you want to delete the <strong>{regionToDelete?.name}</strong> region permanently? This action cannot be undone.
+                  Are you sure you want to delete the <strong>{productToDelete?.name}</strong> product permanently? This action cannot be undone.
                 </p>
               </div>
               <div className="d-flex justify-content-end gap-2 px-12 pb-3">
@@ -323,4 +331,4 @@ const RegionsLayer = () => {
   );
 };
 
-export default RegionsLayer;
+export default BrandsLayer;

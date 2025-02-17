@@ -110,7 +110,10 @@ import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
 import PendingSuppliesPage from "./pages/PendingSuppliesPage";
 import UnpaidSuppliesPage from "./pages/UnpaidSuppliesPage";
-import CompletedSuppliesPage from "./pages/CompletedSuppliesPage"
+import CompletedSuppliesPage from "./pages/CompletedSuppliesPage";
+import CategoryPage from "./pages/CategoryPage";
+import SubCategoryPage from "./pages/SubCategoryPage";
+import BrandsPage from "./pages/BrandsPage";
 
 function App() {
   return (
@@ -159,6 +162,10 @@ function App() {
         <Route exact path='/pending-supplies' element={< PendingSuppliesPage />} />
         <Route exact path='/unpaid-supplies' element={< UnpaidSuppliesPage />} />
         <Route exact path='/completed-supplies' element={< CompletedSuppliesPage />} />
+        <Route exact path='/category' element={<CategoryPage/>} />
+        <Route exact path='/sub-category' element={<SubCategoryPage/>} />
+        <Route exact path='/brands' element={<BrandsPage/>} />
+
         <Route
           exact
           path='/code-generator-new'

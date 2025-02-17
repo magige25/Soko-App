@@ -325,7 +325,9 @@ const RoutesLayer = () => {
                 </h6>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-3">
-                    <label className="form-label">Route Name</label>
+                    <label className="form-label">
+                      Route Name <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -335,7 +337,9 @@ const RoutesLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Sub Region</label>
+                    <label className="form-label">
+                      Sub Region <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -345,7 +349,9 @@ const RoutesLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Region</label>
+                    <label className="form-label">
+                      Region <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -355,7 +361,9 @@ const RoutesLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Customers</label>
+                    <label className="form-label">
+                      Customer <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="number"
                       className="form-control"
@@ -365,7 +373,9 @@ const RoutesLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Sales Agents</label>
+                    <label className="form-label">
+                      Sales Agent <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="number"
                       className="form-control"
@@ -373,6 +383,9 @@ const RoutesLayer = () => {
                       value={editRoute.salesAgents}
                       onChange={(e) => setEditRoute({ ...editRoute, salesAgents: parseInt(e.target.value) || 0 })}
                     />
+                  </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>

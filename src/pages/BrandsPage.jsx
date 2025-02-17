@@ -1,9 +1,9 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import SuppliersLayer from "../components/SuppliersLayer";
+import BrandsLayer from "../components/BrandsLayer";
 
-const SuppliersPage= () => {
+const BrandPage= () => {
   return (
     <>
 
@@ -11,14 +11,14 @@ const SuppliersPage= () => {
         <MasterLayout>
 
           {/* Breadcrumb */}
-          <Breadcrumb title="Suppliers" />
+          <Breadcrumb title="Brands" />
 
-            {/* SuppliersLayer */}
-          <SuppliersLayer/>
+            {/* BrandsLayer */}
+          <BrandsLayer/>
 
         </MasterLayout>
     </>
   );
 };
 
-export default SuppliersPage; 
+export default BrandPage; 

@@ -241,7 +241,7 @@ const SuppliersLayer = () => {
                     <input
                       type="text"
                       className="form-control w-100"
-                      email="email"
+                      name="email"
                       placeholder="Enter Email"
                       value={newSupplier.email}
                       onChange={(e) => setNewSupplier({ ...newSupplier, email: e.target.value })}
@@ -255,7 +255,7 @@ const SuppliersLayer = () => {
                     <input
                       type="number"
                       className="form-control w-100"
-                      phoneNo="phoneNo"
+                      name="phoneNo"
                       placeholder="Enter Phone Number"
                       value={newSupplier.phoneNo}
                       onChange={(e) => setNewSupplier({ ...newSupplier, phoneNo: e.target.value })}
@@ -269,7 +269,7 @@ const SuppliersLayer = () => {
                     <input
                       type="text"
                       className="form-control w-100"
-                      status="status"
+                      name="status"
                       placeholder="Enter Status"
                       value={newSupplier.status}
                       onChange={(e) => setNewSupplier({ ...newSupplier, status: e.target.value })}
@@ -308,6 +308,9 @@ const SuppliersLayer = () => {
                         </ul>
                       )}
                     </div>
+                  </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
@@ -349,7 +352,7 @@ const SuppliersLayer = () => {
                       className="form-control"
                       placeholder="Enter Email"
                       value={editSupplier.customers}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, customers: parseInt(e.target.value) || 0 })}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, email: parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   <div className="mb-3">
@@ -360,8 +363,8 @@ const SuppliersLayer = () => {
                       type="number"
                       className="form-control"
                       placeholder="Enter Phone Number"
-                      value={editSupplier.salesAgents}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, salesAgents: parseInt(e.target.value) || 0 })}
+                      value={editSupplier.phoneNo}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, phoneNo: parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   <div className="mb-3">
@@ -372,8 +375,8 @@ const SuppliersLayer = () => {
                       type="text"
                       className="form-control"
                       placeholder="Enter Payment Method"
-                      value={editSupplier.salesAgents}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, salesAgents: parseInt(e.target.value) || 0 })}
+                      value={editSupplier.paymentMethod}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, paymentMethod: parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   <div className="mb-3">
@@ -384,9 +387,12 @@ const SuppliersLayer = () => {
                       type="text"
                       className="form-control"
                       placeholder="Enter Status"
-                      value={editSupplier.salesAgents}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, salesAgents: parseInt(e.target.value) || 0 })}
+                      value={editSupplier.status}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, status: parseInt(e.target.value) || 0 })}
                     />
+                  </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
