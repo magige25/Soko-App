@@ -61,7 +61,7 @@ const SignInLayer = () => {
 
     try {
       // Make API call to sign-in endpoint
-      const response = await axios.post("http://192.168.100.45:8092/v1/auth", formData,
+      const response = await axios.post("http://192.168.100.45:8098/v1/auth", formData,
       {
         headers: {
           "APP-KEY":"BCM8WTL9MQU4MJLE",

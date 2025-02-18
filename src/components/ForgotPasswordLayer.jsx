@@ -2,17 +2,24 @@ import { Icon } from '@iconify/react/dist/iconify.js';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import toast, { Toaster } from "react-hot-toast";
+import "../styles/spinner.css";
+import axios from "axios";
 
 const ForgotPasswordLayer = () => {
-    const [email, setEmail] = useState("");
     const [emailError, setEmailError] = useState("");
     const [isEmailValid, setIsEmailValid] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [formData, setFormData] = useState({
+        email: '',
+    });
 
     const handleEmailChange = (e) => {
         const value = e.target.value;
-        setEmail(value);
-        
+        setFormData((prevData) => ({
+            ...prevData,
+            email: value,
+        }));
+
         // Basic email format validation
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const isValid = emailRegex.test(value);
@@ -27,17 +34,30 @@ const ForgotPasswordLayer = () => {
     };
 
     const handleClick = async (e) => {
-        e.preventDefault(); 
+        e.preventDefault();
         setLoading(true);
+
         try {
-            if (isEmailValid) {
-                await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log("Sending Request with Payload:", { email: formData.email });
+            const response = await axios.post(
+                "http://192.168.100.45:8098/v1/auth/forget-password",
+                {
+                    email: formData.email,
+                },
+                {
+                    headers: {
+                        "APP-KEY": "BCM8WTL9MQU4MJLE",
+                    },
+                }
+            );
+            console.log("API Response:", response.data);
+            console.log("Response Data:", response.data); 
+            if (response.data.status.code === 0 && response.status === 200) {
                 toast.success("Email sent!", {
                     position: "top-right",
                     duration: 1000,
                     icon: "✅",
                 });
-                
             } else {
                 throw new Error("Invalid email");
             }
@@ -57,9 +77,9 @@ const ForgotPasswordLayer = () => {
                 <Toaster />
                 <div className="auth-right d-lg-block d-none" style={{ width: "70%", height: "100vh" }}>
                     <div className="d-flex align-items-center flex-column h-100 justify-content-center">
-                        <img 
-                            src="assets/images/auth/forgot-pass-img.png" 
-                            alt="" 
+                        <img
+                            src="assets/images/auth/forgot-pass-img.png"
+                            alt=""
                             style={{ width: "100%", height: "100%", objectFit: "cover" }}
                         />
                     </div>
@@ -74,7 +94,7 @@ const ForgotPasswordLayer = () => {
                                     src="assets/images/logo.png"
                                     alt=""
                                     style={{ width: "100%", maxWidth: "200px" }}
-                              />
+                                />
                             </Link>
                             <h5 className="mb-12">Forgot Password</h5>
                             <p className="mb-32 text-secondary-light" style={{ fontSize: "14px", fontWeight: 600 }}>
@@ -90,7 +110,7 @@ const ForgotPasswordLayer = () => {
                                     type="email"
                                     className="form-control h-56-px bg-neutral-50 radius-12"
                                     placeholder="Enter Email"
-                                    value={email}
+                                    value={formData.email}
                                     onChange={handleEmailChange}
                                     required
                                 />
@@ -117,7 +137,7 @@ const ForgotPasswordLayer = () => {
                 </div>
             </section>
         </>
-    )
-}
+    );
+};
 
 export default ForgotPasswordLayer;

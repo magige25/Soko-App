@@ -51,7 +51,6 @@ const OtpVerificationLayer = () => {
   }, [location, navigate]);
 
   useEffect(() => {
-    //console.log("Sending data:", { email: formData.email, password: formData.password });
   }, [formData]);
 
   const handleOtpChange = (index, value) => {
@@ -90,7 +89,7 @@ const OtpVerificationLayer = () => {
     try {
       // Make API call to validate OTP
       const response = await axios.post(
-        "http://192.168.100.45:8092/v1/auth/validate-otp", // Correct API endpoint
+        "http://192.168.100.45:8098/v1/auth/validate-otp", // Correct API endpoint
         {
           email: formData.email,
           password: formData.password,
@@ -144,8 +143,12 @@ const OtpVerificationLayer = () => {
   
     try {
       const response = await axios.post(
-        "http://192.168.100.45:8092/v1/auth/otp", // Endpoint for resending OTP
-        { email: formData.email },
+        "http://192.168.100.45:8098/v1/auth/otp", // Endpoint for resending OTP
+        { email: formData.email, 
+          authMethod: formData.authMethod,
+          password: formData.password
+        },
+        
         { headers: { "APP-KEY": "BCM8WTL9MQU4MJLE" } }
       );
       console.log("API Response:", response);

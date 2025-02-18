@@ -87,7 +87,7 @@ const SubCategoryLayer = () => {
           <div className="ms-auto">
             <button
               type="button"
-              className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
+              className="btn btn-primary text-sm btn-md px-12 py-12 radius-8 d-flex align-items-center gap-2"
               data-bs-toggle="modal"
               data-bs-target="#exampleModal"
             >
@@ -211,7 +211,7 @@ const SubCategoryLayer = () => {
 
         {/* Add Sub Category Modal */}
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-sm modal-dialog-centered">
+          <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">

@@ -213,7 +213,7 @@ const BrandsLayer = () => {
 
         {/* Create Brand Modal */}
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-sm modal-dialog-centered">
+          <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
@@ -234,6 +234,37 @@ const BrandsLayer = () => {
                       onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
                       required
                     />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      No. of products <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control w-100"
+                      name="Number of Products"
+                      placeholder="Enter Number of Products"
+                      value={newProduct.numberOfProducts}
+                      onChange={(e) => setNewProduct({ ...newProduct, numberOfProducts: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Date Created <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      className="form-control w-100"
+                      name="date"
+                      placeholder="Enter Date Created"
+                      value={newProduct.date}
+                      onChange={(e) => setNewProduct({ ...newProduct, date: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
