@@ -249,7 +249,7 @@ const BrandsLayer = () => {
                       required
                     />
                   </div>
-                  <div className="mb-3">
+                  {/* <div className="mb-3">
                     <label className="form-label">
                       Date Created <span className="text-danger">*</span>
                     </label>
@@ -262,7 +262,7 @@ const BrandsLayer = () => {
                       onChange={(e) => setNewProduct({ ...newProduct, date: e.target.value })}
                       required
                     />
-                  </div>
+                  </div> */}
                   <div className="text-muted small mt-3">
                     Fields marked with <span className="text-danger">*</span> are required.
                   </div>

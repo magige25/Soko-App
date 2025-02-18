@@ -35,9 +35,9 @@ const PendingSuppliesLayer = () => {
   };
 
   // Handle input change for date
-  const handleDateChange = (e) => {
-    setNewPendingSupplies({ ...newPendingSupplies, dateOrdered: e.target.value });
-  };
+  //  const handleDateChange = (e) => {
+  //   setNewPendingSupplies({ ...newPendingSupplies, dateOrdered: e.target.value });
+  // };
 
   // Handle form submission for adding new pending supplies
   const handleAddPendingSupplies = (e) => {
@@ -304,7 +304,7 @@ const PendingSuppliesLayer = () => {
                       required
                     />
                   </div>
-                  <div className="mb-3">
+                  {/* <div className="mb-3">
                     <label className="form-label">
                       Date Ordered <span className="text-danger">*</span>
                     </label>
@@ -317,7 +317,7 @@ const PendingSuppliesLayer = () => {
                       onChange={handleDateChange}
                       required
                     />
-                  </div>
+                  </div> */}
                   <div className="mb-3">
                     <div className="position-relative">
                       <label className="form-label">

@@ -111,6 +111,7 @@ const OtpVerificationLayer = () => {
           duration: 1000,
           icon: "✅",
         });
+        localStorage.setItem("token", response.data.data.accessToken);
 
         // Navigate to the dashboard only after successful OTP validation
         navigate("/index-1");
