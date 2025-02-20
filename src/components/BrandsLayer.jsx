@@ -1,83 +1,171 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Icon } from '@iconify/react/dist/iconify.js';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import axios from 'axios';
 
-const BrandsLayer = () => {
-  const [products, setProducts] = useState([
-    { name: "HP Laptops", numberOfProducts: "24", date: "17 Feb 2025" },
-    { name: "Herman Miller", numberOfProducts: "12", date: "17 Feb 2025" },
-    { name: "Dior Beauty", numberOfProducts: "18", date: "17 Feb 2025" },
-    { name: "Nike", numberOfProducts: "35", date: "17 Feb 2025" },
-  ]);
+const API_URL = 'http://192.168.100.45:8098/v1/user/system';
 
-  const [editProduct, setEditProduct] = useState({ name: '', numberOfProducts: '', date: '' });
-  const [newProduct, setNewProduct] = useState({ name: '', numberOfProducts: '', date: '' });
-  const [productToDelete, setProductToDelete] = useState(null);
+const UsersListLayer = () => {
+  const [users, setUsers] = useState([]);
+  const [query, setQuery] = useState('');
+  const [userToDelete, setUserToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [editUser, setEditUser] = useState({
+    id: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    roleId: '',
+    userPermissions: [], // Array of { moduleId, permissionsCodes }
+  });
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
+  // Permissions data
+  const permissionsData = [
+    {
+      moduleId: 1,
+      moduleName: 'Admin',
+      permissions: [
+        { code: 'RD', label: 'Read' },
+        { code: 'WR', label: 'Write' },
+        { code: 'CR', label: 'Create' },
+        { code: 'DL', label: 'Delete' },
+      ],
+    },
+    {
+      moduleId: 2,
+      moduleName: 'Manager',
+      permissions: [
+        { code: 'RD', label: 'Read' },
+        { code: 'WR', label: 'Write' },
+      ],
+    },
+    {
+      moduleId: 3,
+      moduleName: 'User',
+      permissions: [
+        { code: 'RD', label: 'Read' },
+      ],
+    },
+  ];
+
+  // Fetch users from the API
+  useEffect(() => {
+    fetchUsers();
+  }, []);
+
+  const fetchUsers = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(API_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('API Response (Fetch Users):', response.data);
+      setUsers(response.data.data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
+  };
+
+  // Pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  // Open Edit Modal
+  const openEditModal = (user) => {
+    setEditUser({
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      email: user.email,
+      phoneNumber: user.phoneNo,
+      roleId: user.role.id,
+      userPermissions: user.userPermissions || [], // Ensure this matches your API response
     });
   };
 
-  const handleDateChange = (e) => {
-    setEditProduct({ ...editProduct, date: e.target.value });
+  // Handle Permission Changes
+  const handlePermissionChange = (moduleId, permissionCode, isChecked) => {
+    setEditUser((prev) => {
+      const updatedPermissions = [...prev.userPermissions];
+      const moduleIndex = updatedPermissions.findIndex((up) => up.moduleId === moduleId);
+
+      if (moduleIndex === -1) {
+        updatedPermissions.push({
+          moduleId,
+          permissionsCodes: isChecked ? [permissionCode] : [],
+        });
+      } else {
+        // Update existing module permissions
+        const permissionsCodes = updatedPermissions[moduleIndex].permissionsCodes;
+        if (isChecked) {
+          permissionsCodes.push(permissionCode);
+        } else {
+          updatedPermissions[moduleIndex].permissionsCodes = permissionsCodes.filter(
+            (code) => code !== permissionCode
+          );
+        }
+      }
+
+      return { ...prev, userPermissions: updatedPermissions };
+    });
   };
 
-  const handleAddProduct = (e) => {
+  // Handle Edit Form Submission
+  const handleEditSubmit = async (e) => {
     e.preventDefault();
-    if (!newProduct.name.trim()) {
-      alert("Please fill in all fields before saving.");
-      return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.put(
+        `${API_URL}/${editUser.id}`, // Update the endpoint as needed
+        editUser,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      console.log('User updated successfully:', response.data);
+      fetchUsers(); // Refresh the user list
+    } catch (error) {
+      console.error('Error updating user:', error);
     }
-    const newProductData = {
-      name: newProduct.name,
-      numberOfProducts: "0",
-      date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
-    };
-    setProducts([...products, newProductData]);
-    setNewProduct({ name: '', numberOfProducts: '', date: '' });
   };
 
-  const handleEditClick = (product) => {
-    console.log("Editing Product:", product);
-    setEditProduct(product);
+  // Handle Delete Click
+  const handleDeleteClick = (user) => {
+    if (!user) return;
+    setUserToDelete(user);
   };
 
-  const handleEditSubmit = (e) => {
-    e.preventDefault();
-    console.log("Submitting edited product:", editProduct);
+  // Handle Delete Confirmation
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`${API_URL}/${userToDelete.code}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('API Response (Delete User):', 'User deleted successfully');
 
-    const updatedProducts = products.map((product) =>
-      product.name === editProduct.name ? { ...product, ...editProduct } : product
-    );
-
-    console.log("Updated products:", updatedProducts);
-    setProducts(updatedProducts);
-    setEditProduct({ name: '', numberOfProducts: '', date: '' });
-  };
-
-  const handleDeleteClick = (product) => {
-    setProductToDelete(product);
-  };
-
-  const handleDeleteConfirm = () => {
-    const updatedProducts = products.filter((product) => product.name !== productToDelete.name);
-    setProducts(updatedProducts);
-    setProductToDelete(null);
-  };
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = products.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(products.length / itemsPerPage);
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+      // Update the state
+      const updatedUsers = users.filter((c) => c.code !== userToDelete.code);
+      setUsers(updatedUsers);
+      setUserToDelete(null);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
   };
 
   return (
@@ -85,25 +173,28 @@ const BrandsLayer = () => {
       <div className="row">
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
-            <button
-              type="button"
+            <Link
+              to="/add-users"
               className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-              data-bs-toggle="modal"
-              data-bs-target="#exampleModal"
             >
               <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Create Brand
-            </button>
+              Add New User
+            </Link>
           </div>
         </div>
 
-        {/* Products table */}
-        <div className="card shadow-sm mt-3 fullwidth-card" style={{ width: '100%' }}>
+        <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
           <div className="card-body">
             <div>
-              <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}>
-                <input type='text' name='search' placeholder='Search' />
-                  <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
+              <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: '32px' }}>
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="Search"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+                <Icon icon="ion:search-outline" className="icon" style={{ width: '16px', height: '16px' }} />
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: 'visible' }}>
@@ -111,19 +202,29 @@ const BrandsLayer = () => {
                 <thead className="table-light text-start small-text">
                   <tr>
                     <th className="text-start">#</th>
-                    <th className="text-start">Name</th>
-                    <th className="text-start">No. of Products</th>
-                    <th className="text-start">Date Created</th>
+                    <th className="text-start">First Name</th>
+                    <th className="text-start">Last Name</th>
+                    <th className="text-start">Email</th>
+                    <th className="text-start">Phone Number</th>
+                    <th className="text-start">Role</th>
+                    <th className="text-start">Status</th>
                     <th className="text-start">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((product, index) => (
+                  {currentItems.map((user, index) => (
                     <tr key={index}>
                       <th scope="row" className="text-start small-text">{index + 1}</th>
-                      <td className="text-start small-text">{product.name}</td>
-                      <td className="text-start small-text">{product.numberOfProducts}</td>
-                      <td className="text-start small-text">{formatDate(product.date)}</td>
+                      <td className="text-start small-text">{user.firstName}</td>
+                      <td className="text-start small-text">{user.lastName}</td>
+                      <td className="text-start small-text">{user.email}</td>
+                      <td className="text-start small-text">{user.phoneNo}</td>
+                      <td className="text-start small-text">{user.role.name}</td>
+                      <td className="text-start small-text">
+                        <span className={`bg-${user.status === 'Active' ? 'success-focus' : 'neutral-200'} text-${user.status === 'Active' ? 'success-600' : 'neutral-600'} px-24 py-4 radius-8 fw-medium text-sm`}>
+                          {user.status}
+                        </span>
+                      </td>
                       <td className="text-start small-text">
                         <div className="dropdown">
                           <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
@@ -131,32 +232,26 @@ const BrandsLayer = () => {
                           </button>
                           <ul className="dropdown-menu">
                             <li>
-                              <Link
-                                className="dropdown-item"
-                                to={`/product/${product.name}`}
-                                state={{ product }}
-                                onClick={() => console.log("Link clicked:", product)}
-                              >
+                              <Link className="dropdown-item" to={`/users/${user.id}`}>
                                 View
                               </Link>
                             </li>
                             <li>
-                              <Link
+                              <button
                                 className="dropdown-item"
-                                to="#"
                                 data-bs-toggle="modal"
-                                data-bs-target="#editModal"
-                                onClick={() => handleEditClick(product)}
+                                data-bs-target="#editUserModal"
+                                onClick={() => openEditModal(user)}
                               >
                                 Edit
-                              </Link>
+                              </button>
                             </li>
                             <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(product)}
+                                onClick={() => handleDeleteClick(user)}
                                 data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
+                                data-bs-target="#deleteUserModal"
                               >
                                 Delete
                               </button>
@@ -173,7 +268,7 @@ const BrandsLayer = () => {
             {/* Pagination */}
             <div className="d-flex justify-content-between align-items-start mt-3">
               <div className="text-muted">
-                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, products.length)} of {products.length} entries</span>
+                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, users.length)} of {users.length} entries</span>
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -210,150 +305,191 @@ const BrandsLayer = () => {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Create Brand Modal */}
-        <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body">
-                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Create Brand
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-                </h6>
-                <form onSubmit={handleAddProduct}>
-                  <div className="mb-3">
+      {/* Edit User Modal */}
+      <div className="modal fade" id="editUserModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                Edit User
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
+              </h6>
+              <form onSubmit={handleEditSubmit}>
+                {/* First Name and Last Name */}
+                <div className="row mb-3">
+                  <div className="col-md-6">
                     <label className="form-label">
-                      Name <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control w-100"
-                      name="name"
-                      placeholder="Enter Brand Name"
-                      value={newProduct.name}
-                      onChange={(e) => setNewProduct({ ...newProduct, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      No. of products <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control w-100"
-                      name="Number of Products"
-                      placeholder="Enter Number of Products"
-                      value={newProduct.numberOfProducts}
-                      onChange={(e) => setNewProduct({ ...newProduct, numberOfProducts: e.target.value })}
-                      required
-                    />
-                  </div>
-                  {/* <div className="mb-3">
-                    <label className="form-label">
-                      Date Created <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      className="form-control w-100"
-                      name="date"
-                      placeholder="Enter Date Created"
-                      value={newProduct.date}
-                      onChange={(e) => setNewProduct({ ...newProduct, date: e.target.value })}
-                      required
-                    />
-                  </div> */}
-                  <div className="text-muted small mt-3">
-                    Fields marked with <span className="text-danger">*</span> are required.
-                  </div>
-                  <div className="d-flex justify-content-end gap-2">
-                    <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Edit Product Modal */}
-        <div className="modal fade" id="editModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body">
-                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Edit Product
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-                </h6>
-                <form onSubmit={handleEditSubmit}>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Product Name <span className="text-danger">*</span>
+                      First Name <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter Product Name"
-                      value={editProduct.name}
-                      onChange={(e) => setEditProduct({ ...editProduct, name: e.target.value })}
+                      placeholder="Enter First Name"
+                      value={editUser.firstName}
+                      onChange={(e) => setEditUser({ ...editUser, firstName: e.target.value })}
                       required
                     />
                   </div>
-                  <div className="mb-3">
+                  <div className="col-md-6">
                     <label className="form-label">
-                      Number of Products <span className="text-danger">*</span>
+                      Last Name <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter Number of Sub Products"
-                      value={editProduct.numberOfProducts}
-                      onChange={(e) => setEditProduct({ ...editProduct, numberOfProducts: e.target.value })}
+                      placeholder="Enter Last Name"
+                      value={editUser.lastName}
+                      onChange={(e) => setEditUser({ ...editUser, lastName: e.target.value })}
                       required
                     />
                   </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Date Created <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      className="form-control w-100"
-                      name="date"
-                      placeholder="Enter Date Created"
-                      value={editProduct.date}
-                      onChange={handleDateChange}
-                      required
-                    />
-                  </div>
-                  <div className="text-muted small mt-3">
-                    Fields marked with <span className="text-danger">*</span> are required.
-                  </div>
-                  <div className="d-flex justify-content-end gap-2">
-                    <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Delete Confirmation Modal */}
-        <div className="modal fade" id="deleteModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body pt-3 ps-18 pe-18">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h6 className="modal-title fs-6">Delete Product</h6>
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <p className="pb-3 mb-0">
-                  Are you sure you want to delete the <strong>{productToDelete?.name}</strong> product permanently? This action cannot be undone.
-                </p>
+
+                {/* Phone Number and Email */}
+                <div className="row mb-3">
+                  <div className="col-md-6">
+                    <label className="form-label">
+                      Phone Number <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      className="form-control"
+                      placeholder="Enter Phone Number"
+                      value={editUser.phoneNumber}
+                      onChange={(e) => setEditUser({ ...editUser, phoneNumber: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label">
+                      Email <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      className="form-control"
+                      placeholder="Enter Email"
+                      value={editUser.email}
+                      onChange={(e) => setEditUser({ ...editUser, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Role Dropdown */}
+                <div className="mb-3">
+                  <label className="form-label">
+                    Role <span className="text-danger">*</span>
+                  </label>
+                  <div className="dropdown">
+                    <button
+                      className="btn btn-light dropdown-toggle btn-sm w-50 text-start d-flex align-items-center justify-content-between"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                    >
+                      {editUser.roleId
+                        ? permissionsData.find((role) => role.moduleId === editUser.roleId)?.moduleName || "Select Role"
+                        : "Select Role"}
+                    </button>
+                    <ul className="dropdown-menu w-50">
+                      {permissionsData.map((role) => (
+                        <li key={role.moduleId}>
+                          <button
+                            className="dropdown-item"
+                            type="button"
+                            onClick={() => setEditUser({ ...editUser, roleId: role.moduleId })}
+                          >
+                            {role.moduleName}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Permissions Table */}
+                <div className="mb-3">
+                  <label className="form-label">
+                    Permissions <span className="text-danger">*</span>
+                  </label>
+                  <div className="table-responsive">
+                    <table className="table table-borderless">
+                      <thead>
+                        <tr>
+                          <th>Module</th>
+                          <th>Permissions</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {permissionsData.map((module) => (
+                          <tr key={module.moduleId}>
+                            <td>{module.moduleName}</td>
+                            <td>
+                              <div className="d-flex flex-wrap gap-2">
+                                {module.permissions.map((perm) => (
+                                  <div key={perm.code} className="form-check">
+                                    <input
+                                      type="checkbox"
+                                      className="form-check-input"
+                                      checked={editUser.userPermissions
+                                        .find((up) => up.moduleId === module.moduleId)
+                                        ?.permissionsCodes.includes(perm.code)}
+                                      onChange={(e) => handlePermissionChange(module.moduleId, perm.code, e.target.checked)}
+                                    />
+                                    <label className="form-check-label">{perm.label}</label>
+                                  </div>
+                                ))}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <div className="d-flex justify-content-end gap-2">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn btn-primary">
+                    Save
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete Confirmation Modal */}
+      <div className="modal fade" id="deleteUserModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body pt-3 ps-18 pe-18">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h6 className="modal-title fs-6">Delete User</h6>
+                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </div>
-              <div className="d-flex justify-content-end gap-2 px-12 pb-3">
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleDeleteConfirm}>Delete</button>
-              </div>
+              <p className="pb-3 mb-0">
+                Are you sure you want to delete the <strong>{userToDelete?.name}</strong> user permanently? This action cannot be undone.
+              </p>
+            </div>
+            <div className="d-flex justify-content-end gap-2 px-12 pb-3">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleDeleteConfirm}>Delete</button>
             </div>
           </div>
         </div>
@@ -362,4 +498,4 @@ const BrandsLayer = () => {
   );
 };
 
-export default BrandsLayer;
+export default UsersListLayer;

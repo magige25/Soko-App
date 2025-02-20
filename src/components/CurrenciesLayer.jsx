@@ -7,8 +7,8 @@ const API_URL = "http://192.168.100.45:8098/v1/currencies";
 
 const CurrenciesLayer = () => {
   const [currencies, setCurrencies] = useState([]);
-  const [editCurrency, setEditCurrency] = useState({ code: "", name: "", sign: "", dateCreated: "" });
-  const [newCurrency, setNewCurrency] = useState({ code: '', name: '', sign: '', dateCreated: "" });
+  const [editCurrency, setEditCurrency] = useState({ code: '', name: '', sign: ''});
+  const [newCurrency, setNewCurrency] = useState({ code: '', name: '', sign: ''});
   const [currencyToDelete, setCurrencyToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -66,14 +66,12 @@ const CurrenciesLayer = () => {
       });
       console.log("API Response (Add Currency):", response.data);
 
-      // Update the state
       setCurrencies((prevCurrencies) => [
         ...prevCurrencies,
-        { ...response.data.data, dateCreated: new Date().toISOString() }, // Add default date if missing
+        { ...response.data.data },
       ]);
 
-      // Reset the form
-      setNewCurrency({ code: '', name: '', sign: '', dateCreated: '' });
+      setNewCurrency({ code: '', name: '', sign: '' });
 
       // Delay modal closure
       setTimeout(() => {
@@ -150,9 +148,7 @@ const CurrenciesLayer = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = currencies.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(currencies.length / itemsPerPage);
-
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -197,13 +193,17 @@ const CurrenciesLayer = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((currency, index) => (
-                    <tr key={index}>
-                      <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
+                  {currentItems.map((currency) => (
+                    <tr key={currency.code}>
+                      <th scope="row" className="text-start small-text">
+                        {indexOfFirstItem + currentItems.indexOf(currency) + 1}
+                      </th>
                       <td className="text-start small-text">{currency.code}</td>
                       <td className="text-start small-text">{currency.name}</td>
                       <td className="text-start small-text">{currency.sign}</td>
-                      <td className="text-start small-text">{formatDate(currency.dateCreated)}</td>
+                      <td className="text-start small-text">
+                        {currency.dateCreated ? formatDate(currency.dateCreated) : "No Date"}
+                      </td>
                       <td className="text-start small-text">
                         <div className="dropdown">
                           <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
@@ -356,7 +356,12 @@ const CurrenciesLayer = () => {
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
                   Edit Currency
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                  <button 
+                    type="button" 
+                    className="btn-close" 
+                    data-bs-dismiss="modal"
+                  >
+                  </button>
                 </h6>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-3">
