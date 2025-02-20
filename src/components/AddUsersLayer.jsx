@@ -1,111 +1,221 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = "http://192.168.100.45:8092/v1/user/register/update/2";
+const API_URL = "https://biz-system-production.up.railway.app/v1/user/register";
+const ROLES_URL = "https://biz-system-production.up.railway.app/v1/roles";
+const COUNTRIES_URL = "https://biz-system-production.up.railway.app/v1/countries";
 
-const AddUsersLayer = () => {
+const AddUsersLayer = ({ onUserAdded }) => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
-    phoneNumber: '',
     email: '',
+    phoneNumber: '',
     roleId: '',
-    userPermissions: {
-      'User Management': { View: false, Write: false, Create: false, Delete: false },
-      'Financial Management': { View: false, Write: false, Create: false, Delete: false },
-      'Order Management': { View: false, Write: false, Create: false, Delete: false },
-      'Stock Management': { View: false, Write: false, Create: false, Delete: false },
-    },
+    countryCode: '',
+    userPermissions: [],
   });
-
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [roles, setRoles] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [rolePermissions, setRolePermissions] = useState({}); // Map of moduleId to valid permissions
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("No authentication token found. Please log in.");
+        return;
+      }
+
+      try {
+        // Fetch roles
+        const rolesResponse = await axios.get(ROLES_URL, {
+          headers: { "Authorization": `Bearer ${token}` },
+        });
+        console.log("Roles response:", rolesResponse.data);
+        const rolesData = rolesResponse.data.data || [];
+        const rolesArray = Array.isArray(rolesData) ? rolesData : [rolesData];
+        setRoles(rolesArray);
+
+        // Extract modules and permissions per role
+        const allModules = [];
+        const permissionsMap = {};
+        rolesArray.forEach((role) => {
+          role.roleModulePermissions.forEach((module) => {
+            if (!allModules.some((m) => m.moduleId === module.moduleId)) {
+              allModules.push({
+                moduleId: module.moduleId,
+                name: module.name,
+              });
+            }
+            if (!permissionsMap[role.roleId]) permissionsMap[role.roleId] = {};
+            permissionsMap[role.roleId][module.moduleId] = module.rolePermissions.map((p) => p.code);
+          });
+        });
+        setModules(allModules);
+        setRolePermissions(permissionsMap);
+        console.log("Modules:", allModules);
+        console.log("Role permissions map:", permissionsMap);
+
+        // Fetch country code
+        const countriesResponse = await axios.get(COUNTRIES_URL, {
+          headers: { "Authorization": `Bearer ${token}` },
+        });
+        console.log("Countries response:", countriesResponse.data);
+        const countryCode = countriesResponse.data.data?.[0]?.code || 'KE';
+        setFormData((prev) => ({ ...prev, countryCode }));
+
+      } catch (err) {
+        console.error("Error fetching data:", err.response?.data || err.message);
+        setError("Failed to load initial data. Using defaults.");
+        setRoles([{ roleId: 1, roleName: 'Super Admin' }]);
+        setModules([
+          { moduleId: 1, name: 'User Management' },
+          { moduleId: 2, name: 'Region Management' },
+        ]);
+        setRolePermissions({
+          1: {
+            1: ['CRT', 'DLT', 'RD'],
+            2: [],
+          },
+        });
+        setFormData((prev) => ({ ...prev, countryCode: 'KE' }));
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || !formData.phone.trim() || !formData.roleId.trim()) {
-      alert("Please fill in all required fields before saving.");
+    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || 
+        !formData.phoneNumber.trim() || !formData.roleId || !formData.countryCode) {
+      setError("Please fill in all required fields.");
       return;
     }
 
     try {
       setIsLoading(true);
+      setError(null);
       const token = localStorage.getItem("token");
+      console.log("Submitting payload:", JSON.stringify(formData, null, 2));
       const response = await axios.post(API_URL, formData, {
         headers: {
           "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
       });
       console.log("API response (Add User):", response.data);
 
-      // Assuming you want to update a list of users
-      // setUsers((prevUsers) => [...prevUsers, { ...response.data.data }]);
+      if (onUserAdded && response.data.data) {
+        const newUser = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          role: roles.find((r) => r.roleId === formData.roleId)?.roleName || 'Unknown',
+        };
+        onUserAdded(newUser);
+      }
 
       setFormData({
         firstName: '',
         lastName: '',
-        phoneNumber: '',
         email: '',
+        phoneNumber: '',
         roleId: '',
-        userPermissions: {
-          'User Management': { View: false, Write: false, Create: false, Delete: false },
-          'Financial Management': { View: false, Write: false, Create: false, Delete: false },
-          'Order Management': { View: false, Write: false, Create: false, Delete: false },
-          'Stock Management': { View: false, Write: false, Create: false, Delete: false },
-        },
+        countryCode: formData.countryCode,
+        userPermissions: [],
       });
+      alert("User added successfully!");
 
     } catch (error) {
-      console.log("Error adding user:", error);
+      console.error("Error adding user:", error.response?.data || error.message);
+      setError(error.response?.data?.message || "Failed to add user. Please try again.");
     } finally {
       setIsLoading(false);
     }
   };
 
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handlePermissionChange = (moduleId, code, checked) => {
+    const validPermissions = rolePermissions[formData.roleId]?.[moduleId] || [];
+    if (!validPermissions.includes(code)) {
+      console.warn(`Permission ${code} not available for module ${moduleId}`);
+      return;
+    }
+
+    setFormData((prev) => {
+      const existingModule = prev.userPermissions.find((p) => p.moduleId === moduleId);
+      if (checked) {
+        if (existingModule) {
+          return {
+            ...prev,
+            userPermissions: prev.userPermissions.map((p) =>
+              p.moduleId === moduleId
+                ? { ...p, permissionsCodes: [...p.permissionsCodes, code] }
+                : p
+            ),
+          };
+        } else {
+          return {
+            ...prev,
+            userPermissions: [...prev.userPermissions, { moduleId, permissionsCodes: [code] }],
+          };
+        }
+      } else {
+        return {
+          ...prev,
+          userPermissions: prev.userPermissions
+            .map((p) =>
+              p.moduleId === moduleId
+                ? { ...p, permissionsCodes: p.permissionsCodes.filter((c) => c !== code) }
+                : p
+            )
+            .filter((p) => p.permissionsCodes.length > 0),
+        };
+      }
+    });
+  };
+
+  const getPermissionOptionsForModule = (moduleId) => {
+    return rolePermissions[formData.roleId]?.[moduleId] || [];
+  };
+
   return (
     <div className="card h-100 p-0 radius-12">
       <div className="card-body">
+        {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
-          {/* First Name and Last Name */}
           <div className="row gx-3">
-            {['First Name', 'Last Name'].map((label, index) => (
-              <div className="col-md-6 mb-3" key={index}>
+            {['firstName', 'lastName'].map((field) => (
+              <div className="col-md-6 mb-3" key={field}>
                 <label className="form-label fw-semibold text-primary-light text-sm mb-2">
-                  {label} <span className="text-danger">*</span>
+                  {field === 'firstName' ? 'First' : 'Last'} Name <span className="text-danger">*</span>
                 </label>
                 <input
                   type="text"
                   className="form-control radius-8"
-                  placeholder={`Enter ${label}`}
-                  value={formData[label.toLowerCase().replace(' ', '')]}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      [label.toLowerCase().replace(' ', '')]: e.target.value,
-                    })
-                  }
+                  placeholder={`Enter ${field === 'firstName' ? 'First' : 'Last'} Name`}
+                  value={formData[field]}
+                  onChange={(e) => handleInputChange(field, e.target.value)}
                   required
                 />
               </div>
             ))}
           </div>
 
-          {/* Phone and Email */}
           <div className="row gx-3">
             {[
-              { label: 'Phone', 
-                type: 'tel', 
-                id: 'phone', 
-                placeholder: 'Enter phone number' 
-            },
-
-              { label: 'Email', 
-                type: 'email', id: 'email', 
-                placeholder: 'Enter Email Address', 
-                required: true 
-            },
-            ].map(({ label, type, id, placeholder, required }, index) => (
-              <div className="col-md-6 mb-3" key={index}>
+              { label: 'Phone', type: 'tel', id: 'phoneNumber', placeholder: 'Enter phone number' },
+              { label: 'Email', type: 'email', id: 'email', placeholder: 'Enter Email Address', required: true },
+            ].map(({ label, type, id, placeholder, required }) => (
+              <div className="col-md-6 mb-3" key={id}>
                 <label className="form-label fw-semibold text-primary-light text-sm mb-2">
                   {label} {required && <span className="text-danger">*</span>}
                 </label>
@@ -115,93 +225,80 @@ const AddUsersLayer = () => {
                   id={id}
                   placeholder={placeholder}
                   value={formData[id]}
-                  onChange={(e) =>
-                    setFormData({
-                      ...formData,
-                      [id]: e.target.value,
-                    })
-                  }
+                  onChange={(e) => handleInputChange(id, e.target.value)}
                   required={required}
                 />
               </div>
             ))}
           </div>
 
-          {/* Role Dropdown */}
           <div className="mb-3">
             <label className="form-label fw-semibold text-primary-light text-sm mb-2">
               Role <span className="text-danger">*</span>
             </label>
             <select
-             className="form-control rounded-lg form-select pr-2 bg-white" style={{ width: "200px"}}
-              value={formData.role}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  roleId: e.target.value,
-                })
-              }
+              className="form-control rounded-lg form-select pr-2 bg-white"
+              value={formData.roleId}
+              onChange={(e) => handleInputChange('roleId', e.target.value)}
               required
             >
-              <option value="" disabled selected>
-                Select Role
-              </option>
-              {['Sales Person', 'Manager', 'Customer', 'Distributor'].map((role) => (
-                <option key={role} value={role.toLowerCase()}>
-                  {role}
+              <option value="" disabled>Select Role</option>
+              {roles.map((role) => (
+                <option key={role.roleId} value={role.roleId}>
+                  {role.roleName}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* Permissions Table */}
-          <div className="mb-3">
-            <div className="table-responsive px-0 py-4 fw-medium text-sm">
-              <table className="table table-borderless mb-2 mt-12">
-                <thead>
-                  <tr>
-                    <th>Modules</th>
-                    <th>Permissions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {['User Management', 'Financial Management', 'Order Management', 'Stock Management'].map((module) => (
-                    <tr key={module}>
-                      <td>{module}</td>
-                      <td>
-                        <div className="d-flex flex-row flex-grow-1 gap-2">
-                          {['View', 'Write', 'Create', 'Delete'].map((perm) => (
-                            <div className="form-check form-check-md d-flex align-items-center gap-2" key={perm}>
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={formData.permissions?.[module]?.[perm]}
-                                onChange={(e) =>
-                                  setFormData({
-                                    ...formData,
-                                    permissions: {
-                                      ...formData.permissions,
-                                      [module]: {
-                                        ...formData.permissions?.[module],
-                                        [perm]: e.target.checked,
-                                      },
-                                    },
-                                  })
-                                }
-                              />
-                              <label className="form-check-label">{perm}</label>
-                            </div>
-                          ))}
-                        </div>
-                      </td>
+          {formData.roleId && (
+            <div className="mb-3">
+              <div className="table-responsive px-0 py-4 fw-medium text-sm">
+                <table className="table table-borderless mb-2 mt-12">
+                  <thead>
+                    <tr>
+                      <th>Modules</th>
+                      <th>Permissions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {modules.map((module) => {
+                      const perms = getPermissionOptionsForModule(module.moduleId);
+                      if (perms.length === 0) return null; // Skip modules with no permissions
+                      return (
+                        <tr key={module.moduleId}>
+                          <td>{module.name}</td>
+                          <td>
+                            <div className="d-flex flex-row flex-grow-1 gap-2">
+                              {perms.map((code) => (
+                                <div className="form-check form-check-md d-flex align-items-center gap-2" key={code}>
+                                  <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    checked={
+                                      formData.userPermissions
+                                        .find((p) => p.moduleId === module.moduleId)?.permissionsCodes.includes(code) || false
+                                    }
+                                    onChange={(e) => handlePermissionChange(module.moduleId, code, e.target.checked)}
+                                  />
+                                  <label className="form-check-label">{code}</label>
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
+          )}
+
           <div className="text-muted small mt-3">
             Fields marked with <span className="text-danger">*</span> are required.
+            <br />
+            Country Code: {formData.countryCode} (Assigned automatically)
           </div>
 
           <div className="d-flex justify-content-end gap-2">

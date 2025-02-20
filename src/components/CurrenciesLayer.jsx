@@ -3,125 +3,118 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = "http://192.168.100.45:8098/v1/currencies";
+const API_URL = "https://biz-system-production.up.railway.app/v1/currencies";
 
 const CurrenciesLayer = () => {
   const [currencies, setCurrencies] = useState([]);
-  const [editCurrency, setEditCurrency] = useState({ code: '', name: '', sign: ''});
-  const [newCurrency, setNewCurrency] = useState({ code: '', name: '', sign: ''});
+  const [filteredCurrencies, setFilteredCurrencies] = useState([]);
+  const [editCurrency, setEditCurrency] = useState({ code: "", name: "", sign: "" });
+  const [newCurrency, setNewCurrency] = useState({ code: "", name: "", sign: "" });
   const [currencyToDelete, setCurrencyToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch currencies from the API
   useEffect(() => {
     fetchCurrencies();
-  }, []);
+
+    const addModal = document.getElementById("addCurrencyModal");
+    const editModal = document.getElementById("editCurrencyModal");
+    const resetAddForm = () => !isLoading && setNewCurrency({ code: "", name: "", sign: "" });
+    const resetEditForm = () => !isLoading && setEditCurrency({ code: "", name: "", sign: "" });
+
+    addModal?.addEventListener("hidden.bs.modal", resetAddForm);
+    editModal?.addEventListener("hidden.bs.modal", resetEditForm);
+
+    return () => {
+      addModal?.removeEventListener("hidden.bs.modal", resetAddForm);
+      editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
+    };
+  }, [isLoading]);
 
   const fetchCurrencies = async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(API_URL, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
+        headers: { "Authorization": `Bearer ${token}` },
       });
       console.log("API Response (Fetch Currencies):", response.data);
-      setCurrencies(response.data.data);
+      const data = response.data.data || [];
+      setCurrencies(data);
+      setFilteredCurrencies(data);
     } catch (error) {
       console.error("Error fetching currencies:", error);
+      setError("Failed to fetch currencies. Please try again.");
     }
   };
 
   const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return ""; // Handle invalid dates
+    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
     const date = new Date(dateString);
     const day = date.getDate();
-    const month = date.toLocaleString('en-GB', { month: 'short' });
+    const month = date.toLocaleString("en-GB", { month: "short" });
     const year = date.getFullYear();
-
-    // Simple ordinal suffix logic
     const suffix = (day % 10 === 1 && day !== 11) ? "st" :
-      (day % 10 === 2 && day !== 12) ? "nd" :
-      (day % 10 === 3 && day !== 13) ? "rd" : "th";
-
+                   (day % 10 === 2 && day !== 12) ? "nd" :
+                   (day % 10 === 3 && day !== 13) ? "rd" : "th";
     return `${day}${suffix} ${month} ${year}`;
   };
 
   const handleAddCurrency = async (e) => {
     e.preventDefault();
-    if (!newCurrency.code.trim()) {
-      alert("Please fill in all fields before saving.");
+    if (!newCurrency.code.trim() || !newCurrency.name.trim() || !newCurrency.sign.trim()) {
+      setError("Please fill in all required fields.");
       return;
     }
 
     try {
       setIsLoading(true);
+      setError(null);
       const token = localStorage.getItem("token");
       const response = await axios.post(API_URL, newCurrency, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
+        headers: { "Authorization": `Bearer ${token}` },
       });
       console.log("API Response (Add Currency):", response.data);
-
-      setCurrencies((prevCurrencies) => [
-        ...prevCurrencies,
-        { ...response.data.data },
-      ]);
-
-      setNewCurrency({ code: '', name: '', sign: '' });
-
-      // Delay modal closure
-      setTimeout(() => {
-        document.getElementById("addCurrencyModal").classList.remove("show"); // Close modal
-      }, 2000); // Adjust the delay as needed
+      await fetchCurrencies();
     } catch (error) {
       console.error("Error adding currency:", error);
+      setError(error.response?.data?.message || "Failed to add currency.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleEditClick = (currency) => {
-    setEditCurrency(currency);
+    setEditCurrency({ ...currency });
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    if (!editCurrency) return;
+    if (!editCurrency.code.trim() || !editCurrency.name.trim() || !editCurrency.sign.trim()) {
+      setError("Please fill in all required fields.");
+      return;
+    }
 
     try {
       setIsLoading(true);
+      setError(null);
       const token = localStorage.getItem("token");
       const response = await axios.put(`${API_URL}/${editCurrency.code}`, editCurrency, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
+        headers: { "Authorization": `Bearer ${token}` },
       });
       console.log("API Response (Edit Currency):", response.data);
-
-      // Update the state
-      setCurrencies((prevCurrencies) =>
-        prevCurrencies.map((c) =>
-          c.code === editCurrency.code ? response.data.data : c
-        )
-      );
-
-      // Delay modal closure
-      setTimeout(() => {
-        document.getElementById("editCurrencyModal").classList.remove("show"); // Close modal
-      }, 2000); // Adjust the delay as needed
+      await fetchCurrencies();
     } catch (error) {
       console.error("Error updating currency:", error);
+      setError(error.response?.data?.message || "Failed to update currency.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteClick = (currency) => {
-    if (!currency) return;
     setCurrencyToDelete(currency);
   };
 
@@ -129,34 +122,50 @@ const CurrenciesLayer = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`${API_URL}/${currencyToDelete.code}`, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
+        headers: { "Authorization": `Bearer ${token}` },
       });
       console.log("API Response (Delete Currency):", "Currency deleted successfully");
-
-      // Update the state
-      const updatedCurrencies = currencies.filter((c) => c.code !== currencyToDelete.code);
-      setCurrencies(updatedCurrencies);
+      setCurrencies(currencies.filter((c) => c.code !== currencyToDelete.code));
+      setFilteredCurrencies(filteredCurrencies.filter((c) => c.code !== currencyToDelete.code));
       setCurrencyToDelete(null);
     } catch (error) {
       console.error("Error deleting currency:", error);
+      setError(error.response?.data?.message || "Failed to delete currency.");
     }
   };
 
-  // Pagination logic
+  const handleSearch = (e) => {
+    e.preventDefault();
+    filterCurrencies(searchQuery);
+  };
+
+  const handleSearchInputChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    filterCurrencies(query);
+  };
+
+  const filterCurrencies = (query) => {
+    const lowerQuery = query.toLowerCase();
+    const filtered = currencies.filter(
+      (currency) =>
+        currency.code.toLowerCase().includes(lowerQuery) ||
+        currency.name.toLowerCase().includes(lowerQuery) ||
+        currency.sign.toLowerCase().includes(lowerQuery)
+    );
+    setFilteredCurrencies(filtered);
+    setCurrentPage(1);
+  };
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = currencies.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(currencies.length / itemsPerPage);
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
+  const currentItems = filteredCurrencies.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCurrencies.length / itemsPerPage);
+  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
     <div className="page-wrapper">
       <div className="row">
-        {/* Add Currency */}
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <button
@@ -171,108 +180,140 @@ const CurrenciesLayer = () => {
           </div>
         </div>
 
-        {/* Currencies table */}
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
+        <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
+            {error && <div className="alert alert-danger">{error}</div>}
             <div>
-              <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}>
-                <input type='text' name='search' placeholder='Search' />
-                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
+              <form
+                className="navbar-search mb-3"
+                onSubmit={handleSearch}
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="Search by code, name, or sign"
+                  value={searchQuery}
+                  onChange={handleSearchInputChange}
+                  className="form-control"
+                  style={{ maxWidth: "300px" }}
+                />
               </form>
             </div>
-            <div className="table-responsive" style={{ overflow: 'visible' }}>
-              <table className="table table-borderless text-start small-text" style={{ width: '100%' }}>
+            <div className="table-responsive" style={{ overflow: "visible" }}>
+              <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
                 <thead className="table-light text-start small-text">
                   <tr>
-                    <th className="text-start">#</th>
-                    <th className="text-start">Currency Code</th>
-                    <th className="text-start" style={{ width: "220px" }}>Currency Name</th>
-                    <th className="text-start">Currency Sign</th>
-                    <th className="text-start" style={{ width: "220px" }}>Date Created</th>
-                    <th className="text-start">Action</th>
+                    <th className="text-start py-3 px-4">#</th>
+                    <th className="text-start py-3 px-4">Currency Code</th>
+                    <th className="text-start py-3 px-4" style={{ width: "220px" }}>Currency Name</th>
+                    <th className="text-start py-3 px-4">Currency Sign</th>
+                    <th className="text-start py-3 px-4" style={{ width: "220px" }}>Date Created</th>
+                    <th className="text-start py-3 px-4">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((currency) => (
-                    <tr key={currency.code}>
-                      <th scope="row" className="text-start small-text">
-                        {indexOfFirstItem + currentItems.indexOf(currency) + 1}
-                      </th>
-                      <td className="text-start small-text">{currency.code}</td>
-                      <td className="text-start small-text">{currency.name}</td>
-                      <td className="text-start small-text">{currency.sign}</td>
-                      <td className="text-start small-text">
-                        {currency.dateCreated ? formatDate(currency.dateCreated) : "No Date"}
-                      </td>
-                      <td className="text-start small-text">
-                        <div className="dropdown">
-                          <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
-                            Actions
-                          </button>
-                          <ul className="dropdown-menu">
-                            <li>
-                              <Link
-                                className="dropdown-item"
-                                to="#"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editCurrencyModal"
-                                onClick={() => handleEditClick(currency)}
-                              >
-                                Edit
-                              </Link>
-                            </li>
-                            <li>
-                              <button
-                                className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(currency)}
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteCurrencyModal"
-                              >
-                                Delete
-                              </button>
-                            </li>
-                          </ul>
-                        </div>
+                  {currentItems.length > 0 ? (
+                    currentItems.map((currency) => (
+                      <tr key={currency.code} style={{ transition: "background-color 0.2s" }}>
+                        <td className="text-start small-text py-3 px-4">
+                          {indexOfFirstItem + currentItems.indexOf(currency) + 1}
+                        </td>
+                        <td className="text-start small-text py-3 px-4">{currency.code}</td>
+                        <td className="text-start small-text py-3 px-4">{currency.name}</td>
+                        <td className="text-start small-text py-3 px-4">{currency.sign}</td>
+                        <td className="text-start small-text py-3 px-4">
+                          {currency.dateCreated ? formatDate(currency.dateCreated) : ""}
+                        </td>
+                        <td className="text-start small-text py-3 px-4">
+                          <div className="dropdown">
+                            <button
+                              className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                              type="button"
+                              data-bs-toggle="dropdown"
+                              style={{ padding: "4px 8px" }}
+                            >
+                              Actions
+                            </button>
+                            <ul className="dropdown-menu">
+                              <li>
+                                <Link
+                                  className="dropdown-item"
+                                  to="#"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#editCurrencyModal"
+                                  onClick={() => handleEditClick(currency)}
+                                >
+                                  Edit
+                                </Link>
+                              </li>
+                              <li>
+                                <button
+                                  className="dropdown-item text-danger"
+                                  onClick={() => handleDeleteClick(currency)}
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#deleteCurrencyModal"
+                                >
+                                  Delete
+                                </button>
+                              </li>
+                            </ul>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="6" className="text-center py-3">
+                        No currencies found
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             </div>
 
-            {/* Pagination */}
-            <div className="d-flex justify-content-between align-items-start mt-3">
+            <div className="d-flex justify-content-between align-items-center mt-3">
               <div className="text-muted">
-                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, currencies.length)} of {currencies.length} entries</span>
+                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredCurrencies.length)} of {filteredCurrencies.length} entries</span>
               </div>
               <nav aria-label="Page navigation">
-                <ul className="pagination mb-0">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                <ul className="pagination mb-0" style={{ gap: "8px" }}>
+                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                     <button
-                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
+                      className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                      style={{ width: "36px", height: "36px", padding: "0", transition: "all 0.2s" }}
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
                     >
-                      <Icon icon="ep:d-arrow-left" />
+                      <Icon icon="ep:d-arrow-left" style={{ fontSize: "18px" }} />
                     </button>
                   </li>
                   {Array.from({ length: totalPages }, (_, i) => (
-                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                    <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
                       <button
-                        className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
+                        className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle d-flex align-items-center justify-content-center`}
+                        style={{
+                          width: "36px",
+                          height: "36px",
+                          padding: "0",
+                          transition: "all 0.2s",
+                          color: currentPage === i + 1 ? "#fff" : "",
+                        }}
                         onClick={() => handlePageChange(i + 1)}
                       >
                         {i + 1}
                       </button>
                     </li>
                   ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                     <button
-                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
+                      className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                      style={{ width: "36px", height: "36px", padding: "0", transition: "all 0.2s" }}
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
                     >
-                      <Icon icon="ep:d-arrow-right" />
+                      <Icon icon="ep:d-arrow-right" style={{ fontSize: "18px" }} />
                     </button>
                   </li>
                 </ul>
@@ -288,48 +329,25 @@ const CurrenciesLayer = () => {
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
                   Add Currency
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </h6>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <form onSubmit={handleAddCurrency}>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Code <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Currency Code"
-                      value={newCurrency.code}
-                      onChange={(e) => setNewCurrency({ ...newCurrency, code: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Name <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Currency Name"
-                      value={newCurrency.name}
-                      onChange={(e) => setNewCurrency({ ...newCurrency, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Sign <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Currency Sign"
-                      value={newCurrency.sign}
-                      onChange={(e) => setNewCurrency({ ...newCurrency, sign: e.target.value })}
-                      required
-                    />
-                  </div>
+                  {["code", "name", "sign"].map((field) => (
+                    <div className="mb-3" key={field}>
+                      <label className="form-label">
+                        {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={`Enter Currency ${field.charAt(0).toUpperCase() + field.slice(1)}`}
+                        value={newCurrency[field]}
+                        onChange={(e) => setNewCurrency({ ...newCurrency, [field]: e.target.value })}
+                        required
+                      />
+                    </div>
+                  ))}
                   <div className="text-muted small mt-3">
                     Fields marked with <span className="text-danger">*</span> are required.
                   </div>
@@ -337,8 +355,8 @@ const CurrenciesLayer = () => {
                     <button
                       type="submit"
                       className="btn btn-primary"
-                      data-bs-dismiss={!isLoading ? "modal" : undefined}
                       disabled={isLoading}
+                      data-bs-dismiss={!isLoading && !error ? "modal" : undefined}
                     >
                       {isLoading ? "Saving..." : "Save"}
                     </button>
@@ -356,55 +374,37 @@ const CurrenciesLayer = () => {
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
                   Edit Currency
-                  <button 
-                    type="button" 
-                    className="btn-close" 
-                    data-bs-dismiss="modal"
-                  >
-                  </button>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </h6>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <form onSubmit={handleEditSubmit}>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Code <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Currency Code"
-                      value={editCurrency.code}
-                      onChange={(e) => setEditCurrency({ ...editCurrency, code: e.target.value })}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Name <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Currency Name"
-                      value={editCurrency.name}
-                      onChange={(e) => setEditCurrency({ ...editCurrency, name: e.target.value })}
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Sign <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Currency Sign"
-                      value={editCurrency.sign}
-                      onChange={(e) => setEditCurrency({ ...editCurrency, sign: e.target.value })}
-                    />
-                  </div>
+                  {["code", "name", "sign"].map((field) => (
+                    <div className="mb-3" key={field}>
+                      <label className="form-label">
+                        {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={`Enter Currency ${field.charAt(0).toUpperCase() + field.slice(1)}`}
+                        value={editCurrency[field]}
+                        onChange={(e) => setEditCurrency({ ...editCurrency, [field]: e.target.value })}
+                        required
+                      />
+                    </div>
+                  ))}
                   <div className="text-muted small mt-3">
                     Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
-                    <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={isLoading}
+                      data-bs-dismiss={!isLoading && !error ? "modal" : undefined}
+                    >
+                      {isLoading ? "Saving..." : "Save"}
+                    </button>
                   </div>
                 </form>
               </div>

@@ -1,9 +1,10 @@
-import { Icon } from '@iconify/react/dist/iconify.js';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { Icon } from '@iconify/react/dist/iconify.js';
 
-const API_URL = 'http://192.168.100.45:8098/v1/user/system';
+const API_URL = "https://biz-system-production.up.railway.app/v1/user";
+const ROL_URL = "https://biz-system-production.up.railway.app/v1/roles";
 
 const UsersListLayer = () => {
   const [users, setUsers] = useState([]);
@@ -11,167 +12,231 @@ const UsersListLayer = () => {
   const [userToDelete, setUserToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [roles, setRoles] = useState([]);
+  const [modules, setModules] = useState([]);
   const [editUser, setEditUser] = useState({
     id: '',
     firstName: '',
     lastName: '',
     email: '',
-    phoneNumber: '',
+    phoneNo: '',
     roleId: '',
-    userPermissions: [], // Array of { moduleId, permissionsCodes }
+    countryCode: '',
+    userModelModulePermissions: [],
   });
 
-  // Permissions data
-  const permissionsData = [
-    {
-      moduleId: 1,
-      moduleName: 'User Management',
-      permissions: [
-        { code: 'RD', label: 'Read' },
-        { code: 'WR', label: 'Write' },
-        { code: 'CR', label: 'Create' },
-        { code: 'DL', label: 'Delete' },
-      ],
-    },
-    {
-      moduleId: 2,
-      moduleName: 'Financial Management',
-      permissions: [
-        { code: 'RD', label: 'Read' },
-        { code: 'WR', label: 'Write' },
-        { code: 'CR', label: 'Create' },
-        { code: 'DL', label: 'Delete' },
-      ],
-    },
-    {
-      moduleId: 3,
-      moduleName: 'User Management',
-      permissions: [
-        { code: 'RD', label: 'Read' },
-        { code: 'WR', label: 'Write' },
-        { code: 'CR', label: 'Create' },
-        { code: 'DL', label: 'Delete' },
-      ],
-    },
-    // Add more modules as needed
-  ];
-
-  // Fetch users from the API
   useEffect(() => {
     fetchUsers();
+    fetchRolesAndModules();
   }, []);
 
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(API_URL, {
+      const response = await axios.get(`${API_URL}/system`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('API Response (Fetch Users):', response.data);
-      setUsers(response.data.data);
+      console.log('Fetch Users Response:', response.data);
+      setUsers(response.data.data.map(user => ({
+        ...user,
+        countryCode: user.countryCode || '',
+      })) || []);
     } catch (error) {
       console.error('Error fetching users:', error);
+      setUsers([]);
     }
   };
 
-  // Pagination logic
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const fetchRolesAndModules = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(ROL_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('Fetch Roles Response:', response.data);
+      const roleList = response.data.data.map(role => ({
+        roleId: role.roleId,
+        roleName: role.roleName,
+      }));
+      setRoles(roleList);
 
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
+      const moduleMap = new Map();
+      response.data.data.forEach(role => {
+        role.roleModulePermissions.forEach(module => {
+          if (!moduleMap.has(module.moduleId)) {
+            moduleMap.set(module.moduleId, {
+              moduleId: module.moduleId,
+              name: module.name,
+              rolePermissions: module.rolePermissions || [],
+            });
+          }
+        });
+      });
+      setModules(Array.from(moduleMap.values()));
+    } catch (error) {
+      console.error('Error fetching roles and modules:', error);
+      setRoles([]);
+      setModules([]);
+    }
   };
 
-  // Open Edit Modal
-  const openEditModal = (user) => {
-    setEditUser({
-      id: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      phoneNumber: user.phoneNo,
-      roleId: user.role.id,
-      userPermissions: user.userPermissions || [], // Ensure this matches your API response
-    });
-  };
-
-  // Handle Permission Changes
   const handlePermissionChange = (moduleId, permissionCode, isChecked) => {
     setEditUser((prev) => {
-      const updatedPermissions = [...prev.userPermissions];
+      const updatedPermissions = [...prev.userModelModulePermissions];
       const moduleIndex = updatedPermissions.findIndex((up) => up.moduleId === moduleId);
 
       if (moduleIndex === -1) {
         updatedPermissions.push({
           moduleId,
-          permissionsCodes: isChecked ? [permissionCode] : [],
+          moduleName: modules.find(m => m.moduleId === moduleId)?.name || '',
+          permissions: isChecked ? [{ code: permissionCode, name: '', assigned: true }] : [],
         });
       } else {
-        // Update existing module permissions
-        const permissionsCodes = updatedPermissions[moduleIndex].permissionsCodes;
+        const permissions = updatedPermissions[moduleIndex].permissions;
         if (isChecked) {
-          permissionsCodes.push(permissionCode);
+          const permName = modules
+            .find(m => m.moduleId === moduleId)
+            ?.rolePermissions.find(p => p.code === permissionCode)?.name || '';
+          permissions.push({ code: permissionCode, name: permName, assigned: true });
         } else {
-          updatedPermissions[moduleIndex].permissionsCodes = permissionsCodes.filter(
-            (code) => code !== permissionCode
+          updatedPermissions[moduleIndex].permissions = permissions.filter(
+            (perm) => perm.code !== permissionCode
           );
         }
       }
 
-      return { ...prev, userPermissions: updatedPermissions };
+      return { ...prev, userModelModulePermissions: updatedPermissions };
     });
   };
 
-  // Handle Edit Form Submission
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleEditClick = async (user) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.put(
-        `${API_URL}/${editUser.id}`, // Update the endpoint as needed
-        editUser,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log('User updated successfully:', response.data);
-      fetchUsers(); // Refresh the user list
+      const response = await axios.get(`${API_URL}/system/${user.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log('User Details Response:', response.data);
+      const userData = response.data.data;
+
+      setEditUser({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNo: user.phoneNo,
+        roleId: userData.roleId || user.role.id,
+        countryCode: userData.countryCode || user.countryCode || 'KE',
+        userModelModulePermissions: userData.roleModulePermissions.map(module => ({
+          moduleId: module.moduleId,
+          moduleName: module.name,
+          permissions: module.rolePermissions.map(perm => ({
+            code: perm.code,
+            name: perm.name,
+            assigned: perm.assigned,
+          })),
+        })) || [],
+      });
     } catch (error) {
-      console.error('Error updating user:', error);
+      console.error('Error fetching user details:', error);
+      setEditUser({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phoneNo: user.phoneNo,
+        roleId: user.role.id,
+        countryCode: user.countryCode || 'KE',
+        userModelModulePermissions: [],
+      });
     }
   };
 
-  // Handle Delete Click
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editUser) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      console.log('Submitting changes:', editUser);
+
+      const payload = {
+        firstName: editUser.firstName,
+        lastName: editUser.lastName,
+        email: editUser.email,
+        phoneNumber: editUser.phoneNo,
+        roleId: parseInt(editUser.roleId),
+        countryCode: editUser.countryCode,
+        userPermissions: editUser.userModelModulePermissions.map(module => ({
+          moduleId: module.moduleId,
+          permissionsCodes: module.permissions
+            .filter(perm => perm.assigned)
+            .map(perm => perm.code),
+        })).filter(module => module.permissionsCodes.length > 0),
+      };
+
+      console.log('Transformed payload:', payload);
+
+      const response = await axios.put(`${API_URL}/register/update/${editUser.id}`, payload, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === editUser.id ? { ...user, ...response.data.data } : user
+        )
+      );
+      console.log('User updated successfully:', response.data);
+      fetchUsers();
+      document.getElementById('editUserModal').classList.remove('show');
+    } catch (error) {
+      console.error('Error updating user:', error);
+      if (error.response) {
+        console.log('Server error response:', JSON.stringify(error.response.data, null, 2));
+      }
+    }
+  };
+
   const handleDeleteClick = (user) => {
     if (!user) return;
     setUserToDelete(user);
   };
 
-  // Handle Delete Confirmation
   const handleDeleteConfirm = async () => {
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/${userToDelete.code}`, {
+      console.log('Deleting user ID:', userToDelete.id);
+      const response = await axios.delete(`${API_URL}/register/update/${userToDelete.id}`, { // Updated endpoint
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log('API Response (Delete User):', 'User deleted successfully');
-
-      // Update the state
-      const updatedUsers = users.filter((c) => c.code !== userToDelete.code);
+      console.log('API Response (Delete User):', response.data);
+      const updatedUsers = users.filter((user) => user.id !== userToDelete.id);
       setUsers(updatedUsers);
       setUserToDelete(null);
+      document.getElementById('deleteUserModal').classList.remove('show'); // Close modal on success
     } catch (error) {
       console.error('Error deleting user:', error);
+      if (error.response) {
+        console.log('Server error response:', JSON.stringify(error.response.data, null, 2));
+      }
     }
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = users.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(users.length / itemsPerPage);
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -219,7 +284,7 @@ const UsersListLayer = () => {
                 </thead>
                 <tbody>
                   {currentItems.map((user, index) => (
-                    <tr key={index}>
+                    <tr key={user.id}>
                       <th scope="row" className="text-start small-text">{index + 1}</th>
                       <td className="text-start small-text">{user.firstName}</td>
                       <td className="text-start small-text">{user.lastName}</td>
@@ -243,14 +308,15 @@ const UsersListLayer = () => {
                               </Link>
                             </li>
                             <li>
-                              <button
+                              <Link
                                 className="dropdown-item"
+                                to="#"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editUserModal"
-                                onClick={() => openEditModal(user)}
+                                onClick={() => handleEditClick(user)}
                               >
                                 Edit
-                              </button>
+                              </Link>
                             </li>
                             <li>
                               <button
@@ -271,7 +337,6 @@ const UsersListLayer = () => {
               </table>
             </div>
 
-            {/* Pagination */}
             <div className="d-flex justify-content-between align-items-start mt-3">
               <div className="text-muted">
                 <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, users.length)} of {users.length} entries</span>
@@ -313,7 +378,6 @@ const UsersListLayer = () => {
         </div>
       </div>
 
-      {/* Edit User Modal */}
       <div className="modal fade" id="editUserModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-lg modal-dialog-centered">
           <div className="modal-content">
@@ -325,10 +389,9 @@ const UsersListLayer = () => {
                   className="btn-close"
                   data-bs-dismiss="modal"
                   aria-label="Close"
-                ></button>
+                />
               </h6>
               <form onSubmit={handleEditSubmit}>
-                {/* First Name and Last Name */}
                 <div className="row mb-3">
                   <div className="col-md-6">
                     <label className="form-label">
@@ -358,7 +421,6 @@ const UsersListLayer = () => {
                   </div>
                 </div>
 
-                {/* Phone Number and Email */}
                 <div className="row mb-3">
                   <div className="col-md-6">
                     <label className="form-label">
@@ -368,8 +430,8 @@ const UsersListLayer = () => {
                       type="tel"
                       className="form-control"
                       placeholder="Enter Phone Number"
-                      value={editUser.phoneNumber}
-                      onChange={(e) => setEditUser({ ...editUser, phoneNumber: e.target.value })}
+                      value={editUser.phoneNo}
+                      onChange={(e) => setEditUser({ ...editUser, phoneNo: e.target.value })}
                       required
                     />
                   </div>
@@ -388,56 +450,25 @@ const UsersListLayer = () => {
                   </div>
                 </div>
 
-                {/* Role Dropdown */}
                 <div className="mb-3">
                   <label className="form-label">
                     Role <span className="text-danger">*</span>
                   </label>
-                  <div className="dropdown">
-                    <button
-                      className="btn btn-outline-primary-600 not-active px-18 py-11 dropdown-toggle"
-                      type="button"
-                      data-bs-toggle="dropdown"
-                      aria-expanded="false"
-                    >
-                      {editUser.roleId === 1
-                        ? 'Admin'
-                        : editUser.roleId === 2
-                        ? 'Manager'
-                        : editUser.roleId === 3
-                        ? 'User'
-                        : 'Select Role'}
-                    </button>
-                    <ul className="dropdown-menu">
-                      <li>
-                        <button
-                          className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                          onClick={() => setEditUser({ ...editUser, roleId: 1 })}
-                        >
-                          Admin
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                          onClick={() => setEditUser({ ...editUser, roleId: 2 })}
-                        >
-                          Manager
-                        </button>
-                      </li>
-                      <li>
-                        <button
-                          className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
-                          onClick={() => setEditUser({ ...editUser, roleId: 3 })}
-                        >
-                          User
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
+                  <select
+                    className="form-control"
+                    value={editUser.roleId}
+                    onChange={(e) => setEditUser({ ...editUser, roleId: e.target.value })}
+                    required
+                  >
+                    <option value="">Select Role</option>
+                    {roles.map((role) => (
+                      <option key={role.roleId} value={role.roleId}>
+                        {role.roleName}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
-                {/* Permissions Table */}
                 <div className="mb-3">
                   <label className="form-label">
                     Permissions <span className="text-danger">*</span>
@@ -451,22 +482,22 @@ const UsersListLayer = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {permissionsData.map((module) => (
+                        {modules.map((module) => (
                           <tr key={module.moduleId}>
-                            <td>{module.moduleName}</td>
+                            <td>{module.name}</td>
                             <td>
                               <div className="d-flex flex-wrap gap-3">
-                                {module.permissions.map((perm) => (
+                                {module.rolePermissions.map((perm) => (
                                   <div key={perm.code} className="form-check" style={{ display: 'flex', alignItems: 'center' }}>
                                     <input
                                       type="checkbox"
                                       className="form-check-input me-2"
-                                      checked={editUser.userPermissions
+                                      checked={editUser.userModelModulePermissions
                                         .find((up) => up.moduleId === module.moduleId)
-                                        ?.permissionsCodes.includes(perm.code)}
+                                        ?.permissions.some((p) => p.code === perm.code && p.assigned) || false}
                                       onChange={(e) => handlePermissionChange(module.moduleId, perm.code, e.target.checked)}
                                     />
-                                    <label className="form-check-label" style={{ marginBottom: 0 }}>{perm.label}</label>
+                                    <label className="form-check-label" style={{ marginBottom: 0 }}>{perm.name}</label>
                                   </div>
                                 ))}
                               </div>
@@ -477,17 +508,8 @@ const UsersListLayer = () => {
                     </table>
                   </div>
                 </div>
-
-                {/* Submit Button */}
                 <div className="d-flex justify-content-end gap-2">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                  >
-                    Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
+                  <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">
                     Save
                   </button>
                 </div>
@@ -497,7 +519,6 @@ const UsersListLayer = () => {
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       <div className="modal fade" id="deleteUserModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
@@ -507,12 +528,12 @@ const UsersListLayer = () => {
                 <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <p className="pb-3 mb-0">
-                Are you sure you want to delete the <strong>{userToDelete?.name}</strong> user permanently? This action cannot be undone.
+                Are you sure you want to delete the <strong>{userToDelete?.firstName} {userToDelete?.lastName}</strong> user permanently? This action cannot be undone.
               </p>
             </div>
             <div className="d-flex justify-content-end gap-2 px-12 pb-3">
               <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleDeleteConfirm}>Delete</button>
+              <button type="button" className="btn btn-danger" onClick={handleDeleteConfirm}>Delete</button>
             </div>
           </div>
         </div>

@@ -7,9 +7,9 @@ import axios from "axios";
 const OtpVerificationLayer = () => {
   const [formData, setFormData] = useState({
     email: "",
-    authMethod: "EMAILPASSWORD", // Fixed value
-    password: "", // Not used in OTP verification but included for consistency
-    otp: ["", "", "", "", ""], // OTP is stored as an array
+    authMethod: "EMAILPASSWORD",
+    password: "",
+    otp: ["", "", "", "", ""],
   });
   const [message, setMessage] = useState("We have sent an OTP to your email");
   const [timer, setTimer] = useState(10);
@@ -89,7 +89,7 @@ const OtpVerificationLayer = () => {
     try {
       // Make API call to validate OTP
       const response = await axios.post(
-        "http://192.168.100.45:8098/v1/auth/validate-otp", // Correct API endpoint
+        "https://biz-system-production.up.railway.app/v1/auth/validate-otp", // Correct API endpoint
         {
           email: formData.email,
           password: formData.password,
