@@ -19,7 +19,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
   const [error, setError] = useState(null);
   const [roles, setRoles] = useState([]);
   const [modules, setModules] = useState([]);
-  const [rolePermissions, setRolePermissions] = useState({}); // Map of moduleId to valid permissions
+  const [rolePermissions, setRolePermissions] = useState({}); // Map of moduleId to valid permissions with code and name
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,7 +51,11 @@ const AddUsersLayer = ({ onUserAdded }) => {
               });
             }
             if (!permissionsMap[role.roleId]) permissionsMap[role.roleId] = {};
-            permissionsMap[role.roleId][module.moduleId] = module.rolePermissions.map((p) => p.code);
+            // Store both code and name for each permission
+            permissionsMap[role.roleId][module.moduleId] = module.rolePermissions.map((p) => ({
+              code: p.code,
+              name: p.name || p.code, // Fallback to code if name is unavailable
+            }));
           });
         });
         setModules(allModules);
@@ -77,7 +81,11 @@ const AddUsersLayer = ({ onUserAdded }) => {
         ]);
         setRolePermissions({
           1: {
-            1: ['CRT', 'DLT', 'RD'],
+            1: [
+              { code: 'CRT', name: 'Create' },
+              { code: 'DLT', name: 'Delete' },
+              { code: 'RD', name: 'Read' },
+            ],
             2: [],
           },
         });
@@ -145,7 +153,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
 
   const handlePermissionChange = (moduleId, code, checked) => {
     const validPermissions = rolePermissions[formData.roleId]?.[moduleId] || [];
-    if (!validPermissions.includes(code)) {
+    if (!validPermissions.some((p) => p.code === code)) {
       console.warn(`Permission ${code} not available for module ${moduleId}`);
       return;
     }
@@ -232,12 +240,12 @@ const AddUsersLayer = ({ onUserAdded }) => {
             ))}
           </div>
 
-          <div className="mb-3">
+          <div className="col-md-4 mb-3">
             <label className="form-label fw-semibold text-primary-light text-sm mb-2">
               Role <span className="text-danger">*</span>
             </label>
             <select
-              className="form-control rounded-lg form-select pr-2 bg-white"
+              className="form-control rounded-lg form-select pr-4 bg-white"
               value={formData.roleId}
               onChange={(e) => handleInputChange('roleId', e.target.value)}
               required
@@ -270,18 +278,18 @@ const AddUsersLayer = ({ onUserAdded }) => {
                           <td>{module.name}</td>
                           <td>
                             <div className="d-flex flex-row flex-grow-1 gap-2">
-                              {perms.map((code) => (
-                                <div className="form-check form-check-md d-flex align-items-center gap-2" key={code}>
+                              {perms.map((perm) => (
+                                <div className="form-check form-check-md d-flex align-items-center gap-2" key={perm.code}>
                                   <input
                                     className="form-check-input"
                                     type="checkbox"
                                     checked={
                                       formData.userPermissions
-                                        .find((p) => p.moduleId === module.moduleId)?.permissionsCodes.includes(code) || false
+                                        .find((p) => p.moduleId === module.moduleId)?.permissionsCodes.includes(perm.code) || false
                                     }
-                                    onChange={(e) => handlePermissionChange(module.moduleId, code, e.target.checked)}
+                                    onChange={(e) => handlePermissionChange(module.moduleId, perm.code, e.target.checked)}
                                   />
-                                  <label className="form-check-label">{code}</label>
+                                  <label className="form-check-label">{perm.name}</label>
                                 </div>
                               ))}
                             </div>
@@ -297,8 +305,6 @@ const AddUsersLayer = ({ onUserAdded }) => {
 
           <div className="text-muted small mt-3">
             Fields marked with <span className="text-danger">*</span> are required.
-            <br />
-            Country Code: {formData.countryCode} (Assigned automatically)
           </div>
 
           <div className="d-flex justify-content-end gap-2">

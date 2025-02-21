@@ -22,17 +22,15 @@ const OtpVerificationLayer = () => {
 
   useEffect(() => {
     if (location.state?.email && location.state?.password) {
-  setFormData((prevData) => ({
-    ...prevData,
-    email: location.state.email,
-    password: location.state.password, // Ensure password is set
-  }));
-  
+      setFormData((prevData) => ({
+        ...prevData,
+        email: location.state.email,
+        password: location.state.password,
+      }));
     } else {
-      navigate("/sign-in"); // Redirect to sign-in if no email is provided
+      navigate("/sign-in");
     }
 
-    // Start the OTP timer
     if (intervalRef.current) return;
 
     intervalRef.current = setInterval(() => {
@@ -50,33 +48,27 @@ const OtpVerificationLayer = () => {
     return () => clearInterval(intervalRef.current);
   }, [location, navigate]);
 
-  useEffect(() => {
-  }, [formData]);
-
   const handleOtpChange = (index, value) => {
     if (!/^[0-9]?$/.test(value)) return;
 
     const newOtp = [...formData.otp];
-    //console.log("OTP", newOtp)
     newOtp[index] = value;
     setFormData((prevData) => ({
       ...prevData,
       otp: newOtp,
     }));
 
-    // Move focus to the next input field
     if (value && index < formData.otp.length - 1) {
       inputRefs.current[index + 1].focus();
     }
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission behavior
+    e.preventDefault();
     setLoading(true);
 
     const otpCode = formData.otp.join("");
 
-    // Basic client-side validation: Ensure all OTP fields are filled
     if (otpCode.length !== 5) {
       toast.error("Please enter a valid 5-digit OTP.", {
         position: "top-right",
@@ -85,11 +77,16 @@ const OtpVerificationLayer = () => {
       setLoading(false);
       return;
     }
-    setLoading(true);
+
     try {
-      // Make API call to validate OTP
+      console.log("Submitting OTP with payload:", {
+        email: formData.email,
+        password: formData.password,
+        authMethod: formData.authMethod,
+        otp: otpCode,
+      });
       const response = await axios.post(
-        "https://biz-system-production.up.railway.app/v1/auth/validate-otp", // Correct API endpoint
+        "https://biz-system-production.up.railway.app/v1/auth/validate-otp",
         {
           email: formData.email,
           password: formData.password,
@@ -101,20 +98,23 @@ const OtpVerificationLayer = () => {
             "APP-KEY": "BCM8WTL9MQU4MJLE",
           },
         }
-        
       );
-      //console.log("API Response:", response.data);
-      // Check if the OTP validation was successful
-      if (response.data.status.code === 0 && response.status === 200) {
+
+      console.log("OTP Validation Full Response:", response);
+      console.log("OTP Validation Response Data:", response.data);
+
+      if (response.status === 200 && response.data.status?.code === 0) {
         toast.success("OTP Verified Successfully", {
           position: "top-right",
-          duration: 1000,
+          duration: 2000,
           icon: "✅",
         });
+
         localStorage.setItem("token", response.data.data.accessToken);
 
-        // Navigate to the dashboard only after successful OTP validation
-        navigate("/index-1");
+        setTimeout(() => {
+          navigate("/index-1");
+        }, 2000);
       } else {
         toast.error("Invalid OTP. Please try again.", {
           position: "top-right",
@@ -122,7 +122,7 @@ const OtpVerificationLayer = () => {
         });
       }
     } catch (error) {
-      console.error("OTP Validation Error:", error);
+      console.error("OTP Validation Error:", error.message, error.response?.data);
       toast.error("Failed to validate OTP. Please try again.", {
         position: "top-right",
         duration: 2000,
@@ -134,43 +134,46 @@ const OtpVerificationLayer = () => {
 
   const handleResend = async () => {
     if (!formData.email?.trim()) {
-      console.log("Error: Email is missing!"); 
+      console.log("Error: Email is missing!");
       toast.error("Email is required to resend OTP.", {
         position: "top-right",
         duration: 2000,
       });
       return;
     }
-  
+
+    setLoading(true);
+
     try {
+      console.log("Resending OTP with payload:", {
+        email: formData.email,
+        authMethod: formData.authMethod,
+        password: formData.password,
+      });
       const response = await axios.post(
-        "http://192.168.100.45:8098/v1/auth/otp", // Endpoint for resending OTP
-        { email: formData.email, 
+        "https://biz-system-production.up.railway.app/v1/auth/otp",
+        {
+          email: formData.email,
           authMethod: formData.authMethod,
-          password: formData.password
+          password: formData.password,
         },
-        
         { headers: { "APP-KEY": "BCM8WTL9MQU4MJLE" } }
       );
-      console.log("API Response:", response);
-      console.log("Response Data:", response.data);
-      console.log("Status Code:", response.data?.status?.code);
-      console.log("Status Message:", response.data?.status?.message);
 
-      if (response.data.status.code === 0 && response.status === 200) {
-        console.log("OTP successfully sent to:", formData.email);
+      console.log("Resend OTP Full Response:", response);
+      console.log("Resend OTP Response Data:", response.data);
 
+      if (response.status === 200 && response.data.status?.code === 0) {
         toast.success("OTP Resent Successfully", {
           position: "top-right",
-          duration: 1000,
+          duration: 2000,
           icon: "✅",
         });
-  
-        setTimer(10); // ✅ Reset timer only on success
-        setResendDisabled(true); // ✅ Disable button only on success
-        setMessage("A new OTP has been sent to your email"); // ✅ Set message on success
-  
-        // Restart the timer
+
+        setTimer(10);
+        setResendDisabled(true);
+        setMessage("A new OTP has been sent to your email");
+
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
         }
@@ -192,35 +195,44 @@ const OtpVerificationLayer = () => {
         });
       }
     } catch (error) {
+      console.error("Resend OTP Error:", error.message, error.response?.data);
       toast.error("Failed to resend OTP. Please try again.", {
         position: "top-right",
         duration: 2000,
       });
+    } finally {
+      setLoading(false);
     }
   };
-  
+
   return (
-    <section className="auth bg-base d-flex" style={{ height: "100vh" }}>
+    <section
+      className="auth bg-base d-flex flex-nowrap"
+      style={{ height: "100vh", minWidth: "100vw", overflowX: "auto" }}
+    >
       <Toaster />
-      <div className="auth-right d-lg-block d-none" style={{ width: "70%", height: "100vh" }}>
+      <div
+        className="auth-right d-block"
+        style={{ width: "70%", height: "100vh", flexShrink: 0 }}
+      >
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
             src="assets/images/auth/auth-img.png"
-            alt=""
+            alt="Authentication"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
       </div>
       <div
         className="auth-form d-flex flex-column justify-content-center align-items-center"
-        style={{ width: "30%", height: "100vh", padding: "0 20px" }}
+        style={{ width: "30%", height: "100vh", padding: "0 20px", flexShrink: 0 }}
       >
         <div className="w-100" style={{ maxWidth: "400px" }}>
           <div className="text-center">
             <Link to="/" className="mb-40 max-w-290-px">
               <img
                 src="assets/images/logo.png"
-                alt=""
+                alt="Logo"
                 style={{ width: "100%", maxWidth: "200px" }}
               />
             </Link>
@@ -233,54 +245,81 @@ const OtpVerificationLayer = () => {
             </p>
           </div>
 
-          {/* OTP Input Boxes */}
           <form onSubmit={handleSubmit}>
-            <div className="otp-inputs d-flex justify-content-center gap-2 mb-24">
-              {formData.otp.map((digit, index) => (
-                <input
-                  key={index}
-                  type="text"
-                  className="otp-box form-control text-center"
-                  value={digit}
-                  maxLength="1"
-                  onChange={(e) => handleOtpChange(index, e.target.value)}
-                  ref={(el) => (inputRefs.current[index] = el)}
-                  style={{
-                    width: "50px",
-                    height: "50px",
-                    fontSize: "14px",
-                    textAlign: "center",
-                    borderRadius: "10px",
-                    fontWeight: "bold",
-                  }}
-                  autoFocus={index === 0}
-                />
-              ))}
-            </div>
+            <div className="form-container" style={{ width: "280px", margin: "0 auto" }}>
+              <div
+                className="otp-inputs d-flex gap-2 mb-24"
+                style={{ width: "100%" }}
+              >
+                {formData.otp.map((digit, index) => (
+                  <input
+                    key={index}
+                    type="text"
+                    className={`otp-box form-control text-center ${digit ? "filled" : ""}`}
+                    value={digit}
+                    maxLength="1"
+                    onChange={(e) => handleOtpChange(index, e.target.value)}
+                    ref={(el) => (inputRefs.current[index] = el)}
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      fontSize: "13px",
+                      fontWeight: "bold",
+                      borderRadius: "8px",
+                      border: "1.5px solid #d0d0d0",
+                      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+                      transition: "all 0.2s ease",
+                    }}
+                    autoFocus={index === 0}
+                  />
+                ))}
+              </div>
 
-            <button
-              type="submit"
-              className="btn btn-primary"
-              style={{ width: "280px", display: "block", margin: "0 auto" }}
-              disabled={formData.otp.includes("") || loading}
-            >
-              {loading ? <div className="spinner"></div> : "Submit"}
-            </button>
+              <button
+                type="submit"
+                className="btn btn-primary text-sm btn-sm px-12 py-16 radius-12"
+                style={{
+                  width: "100%",
+                  padding: "10px 20px",
+                  fontSize: "16px",
+                }}
+                disabled={formData.otp.includes("") || loading}
+              >
+                {loading ? <div className="spinner"></div> : "Submit"}
+              </button>
+            </div>
           </form>
 
-          <p className="text-secondary-light text-center">
+          <p className="text-secondary-light text-center mt-20">
             Did not receive code?{" "}
             <button
               className="btn btn-link text-primary-400 fw-medium"
               onClick={handleResend}
-              disabled={resendDisabled}
+              disabled={resendDisabled || loading}
               style={{ fontSize: "16px" }}
             >
-              Resend
+              {loading ? <div className="spinner"></div> : "Resend"}
             </button>
           </p>
         </div>
       </div>
+
+      <style jsx>{`
+        .otp-box {
+          background-color: #fff;
+          color: #333;
+        }
+        .otp-box:focus {
+          border-color: #007bff;
+          box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
+          outline: none;
+        }
+        .otp-box.filled {
+          background-color: #f5faff;
+          border-color: #007bff;
+          color: #007bff;
+        }
+      `}</style>
     </section>
   );
 };

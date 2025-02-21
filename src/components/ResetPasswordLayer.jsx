@@ -1,4 +1,4 @@
-import { Icon } from "@iconify/react";
+import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/spinner.css";
@@ -17,6 +17,7 @@ const ResetPasswordLayer = () => {
     confirmPassword: "",
   });
   const [passwordError, setPasswordError] = useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
   const togglePasswordVisibility = (field) => {
     setPasswordVisibility((prevState) => ({
@@ -32,33 +33,54 @@ const ResetPasswordLayer = () => {
       [name]: value,
     }));
 
-    // Validate password length
-    if (name === "password" && value.length < 5) {
-      setPasswordError("Password must be at least 5 characters.");
-    } else {
-      setPasswordError("");
+    if (name === "password") {
+      if (!value) {
+        setPasswordError("Password is required");
+      } else if (value.length < 5) {
+        setPasswordError("Password must be at least 5 characters");
+      } else {
+        setPasswordError("");
+      }
+    }
+
+    if (name === "confirmPassword") {
+      if (!value) {
+        setConfirmPasswordError("Confirm password is required");
+      } else if (value !== formData.password) {
+        setConfirmPasswordError("Passwords do not match");
+      } else {
+        setConfirmPasswordError("");
+      }
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleClick = async (e) => {
     e.preventDefault();
 
     if (!formData.password || !formData.confirmPassword) {
-      toast.error("Please fill in both fields.", { position: "top-right" });
+      toast.error("Please fill in both password fields", {
+        position: "top-right",
+        duration: 2000,
+      });
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match.", { position: "top-right" });
+    if (passwordError || confirmPasswordError) {
+      console.log("Validation failed:", { passwordError, confirmPasswordError });
+      toast.error("Please fix the errors before submitting", {
+        position: "top-right",
+        duration: 2000,
+      });
       return;
     }
 
+    console.log("Attempting password reset with:", formData);
     setLoading(true);
 
     try {
       console.log("Sending Request with Payload:", { password: formData.password });
       const response = await axios.post(
-        "https://biz-system-production.up.railway.app/v1/auth/reset-password/17e6cb85-7fd6-4185-867b-adbd757284e0", // Update the endpoint as needed
+        "https://biz-system-production.up.railway.app/v1/auth/reset-password/17e6cb85-7fd6-4185-867b-adbd757284e0",
         {
           password: formData.password,
         },
@@ -69,58 +91,99 @@ const ResetPasswordLayer = () => {
         }
       );
 
-      console.log("API Response:", response.data);
+      console.log("Full API Response:", response);
+      console.log("Response Data:", response.data);
 
-      if (response.data.status.code === 0 && response.status === 200) {
-        toast.success("Password reset successful!", { position: "top-right" });
-        setTimeout(() => navigate("/sign-in"), 1000);
+      if (response.status === 200 && response.data.status?.code === 0) {
+        toast.success("Password reset successful!", {
+          position: "top-right",
+          duration: 1000,
+          icon: "✅",
+        });
+        setTimeout(() => navigate("/sign-in"), 2000);
       } else {
-        toast.error("Failed to reset password. Please try again.", { position: "top-right" });
+        toast.error("Failed to reset password. Invalid reset token or server error.", {
+          position: "top-right",
+          duration: 2000,
+        });
       }
     } catch (error) {
-      console.error("API Error:", error);
-      toast.error("Failed to reset password. Please check your details.", { position: "top-right" });
+      console.error("Reset Password Error:", error.message, error.response?.data);
+      toast.error(
+        error.response?.data?.message || "Failed to reset password. Please check your reset link.",
+        {
+          position: "top-right",
+          duration: 2000,
+        }
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <section className="auth bg-base d-flex" style={{ height: "100vh" }}>
-      <Toaster position="top-right" />
-      <div className="auth-right d-lg-block d-none" style={{ width: "70%", height: "100vh" }}>
+    <section
+      className="auth bg-base d-flex flex-nowrap"
+      style={{ height: "100vh", minWidth: "100vw", overflowX: "auto" }}
+    >
+      <Toaster />
+      <div
+        className="auth-right d-block"
+        style={{ width: "70%", height: "100vh", flexShrink: 0 }}
+      >
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
             src="assets/images/auth/auth-img.png"
-            alt=""
+            alt="Reset Password"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
       </div>
       <div
         className="auth-form d-flex flex-column justify-content-center align-items-center"
-        style={{ width: "30%", height: "100vh", padding: "0 20px" }}
+        style={{ width: "30%", height: "100vh", padding: "0 20px", flexShrink: 0 }}
       >
         <div className="w-100" style={{ maxWidth: "400px" }}>
           <div className="text-center">
             <Link to="/" className="mb-40 max-w-290-px">
               <img
                 src="assets/images/logo.png"
-                alt=""
+                alt="Logo"
                 style={{ width: "100%", maxWidth: "200px" }}
               />
             </Link>
             <h5 className="mb-12">Reset Password</h5>
-            <p className="mb-32 text-secondary-light" style={{ fontSize: "14px", fontWeight: 600 }}>
+            <p
+              className="mb-32 text-secondary-light"
+              style={{ fontSize: "14px", fontWeight: 600 }}
+            >
               Enter your new password
             </p>
           </div>
-          <form onSubmit={handleSubmit}>
-            {["password", "confirmPassword"].map((field, index) => (
+          <form>
+            {["password", "confirmPassword"].map((field) => (
               <div className="position-relative mb-20" key={field}>
-                <div className="icon-field">
-                  <span className="icon top-50 translate-middle-y">
-                    <Icon icon="solar:lock-password-outline" />
+                <div
+                  className="icon-field mb-16"
+                  style={{
+                    position: "relative",
+                    height: "56px", // Fixed height to prevent shifting
+                  }}
+                >
+                  <span
+                    className="icon"
+                    style={{
+                      position: "absolute",
+                      left: "12px", // Adjusted for better spacing
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      zIndex: 1,
+                      width: "24px", // Fixed width for consistency
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Icon icon="solar:lock-password-outline" width="20" />
                   </span>
                   <input
                     type={passwordVisibility[field] ? "text" : "password"}
@@ -130,26 +193,54 @@ const ResetPasswordLayer = () => {
                     value={formData[field]}
                     onChange={handlePasswordChange}
                     required
+                    style={{
+                      paddingLeft: "44px", // Increased to fully clear the lock icon
+                      paddingRight: "44px", // Increased to fully clear the eye icon
+                      height: "100%",
+                      position: "relative",
+                      zIndex: 0,
+                      boxSizing: "border-box", // Ensures padding doesn't affect dimensions
+                    }}
                   />
+                  <span
+                    className={`cursor-pointer text-secondary-light ${
+                      passwordVisibility[field] ? "ri-eye-off-line" : "ri-eye-line"
+                    }`}
+                    onClick={() => togglePasswordVisibility(field)}
+                    aria-label={passwordVisibility[field] ? "Hide password" : "Show password"}
+                    title={passwordVisibility[field] ? "Hide password" : "Show password"}
+                    style={{
+                      position: "absolute",
+                      right: "12px", // Adjusted for better spacing
+                      top: "50%",
+                      transform: "translateY(-50%)",
+                      zIndex: 1,
+                      width: "24px", // Fixed width for consistency
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
+                  </span>
                 </div>
-                <span
-                  className="toggle-password cursor-pointer position-absolute end-0 top-50 translate-middle-y me-16 text-secondary-light"
-                  style={{ fontSize: "20px" }}
-                  onClick={() => togglePasswordVisibility(field)}
-                >
-                  <Icon icon={passwordVisibility[field] ? "mdi:eye-off" : "mdi:eye"} />
-                </span>
                 {field === "password" && passwordError && (
-                  <div className="text-danger" style={{ fontSize: "12px", marginTop: "5px" }}>
-                    {passwordError}
-                  </div>
+                  <p style={{ color: "red", fontSize: "12px", marginTop: "2px" }}>{passwordError}</p>
+                )}
+                {field === "confirmPassword" && confirmPasswordError && (
+                  <p style={{ color: "red", fontSize: "12px", marginTop: "2px" }}>{confirmPasswordError}</p>
                 )}
               </div>
             ))}
             <button
               type="submit"
               className="btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-32"
-              disabled={loading || !formData.password || !formData.confirmPassword || passwordError}
+              onClick={handleClick}
+              disabled={
+                loading ||
+                !formData.password ||
+                !formData.confirmPassword ||
+                passwordError ||
+                confirmPasswordError
+              }
               style={{ padding: "10px 20px", fontSize: "16px" }}
             >
               {loading ? <div className="spinner"></div> : "Reset Password"}

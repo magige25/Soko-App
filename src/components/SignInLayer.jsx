@@ -1,291 +1,294 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { Icon } from "@iconify/react/dist/iconify.js";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "../styles/spinner.css";
+import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
-const API_URL = "https://biz-system-production.up.railway.app/v1/user/register";
-const ROLES_URL = "https://biz-system-production.up.railway.app/v1/roles";
-const COUNTRIES_URL = "https://biz-system-production.up.railway.app/v1/countries";
-
-const AddUsersLayer = ({ onUserAdded }) => {
+const SignInLayer = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
-    roleId: '',
-    countryCode: '',
-    userPermissions: [],
+    email: "",
+    authMethod: "EMAILPASSWORD",
+    password: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [roles, setRoles] = useState([]);
-  const [modules, setModules] = useState([]);
-  const [permissionOptions, setPermissionOptions] = useState([]);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem("token");
-      try {
-        // Fetch roles and modules
-        const rolesResponse = await axios.get(ROLES_URL, {
-          headers: { "Authorization": `Bearer ${token}` },
-        });
-        const rolesData = rolesResponse.data.data || [];
-        setRoles(Array.isArray(rolesData) ? rolesData : [rolesData]); // Handle single object or array
+  const handleEmailChange = (e) => {
+    const email = e.target.value;
+    setFormData({ ...formData, email });
+    
+    if (!email) {
+      setEmailError("Email is required");
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setEmailError("Please enter a valid email");
+    } else {
+      setEmailError("");
+    }
+  };
 
-        // Extract unique modules and permissions from all roles
-        const allModules = [];
-        const allPermissions = new Set();
-        (Array.isArray(rolesData) ? rolesData : [rolesData]).forEach((role) => {
-          role.roleModulePermissions.forEach((module) => {
-            if (!allModules.some((m) => m.moduleId === module.moduleId)) {
-              allModules.push({
-                moduleId: module.moduleId,
-                name: module.name,
-              });
-            }
-            module.rolePermissions.forEach((perm) => allPermissions.add(perm.code));
-          });
-        });
-        setModules(allModules);
-        setPermissionOptions([...allPermissions]);
+  const handlePasswordChange = (e) => {
+    const password = e.target.value;
+    setFormData({ ...formData, password });
+    
+    if (!password) {
+      setPasswordError("Password is required");
+    } else if (password.length < 5) {
+      setPasswordError("Password must be at least 5 characters");
+    } else {
+      setPasswordError("");
+    }
+  };
 
-        // Fetch country code (assuming first country for simplicity)
-        const countriesResponse = await axios.get(COUNTRIES_URL, {
-          headers: { "Authorization": `Bearer ${token}` },
-        });
-        const countryCode = countriesResponse.data.data?.[0]?.code || 'KE'; // Adjust based on actual response
-        setFormData((prev) => ({ ...prev, countryCode }));
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("Failed to load initial data. Using defaults.");
-        setRoles([{ roleId: 1, roleName: 'Super Admin' }]);
-        setModules([
-          { moduleId: 1, name: 'User Management' },
-          { moduleId: 2, name: 'Region Management' },
-        ]);
-        setPermissionOptions(['CRT', 'DLT', 'RD']);
-        setFormData((prev) => ({ ...prev, countryCode: 'KE' }));
-      }
-    };
-    fetchData();
-  }, []);
-
-  const handleSubmit = async (e) => {
+  const handleClick = async (e) => {
     e.preventDefault();
+    
+    console.log("Attempting sign-in with:", formData);
 
-    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || 
-        !formData.phoneNumber.trim() || !formData.roleId || !formData.countryCode) {
-      setError("Please fill in all required fields.");
+    if (emailError || passwordError) {
+      console.log("Validation failed:", { emailError, passwordError });
+      toast.error("Please fix the errors before submitting", {
+        position: "top-right",
+        duration: 2000,
+      });
       return;
     }
 
+    setLoading(true);
+
     try {
-      setIsLoading(true);
-      setError(null);
-      const token = localStorage.getItem("token");
-      console.log("Submitting payload:", formData); // Debug payload
-      const response = await axios.post(API_URL, formData, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("API response (Add User):", response.data);
+      const response = await axios.post(
+        "https://biz-system-production.up.railway.app/v1/auth",
+        formData,
+        {
+          headers: {
+            "APP-KEY": "BCM8WTL9MQU4MJLE",
+          },
+        }
+      );
 
-      if (onUserAdded && response.data.data) {
-        const newUser = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          role: roles.find((r) => r.roleId === formData.roleId)?.roleName || 'Unknown',
-        };
-        onUserAdded(newUser);
+      console.log("Full API Response:", response);
+      console.log("Response Data:", response.data);
+
+      if (response.status === 200 && response.data.status?.code === 0) {
+        console.log("Sign-in successful! OTP should be here if returned by API:", response.data);
+        toast.success("Sign In Successful", {
+          position: "top-right",
+          duration: 1000,
+          icon: "✅",
+        });
+
+        sessionStorage.setItem("userToken", response.data.token);
+        
+        setTimeout(() => {
+          console.log("Navigating to OTP page with:", {
+            email: formData.email,
+            password: formData.password,
+          });
+          navigate("/otp", { 
+            state: { email: formData.email, password: formData.password }
+          });
+        }, 2000);
+      } else {
+        console.log("Sign-in failed - Invalid credentials or unexpected response");
+        toast.error("Invalid sign-in credentials!", {
+          position: "top-right",
+          duration: 2000,
+        });
       }
-
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: '',
-        roleId: '',
-        countryCode: formData.countryCode,
-        userPermissions: [],
-      });
-      alert("User added successfully!");
-
     } catch (error) {
-      console.error("Error adding user:", error.response?.data || error.message);
-      setError(error.response?.data?.message || "Failed to add user. Please try again.");
+      console.error("Login Error:", error.message, error.response?.data);
+      toast.error("Failed. Input correct details.", {
+        position: "top-right",
+        duration: 2000,
+      });
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const handleInputChange = (field, value) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handlePermissionChange = (moduleId, code, checked) => {
-    setFormData((prev) => {
-      const existingModule = prev.userPermissions.find((p) => p.moduleId === moduleId);
-      if (checked) {
-        if (existingModule) {
-          return {
-            ...prev,
-            userPermissions: prev.userPermissions.map((p) =>
-              p.moduleId === moduleId
-                ? { ...p, permissionsCodes: [...p.permissionsCodes, code] }
-                : p
-            ),
-          };
-        } else {
-          return {
-            ...prev,
-            userPermissions: [...prev.userPermissions, { moduleId, permissionsCodes: [code] }],
-          };
-        }
-      } else {
-        return {
-          ...prev,
-          userPermissions: prev.userPermissions
-            .map((p) =>
-              p.moduleId === moduleId
-                ? { ...p, permissionsCodes: p.permissionsCodes.filter((c) => c !== code) }
-                : p
-            )
-            .filter((p) => p.permissionsCodes.length > 0),
-        };
-      }
-    });
-  };
-
   return (
-    <div className="card h-100 p-0 radius-12">
-      <div className="card-body">
-        {error && <div className="alert alert-danger">{error}</div>}
-        <form onSubmit={handleSubmit}>
-          {/* First Name and Last Name */}
-          <div className="row gx-3">
-            {['firstName', 'lastName'].map((field) => (
-              <div className="col-md-6 mb-3" key={field}>
-                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
-                  {field === 'firstName' ? 'First' : 'Last'} Name <span className="text-danger">*</span>
-                </label>
-                <input
-                  type="text"
-                  className="form-control radius-8"
-                  placeholder={`Enter ${field === 'firstName' ? 'First' : 'Last'} Name`}
-                  value={formData[field]}
-                  onChange={(e) => handleInputChange(field, e.target.value)}
-                  required
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Phone and Email */}
-          <div className="row gx-3">
-            {[
-              { label: 'Phone', type: 'tel', id: 'phoneNumber', placeholder: 'Enter phone number' },
-              { label: 'Email', type: 'email', id: 'email', placeholder: 'Enter Email Address', required: true },
-            ].map(({ label, type, id, placeholder, required }) => (
-              <div className="col-md-6 mb-3" key={id}>
-                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
-                  {label} {required && <span className="text-danger">*</span>}
-                </label>
-                <input
-                  type={type}
-                  className="form-control radius-8"
-                  id={id}
-                  placeholder={placeholder}
-                  value={formData[id]}
-                  onChange={(e) => handleInputChange(id, e.target.value)}
-                  required={required}
-                />
-              </div>
-            ))}
-          </div>
-
-          {/* Role */}
-          <div className="mb-3">
-            <label className="form-label fw-semibold text-primary-light text-sm mb-2">
-              Role <span className="text-danger">*</span>
-            </label>
-            <select
-              className="form-control rounded-lg form-select pr-2 bg-white"
-              value={formData.roleId}
-              onChange={(e) => handleInputChange('roleId', e.target.value)}
-              required
+    <section
+      className="auth bg-base d-flex flex-nowrap"
+      style={{ height: "100vh", minWidth: "100vw", overflowX: "auto" }}
+    >
+      <Toaster />
+      <div
+        className="auth-right d-block"
+        style={{ width: "70%", height: "100vh", flexShrink: 0 }}
+      >
+        <div className="d-flex align-items-center flex-column h-100 justify-content-center">
+          <img
+            src="assets/images/auth/auth-img.png"
+            alt="Authentication"
+            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+          />
+        </div>
+      </div>
+      <div
+        className="auth-form d-flex flex-column justify-content-center align-items-center"
+        style={{ width: "30%", height: "100vh", padding: "0 20px", flexShrink: 0 }}
+      >
+        <div className="w-100" style={{ maxWidth: "400px" }}>
+          <div className="text-center">
+            <Link to="/" className="mb-40 max-w-290-px">
+              <img
+                src="assets/images/logo.png"
+                alt="Logo"
+                style={{ width: "100%", maxWidth: "200px" }}
+              />
+            </Link>
+            <h5 className="mb-12">Sign In</h5>
+            <p
+              className="mb-32 text-secondary-light"
+              style={{ fontSize: "14px", fontWeight: 600 }}
             >
-              <option value="" disabled>Select Role</option>
-              {roles.map((role) => (
-                <option key={role.roleId} value={role.roleId}>
-                  {role.roleName}
-                </option>
-              ))}
-            </select>
+              Welcome! Please enter your details
+            </p>
           </div>
-
-          {/* Permissions Table */}
-          <div className="mb-3">
-            <div className="table-responsive px-0 py-4 fw-medium text-sm">
-              <table className="table table-borderless mb-2 mt-12">
-                <thead>
-                  <tr>
-                    <th>Modules</th>
-                    <th>Permissions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {modules.map((module) => (
-                    <tr key={module.moduleId}>
-                      <td>{module.name}</td>
-                      <td>
-                        <div className="d-flex flex-row flex-grow-1 gap-2">
-                          {permissionOptions.map((code) => (
-                            <div className="form-check form-check-md d-flex align-items-center gap-2" key={code}>
-                              <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={
-                                  formData.userPermissions
-                                    .find((p) => p.moduleId === module.moduleId)?.permissionsCodes.includes(code) || false
-                                }
-                                onChange={(e) => handlePermissionChange(module.moduleId, code, e.target.checked)}
-                              />
-                              <label className="form-check-label">{code}</label>
-                            </div>
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <form>
+            <div className="mb-20" style={{ position: "relative" }}>
+              <div
+                className="icon-field mb-16"
+                style={{
+                  position: "relative",
+                  height: "56px",
+                }}
+              >
+                <span
+                  className="icon"
+                  style={{
+                    position: "absolute",
+                    left: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    zIndex: 1,
+                    width: "24px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <Icon icon="mage:email" width="20" />
+                </span>
+                <input
+                  type="email"
+                  className="form-control h-56-px bg-neutral-50 radius-12"
+                  placeholder="Email"
+                  value={formData.email}
+                  onChange={handleEmailChange}
+                  required
+                  style={{
+                    paddingLeft: "44px",
+                    paddingRight: "12px",
+                    height: "100%",
+                    position: "relative",
+                    zIndex: 0,
+                    boxSizing: "border-box",
+                  }}
+                />
+              </div>
+              {emailError && (
+                <p style={{ color: "red", fontSize: "12px", marginTop: "2px" }}>{emailError}</p>
+              )}
             </div>
-          </div>
-
-          <div className="text-muted small mt-3">
-            Fields marked with <span className="text-danger">*</span> are required.
-            <br />
-            Country Code: {formData.countryCode} (Assigned automatically)
-          </div>
-
-          <div className="d-flex justify-content-end gap-2">
+            <div className="position-relative mb-20">
+              <div
+                className="icon-field mb-16"
+                style={{
+                  position: "relative",
+                  height: "56px",
+                }}
+              >
+                <span
+                  className="icon"
+                  style={{
+                    position: "absolute",
+                    left: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    zIndex: 1,
+                    width: "24px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                  <Icon icon="solar:lock-password-outline" width="20" />
+                </span>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  className="form-control h-56-px bg-neutral-50 radius-12"
+                  placeholder="Password"
+                  value={formData.password}
+                  onChange={handlePasswordChange}
+                  required
+                  style={{
+                    paddingLeft: "44px",
+                    paddingRight: "44px",
+                    height: "100%",
+                    position: "relative",
+                    zIndex: 0,
+                    boxSizing: "border-box",
+                  }}
+                />
+                <span
+                  className={`cursor-pointer text-secondary-light ${
+                    showPassword ? "ri-eye-off-line" : "ri-eye-line"
+                  }`}
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  title={showPassword ? "Hide password" : "Show password"}
+                  style={{
+                    position: "absolute",
+                    right: "12px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    zIndex: 1,
+                    width: "24px",
+                    display: "flex",
+                    alignItems: "center",
+                  }}
+                >
+                </span>
+              </div>
+              {passwordError && (
+                <p style={{ color: "red", fontSize: "12px", marginTop: "2px" }}>{passwordError}</p>
+              )}
+            </div>
+            <div className="">
+              <div className="d-flex justify-content-between gap-2">
+                <div className="form-check style-check d-flex align-items-center"></div>
+                <Link to="/forgot-password" className="text-primary-600 fw-medium">
+                  Forgot Password?
+                </Link>
+              </div>
+            </div>
             <button
               type="submit"
-              className="btn btn-primary"
-              disabled={isLoading}
+              className="btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-32"
+              onClick={handleClick}
+              disabled={
+                loading ||
+                !formData.email ||
+                !formData.password ||
+                emailError ||
+                passwordError
+              }
+              style={{ padding: "10px 20px", fontSize: "16px" }}
             >
-              {isLoading ? "Saving..." : "Save"}
+              {loading ? <div className="spinner"></div> : "Sign In"}
             </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 
-export default AddUsersLayer;
+export default SignInLayer;
