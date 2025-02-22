@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = "https://biz-system-production.up.railway.app/v1/user/register";
 const ROLES_URL = "https://biz-system-production.up.railway.app/v1/roles";
 const COUNTRIES_URL = "https://biz-system-production.up.railway.app/v1/countries";
 
 const AddUsersLayer = ({ onUserAdded }) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -16,30 +18,27 @@ const AddUsersLayer = ({ onUserAdded }) => {
     userPermissions: [],
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
   const [roles, setRoles] = useState([]);
   const [modules, setModules] = useState([]);
-  const [rolePermissions, setRolePermissions] = useState({}); // Map of moduleId to valid permissions with code and name
+  const [rolePermissions, setRolePermissions] = useState({});
 
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        setError("No authentication token found. Please log in.");
+        setErrors({ submit: "No authentication token found. Please log in." });
         return;
       }
 
       try {
-        // Fetch roles
         const rolesResponse = await axios.get(ROLES_URL, {
           headers: { "Authorization": `Bearer ${token}` },
         });
-        console.log("Roles response:", rolesResponse.data);
         const rolesData = rolesResponse.data.data || [];
         const rolesArray = Array.isArray(rolesData) ? rolesData : [rolesData];
         setRoles(rolesArray);
 
-        // Extract modules and permissions per role
         const allModules = [];
         const permissionsMap = {};
         rolesArray.forEach((role) => {
@@ -51,29 +50,24 @@ const AddUsersLayer = ({ onUserAdded }) => {
               });
             }
             if (!permissionsMap[role.roleId]) permissionsMap[role.roleId] = {};
-            // Store both code and name for each permission
             permissionsMap[role.roleId][module.moduleId] = module.rolePermissions.map((p) => ({
               code: p.code,
-              name: p.name || p.code, // Fallback to code if name is unavailable
+              name: p.name || p.code,
             }));
           });
         });
         setModules(allModules);
         setRolePermissions(permissionsMap);
-        console.log("Modules:", allModules);
-        console.log("Role permissions map:", permissionsMap);
 
-        // Fetch country code
         const countriesResponse = await axios.get(COUNTRIES_URL, {
           headers: { "Authorization": `Bearer ${token}` },
         });
-        console.log("Countries response:", countriesResponse.data);
         const countryCode = countriesResponse.data.data?.[0]?.code || 'KE';
         setFormData((prev) => ({ ...prev, countryCode }));
 
       } catch (err) {
         console.error("Error fetching data:", err.response?.data || err.message);
-        setError("Failed to load initial data. Using defaults.");
+        setErrors({ submit: "Failed to load initial data. Using defaults." });
         setRoles([{ roleId: 1, roleName: 'Super Admin' }]);
         setModules([
           { moduleId: 1, name: 'User Management' },
@@ -95,60 +89,26 @@ const AddUsersLayer = ({ onUserAdded }) => {
     fetchData();
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!formData.firstName.trim() || !formData.lastName.trim() || !formData.email.trim() || 
-        !formData.phoneNumber.trim() || !formData.roleId || !formData.countryCode) {
-      setError("Please fill in all required fields.");
-      return;
+  const validateField = (field, value) => {
+    if (!value.trim() && field !== 'userPermissions') {
+      return `${field === 'roleId' ? 'Role' : field.charAt(0).toUpperCase() + field.slice(1)} is required`;
     }
-
-    try {
-      setIsLoading(true);
-      setError(null);
-      const token = localStorage.getItem("token");
-      console.log("Submitting payload:", JSON.stringify(formData, null, 2));
-      const response = await axios.post(API_URL, formData, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("API response (Add User):", response.data);
-
-      if (onUserAdded && response.data.data) {
-        const newUser = {
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          phoneNumber: formData.phoneNumber,
-          role: roles.find((r) => r.roleId === formData.roleId)?.roleName || 'Unknown',
-        };
-        onUserAdded(newUser);
-      }
-
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: '',
-        roleId: '',
-        countryCode: formData.countryCode,
-        userPermissions: [],
-      });
-      alert("User added successfully!");
-
-    } catch (error) {
-      console.error("Error adding user:", error.response?.data || error.message);
-      setError(error.response?.data?.message || "Failed to add user. Please try again.");
-    } finally {
-      setIsLoading(false);
+    if (field === 'email' && value && !/\S+@\S+\.\S+/.test(value)) {
+      return 'Please enter a valid email address';
     }
+    if (field === 'phoneNumber' && value && !/^\+?\d{9,}$/.test(value)) {
+      return 'Please enter a valid phone number';
+    }
+    return '';
   };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    const error = validateField(field, value);
+    setErrors((prev) => ({
+      ...prev,
+      [field]: error
+    }));
   };
 
   const handlePermissionChange = (moduleId, code, checked) => {
@@ -191,6 +151,54 @@ const AddUsersLayer = ({ onUserAdded }) => {
     });
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const newErrors = {};
+    Object.keys(formData).forEach((field) => {
+      if (field !== 'userPermissions') {
+        const error = validateField(field, formData[field]);
+        if (error) newErrors[field] = error;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setErrors({});
+      const token = localStorage.getItem("token");
+      const response = await axios.post(API_URL, formData, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (onUserAdded && response.data.data) {
+        const newUser = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          role: roles.find((r) => r.roleId === formData.roleId)?.roleName || 'Unknown',
+        };
+        onUserAdded(newUser);
+      }
+
+      navigate('/users-list');
+
+    } catch (error) {
+      console.error("Error adding user:", error.response?.data || error.message);
+      setErrors({ submit: error.response?.data?.message || "Failed to add user. Please try again." });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getPermissionOptionsForModule = (moduleId) => {
     return rolePermissions[formData.roleId]?.[moduleId] || [];
   };
@@ -198,7 +206,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
   return (
     <div className="card h-100 p-0 radius-12">
       <div className="card-body">
-        {error && <div className="alert alert-danger">{error}</div>}
+        {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
         <form onSubmit={handleSubmit}>
           <div className="row gx-3">
             {['firstName', 'lastName'].map((field) => (
@@ -208,12 +216,12 @@ const AddUsersLayer = ({ onUserAdded }) => {
                 </label>
                 <input
                   type="text"
-                  className="form-control radius-8"
+                  className={`form-control radius-8 ${errors[field] ? 'is-invalid' : ''}`}
                   placeholder={`Enter ${field === 'firstName' ? 'First' : 'Last'} Name`}
                   value={formData[field]}
                   onChange={(e) => handleInputChange(field, e.target.value)}
-                  required
                 />
+                {errors[field] && <div className="invalid-feedback">{errors[field]}</div>}
               </div>
             ))}
           </div>
@@ -222,20 +230,20 @@ const AddUsersLayer = ({ onUserAdded }) => {
             {[
               { label: 'Phone', type: 'tel', id: 'phoneNumber', placeholder: 'Enter phone number' },
               { label: 'Email', type: 'email', id: 'email', placeholder: 'Enter Email Address', required: true },
-            ].map(({ label, type, id, placeholder, required }) => (
+            ].map(({ label, type, id, placeholder }) => (
               <div className="col-md-6 mb-3" key={id}>
                 <label className="form-label fw-semibold text-primary-light text-sm mb-2">
-                  {label} {required && <span className="text-danger">*</span>}
+                  {label} <span className="text-danger">*</span>
                 </label>
                 <input
                   type={type}
-                  className="form-control radius-8"
+                  className={`form-control radius-8 ${errors[id] ? 'is-invalid' : ''}`}
                   id={id}
                   placeholder={placeholder}
                   value={formData[id]}
                   onChange={(e) => handleInputChange(id, e.target.value)}
-                  required={required}
                 />
+                {errors[id] && <div className="invalid-feedback">{errors[id]}</div>}
               </div>
             ))}
           </div>
@@ -245,10 +253,9 @@ const AddUsersLayer = ({ onUserAdded }) => {
               Role <span className="text-danger">*</span>
             </label>
             <select
-              className="form-control rounded-lg form-select pr-4 bg-white"
+              className={`form-control rounded-lg form-select pr-4 bg-white ${errors.roleId ? 'is-invalid' : ''}`}
               value={formData.roleId}
               onChange={(e) => handleInputChange('roleId', e.target.value)}
-              required
             >
               <option value="" disabled>Select Role</option>
               {roles.map((role) => (
@@ -257,6 +264,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
                 </option>
               ))}
             </select>
+            {errors.roleId && <div className="invalid-feedback">{errors.roleId}</div>}
           </div>
 
           {formData.roleId && (
@@ -272,7 +280,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
                   <tbody>
                     {modules.map((module) => {
                       const perms = getPermissionOptionsForModule(module.moduleId);
-                      if (perms.length === 0) return null; // Skip modules with no permissions
+                      if (perms.length === 0) return null;
                       return (
                         <tr key={module.moduleId}>
                           <td>{module.name}</td>
