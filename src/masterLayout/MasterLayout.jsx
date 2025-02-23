@@ -368,13 +368,24 @@ const MasterLayout = ({ children }) => {
                 </li>
                 <li>
                   <NavLink
-                    to='/completed-supplies'
+                    to='/settled-supplies'
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
                     }
                   >
                     <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Completed Supplies
+                    Settled Supplies
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/products'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Products
                   </NavLink>
                 </li>
               </ul>
@@ -1395,6 +1406,17 @@ const MasterLayout = ({ children }) => {
                   >
                     <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
                     Currencies
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/countries'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
+                    Countries
                   </NavLink>
                 </li>
                 <li>

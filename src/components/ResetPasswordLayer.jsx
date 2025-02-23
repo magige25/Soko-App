@@ -3,16 +3,19 @@ import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/spinner.css";
 import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
 
-const ResetPassword = () => {
+const ResetPasswordLayer = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState({
     password: false,
     confirmPassword: false,
   });
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [formData, setFormData] = useState({
+    password: "",
+    confirmPassword: "",
+  });
   const [passwordError, setPasswordError] = useState("");
 
   const togglePasswordVisibility = (field) => {
@@ -23,33 +26,60 @@ const ResetPassword = () => {
   };
 
   const handlePasswordChange = (e) => {
-    const newPassword = e.target.value;
-    setPassword(newPassword);
-    if (newPassword.length < 8) {
-      setPasswordError("Password must be at least 8 characters.");
+    const { name, value } = e.target;
+    setFormData((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+
+    // Validate password length
+    if (name === "password" && value.length < 5) {
+      setPasswordError("Password must be at least 5 characters.");
     } else {
       setPasswordError("");
     }
   };
 
-  const handleClick = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!password || !confirmPassword) {
+
+    if (!formData.password || !formData.confirmPassword) {
       toast.error("Please fill in both fields.", { position: "top-right" });
       return;
     }
-    if (password !== confirmPassword) {
-      toast.error("Passwords do not match", { position: "top-right" });
+
+    if (formData.password !== formData.confirmPassword) {
+      toast.error("Passwords do not match.", { position: "top-right" });
       return;
     }
+
     setLoading(true);
-    
+
     try {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      toast.success("Password reset successful!", { position: "top-right" });
-      setTimeout(() => navigate("/sign-in"), 1000);
+      console.log("Sending Request with Payload:", { password: formData.password });
+      const response = await axios.post(
+        "http://192.168.100.45:8098/v1/auth/reset-password/89a0d2e9-8308-4f5f-a087-43bd5c440a9f", // Update the endpoint as needed
+        {
+          password: formData.password,
+        },
+        {
+          headers: {
+            "APP-KEY": "BCM8WTL9MQU4MJLE",
+          },
+        }
+      );
+
+      console.log("API Response:", response.data);
+
+      if (response.data.status.code === 0 && response.status === 200) {
+        toast.success("Password reset successful!", { position: "top-right" });
+        setTimeout(() => navigate("/sign-in"), 1000);
+      } else {
+        toast.error("Failed to reset password. Please try again.", { position: "top-right" });
+      }
     } catch (error) {
-      toast.error("Failed. Input correct details.", { position: "top-right" });
+      console.error("API Error:", error);
+      toast.error("Failed to reset password. Please check your details.", { position: "top-right" });
     } finally {
       setLoading(false);
     }
@@ -85,7 +115,7 @@ const ResetPassword = () => {
               Enter your new password
             </p>
           </div>
-          <form onSubmit={handleClick}>
+          <form onSubmit={handleSubmit}>
             {["password", "confirmPassword"].map((field, index) => (
               <div className="position-relative mb-20" key={field}>
                 <div className="icon-field">
@@ -96,8 +126,9 @@ const ResetPassword = () => {
                     type={passwordVisibility[field] ? "text" : "password"}
                     className="form-control h-56-px bg-neutral-50 radius-12"
                     placeholder={field === "password" ? "New Password" : "Confirm New Password"}
-                    value={field === "password" ? password : confirmPassword}
-                    onChange={field === "password" ? handlePasswordChange : (e) => setConfirmPassword(e.target.value)}
+                    name={field}
+                    value={formData[field]}
+                    onChange={handlePasswordChange}
                     required
                   />
                 </div>
@@ -118,7 +149,7 @@ const ResetPassword = () => {
             <button
               type="submit"
               className="btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-32"
-              disabled={loading || !password || !confirmPassword || passwordError}
+              disabled={loading || !formData.password || !formData.confirmPassword || passwordError}
               style={{ padding: "10px 20px", fontSize: "16px" }}
             >
               {loading ? <div className="spinner"></div> : "Reset Password"}
@@ -130,4 +161,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default ResetPasswordLayer;

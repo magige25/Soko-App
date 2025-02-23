@@ -90,7 +90,7 @@ const OtpVerificationLayer = () => {
     try {
       // Make API call to validate OTP
       const response = await axios.post(
-        "http://192.168.100.45:8092/v1/auth/validate-otp", // Correct API endpoint
+        "https://biz-system-production.up.railway.app/v1/auth/validate-otp", // Correct API endpoint
         {
           email: formData.email,
           password: formData.password,
@@ -112,6 +112,9 @@ const OtpVerificationLayer = () => {
           duration: 1000,
           icon: "✅",
         });
+
+
+        localStorage.setItem("token", response.data.data.accessToken)
 
         // Navigate to the dashboard only after successful OTP validation
         navigate("/index-1");
@@ -144,7 +147,7 @@ const OtpVerificationLayer = () => {
   
     try {
       const response = await axios.post(
-        "http://192.168.100.45:8092/v1/auth/otp", // Endpoint for resending OTP
+        "https://biz-system-production.up.railway.app/v1/auth/validate-otp", // Endpoint for resending OTP
         { email: formData.email },
         { headers: { "APP-KEY": "BCM8WTL9MQU4MJLE" } }
       );
