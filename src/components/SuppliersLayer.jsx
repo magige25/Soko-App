@@ -3,19 +3,20 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
 const SuppliersLayer = () => {
-  const [suppliers, setSuppliers] = useState( [
-    { name: "Apexio Company", email: "apexio@gmail.com", phoneNo: 756453475, paymentMethod: "Cash", status: "Active",  },
-    { name: "Joy Link Ventures", email: "joylink@gmail.com", phoneNo: 756453475, paymentMethod: "Bank", status: "Active"  },
-    { name: "Charmie Enterprises", email: "charmie@gmail.com", phoneNo: 756453475, paymentMethod: "Cash", status: "Active"  },
-    { name: "Customs Limited", email: "customs@gmail.com", phoneNo: 756453475, paymentMethod: "Paybill", status: "Inactive"  },
-    { name: "Plastic Company", email: "plastic@gmail.com", phoneNo: 756453475, paymentMethod: "Cash", status: "Active"  },
-    { name: "Wesa Ventures", email: "wesa@gmail.com", phoneNo: 756453475, paymentMethod: "Paybill", status: "Active"  },
+  const [suppliers, setSuppliers] = useState([
+    { name: "Apexio Company", email: "apexio@gmail.com", phoneNo: "756453475", country: "Kenya", paymentMethod: "Cash", status: "Active" },
+    { name: "Joy Link Ventures", email: "joylink@gmail.com", phoneNo: "756453475", country: "Uganda", paymentMethod: "Bank", status: "Active" },
+    { name: "Charmie Enterprises", email: "charmie@gmail.com", phoneNo: "756453475", country: "Tanzania", paymentMethod: "Cash", status: "Active" },
+    { name: "Customs Limited", email: "customs@gmail.com", phoneNo: "756453475", country: "USA", paymentMethod: "Paybill", status: "Inactive" },
+    { name: "Plastic Company", email: "plastic@gmail.com", phoneNo: "756453475", country: "Nigeria", paymentMethod: "Cash", status: "Active" },
+    { name: "Wesa Ventures", email: "wesa@gmail.com", phoneNo: "756453475", country: "United Kingdom", paymentMethod: "Paybill", status: "Active" },
   ]);
 
-  const [editSupplier, setEditSupplier] = React.useState({ email: '', phoneNo: '', paymentMethod: '', status: '' });
-  const [newSupplier, setNewSupplier] = useState({ name: '', email: '', phoneNo: '', paymentMethod: '', status:'',  });
-  const [supplierToDelete, setSupplierToDelete] = React.useState(null);
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [editSupplier, setEditSupplier] = useState({ name: '', email: '', phoneNo: '', country: '', paymentMethod: '', status: '' });
+  const [newSupplier, setNewSupplier] = useState({ name: '', email: '', phoneNo: '', country: '', paymentMethod: '', status: '' });
+  const [supplierToDelete, setSupplierToDelete] = useState(null);
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
@@ -29,6 +30,7 @@ const SuppliersLayer = () => {
       r.name === editSupplier.name ? { ...r, ...editSupplier } : r
     );
     setSuppliers(updatedSuppliers);
+    setEditSupplier({ name: '', email: '', phoneNo: '', country: '', paymentMethod: '', status: '' });
   };
 
   const handleDeleteClick = (supplier) => {
@@ -43,32 +45,28 @@ const SuppliersLayer = () => {
 
   const handleAddSupplier = (e) => {
     e.preventDefault();
-    if (!newSupplier.name || !newSupplier.email || !newSupplier.paymentMethod) {
-      alert("Please fill in all fields before saving.");
+    if (!newSupplier.name || !newSupplier.email || !newSupplier.phoneNo || !newSupplier.country || !newSupplier.paymentMethod || !newSupplier.status) {
+      alert("Please fill in all required fields before saving.");
       return;
     }
     const newSupplierData = {
       name: newSupplier.name,
       email: newSupplier.email,
       phoneNo: newSupplier.phoneNo,
-      status: newSupplier.status,
+      country: newSupplier.country,
       paymentMethod: newSupplier.paymentMethod,
-      
+      status: newSupplier.status,
     };
     setSuppliers([...suppliers, newSupplierData]);
-    setNewSupplier({ name: '', email: '', phoneNo: '', status: '', paymentMethod: '' }); // Reset form state
-    e.target.reset(); // Reset the form
+    setNewSupplier({ name: '', email: '', phoneNo: '', country: '', paymentMethod: '', status: '' });
   };
-
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = suppliers.slice(indexOfFirstItem, indexOfLastItem);
-
   const totalPages = Math.ceil(suppliers.length / itemsPerPage);
 
-  // Handle page change
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -76,7 +74,6 @@ const SuppliersLayer = () => {
   return (
     <div className="page-wrapper">
       <div className="row">
-
         {/* Add Supplier */}
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
@@ -97,8 +94,8 @@ const SuppliersLayer = () => {
           <div className="card-body">
             <div>
               <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}>
-                <input type='text' name='search' placeholder='Search' />
-                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
+                <input type="text" name="search" placeholder="Search" />
+                <Icon icon="ion:search-outline" className="icon" style={{ width: '16px', height: '16px' }} />
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: 'visible' }}>
@@ -109,6 +106,7 @@ const SuppliersLayer = () => {
                     <th className="text-start">Name</th>
                     <th className="text-start">Email</th>
                     <th className="text-start">Phone No.</th>
+                    <th className="text-start">Country</th>
                     <th className="text-start">Payment Method</th>
                     <th className="text-start">Status</th>
                     <th className="text-start">Action</th>
@@ -118,9 +116,10 @@ const SuppliersLayer = () => {
                   {currentItems.map((supplier, index) => (
                     <tr key={index}>
                       <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
-                      <td className="text-start small-text">{supplier.name} Supplier</td>
+                      <td className="text-start small-text">{supplier.name}</td>
                       <td className="text-start small-text">{supplier.email}</td>
                       <td className="text-start small-text">{supplier.phoneNo}</td>
+                      <td className="text-start small-text">{supplier.country}</td>
                       <td className="text-start small-text">{supplier.paymentMethod}</td>
                       <td className="text-start small-text">{supplier.status}</td>
                       <td className="text-start small-text">
@@ -132,9 +131,8 @@ const SuppliersLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/suppliers/${suppliers.name}`}
+                                to={`/suppliers/${supplier.name}`}
                                 state={{ supplier }}
-                                onClick={() => console.log("Link clicked:", supplier)} // Debugging
                               >
                                 View
                               </Link>
@@ -239,7 +237,7 @@ const SuppliersLayer = () => {
                       Email <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="text"
+                      type="email"
                       className="form-control w-100"
                       name="email"
                       placeholder="Enter Email"
@@ -253,7 +251,7 @@ const SuppliersLayer = () => {
                       Phone No <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       className="form-control w-100"
                       name="phoneNo"
                       placeholder="Enter Phone Number"
@@ -263,18 +261,37 @@ const SuppliersLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">
-                      Status <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control w-100"
-                      name="status"
-                      placeholder="Enter Status"
-                      value={newSupplier.status}
-                      onChange={(e) => setNewSupplier({ ...newSupplier, status: e.target.value })}
-                      required
-                    />
+                    <div className="position-relative">
+                      <label className="form-label">
+                        Country <span className="text-danger">*</span>
+                      </label>
+                      <div
+                        className="form-control d-flex justify-content-between align-items-center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                      >
+                        <span>{newSupplier.country || "Select Country"}</span>
+                        <i className="dropdown-toggle ms-2"></i>
+                      </div>
+                      {showCountryDropdown && (
+                        <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
+                          {["Kenya", "Uganda", "Tanzania", "USA", "Nigeria", "United Kingdom"].map((country, index) => (
+                            <li key={index}>
+                              <button
+                                type="button"
+                                className="dropdown-item"
+                                onClick={() => {
+                                  setNewSupplier({ ...newSupplier, country });
+                                  setShowCountryDropdown(false);
+                                }}
+                              >
+                                {country}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
                   <div className="mb-3">
                     <div className="position-relative">
@@ -284,12 +301,12 @@ const SuppliersLayer = () => {
                       <div
                         className="form-control d-flex justify-content-between align-items-center"
                         style={{ cursor: "pointer" }}
-                        onClick={() => setShowDropdown(!showDropdown)}
+                        onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
                       >
                         <span>{newSupplier.paymentMethod || "Select Payment Method"}</span>
                         <i className="dropdown-toggle ms-2"></i>
                       </div>
-                      {showDropdown && (
+                      {showPaymentDropdown && (
                         <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
                           {["Cash", "Bank", "Paybill"].map((paymentMethod, index) => (
                             <li key={index}>
@@ -298,7 +315,7 @@ const SuppliersLayer = () => {
                                 className="dropdown-item"
                                 onClick={() => {
                                   setNewSupplier({ ...newSupplier, paymentMethod });
-                                  setShowDropdown(false);
+                                  setShowPaymentDropdown(false);
                                 }}
                               >
                                 {paymentMethod}
@@ -308,6 +325,22 @@ const SuppliersLayer = () => {
                         </ul>
                       )}
                     </div>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Status <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-control"
+                      name="status"
+                      value={newSupplier.status}
+                      onChange={(e) => setNewSupplier({ ...newSupplier, status: e.target.value })}
+                      required
+                    >
+                      <option value="">Select Status</option>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
                   </div>
                   <div className="text-muted small mt-3">
                     Fields marked with <span className="text-danger">*</span> are required.
@@ -321,7 +354,7 @@ const SuppliersLayer = () => {
           </div>
         </div>
 
-         {/* Edit Supplier Modal */}
+        {/* Edit Supplier Modal */}
         <div className="modal fade" id="editModal" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
@@ -341,6 +374,7 @@ const SuppliersLayer = () => {
                       placeholder="Enter Supplier Name"
                       value={editSupplier.name}
                       onChange={(e) => setEditSupplier({ ...editSupplier, name: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
@@ -348,11 +382,12 @@ const SuppliersLayer = () => {
                       Email <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="text"
+                      type="email"
                       className="form-control"
                       placeholder="Enter Email"
-                      value={editSupplier.customers}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, email: parseInt(e.target.value) || 0 })}
+                      value={editSupplier.email}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, email: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
@@ -360,11 +395,25 @@ const SuppliersLayer = () => {
                       Phone No <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
                       placeholder="Enter Phone Number"
                       value={editSupplier.phoneNo}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, phoneNo: parseInt(e.target.value) || 0 })}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, phoneNo: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Country <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Country"
+                      value={editSupplier.country}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, country: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
@@ -376,20 +425,24 @@ const SuppliersLayer = () => {
                       className="form-control"
                       placeholder="Enter Payment Method"
                       value={editSupplier.paymentMethod}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, paymentMethod: parseInt(e.target.value) || 0 })}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, paymentMethod: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
                       Status <span className="text-danger">*</span>
                     </label>
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
-                      placeholder="Enter Status"
                       value={editSupplier.status}
-                      onChange={(e) => setEditSupplier({ ...editSupplier, status: parseInt(e.target.value) || 0 })}
-                    />
+                      onChange={(e) => setEditSupplier({ ...editSupplier, status: e.target.value })}
+                      required
+                    >
+                      <option value="">Select Status</option>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
                   </div>
                   <div className="text-muted small mt-3">
                     Fields marked with <span className="text-danger">*</span> are required.

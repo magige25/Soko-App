@@ -4,14 +4,15 @@ import { Link } from "react-router-dom";
 
 const RegionsLayer = () => {
   const [regions, setRegions] = React.useState([
-    { name: "Nyanza", customers: "870", salesAgents: "65" },
-    { name: "Coastal", customers: "456", salesAgents: "34" },
-    { name: "Western", customers: "589", salesAgents: "48" },
-    { name: "Nairobi", customers: "965", salesAgents: "89" },
+    { name: "Nyanza", country: "Kenya", customers: "870", salesAgents: "65" },
+    { name: "Coastal", country: "Uganda", customers: "456", salesAgents: "34" },
+    { name: "Western", country: "Tanzania", customers: "589", salesAgents: "48" },
+    { name: "Nairobi", country: "USA", customers: "965", salesAgents: "89" },
   ]);
-
+  const [newRegion, setNewRegion] = useState({ name: '', country: '' });
   const [editRegion, setEditRegion] = React.useState({ name: '', customers: 0, salesAgents: 0 });
   const [regionToDelete, setRegionToDelete] = React.useState(null);
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set items per page to 10
 
@@ -116,6 +117,7 @@ const RegionsLayer = () => {
                   <tr>
                     <th className="text-start">#</th>
                     <th className="text-start">Name</th>
+                    <th className="text-start">Country</th>
                     <th className="text-start">Customers</th>
                     <th className="text-start">Sales Agents</th>
                     <th className="text-start">Action</th>
@@ -125,7 +127,8 @@ const RegionsLayer = () => {
                   {currentItems.map((region, index) => (
                     <tr key={index}>
                       <th scope="row" className="text-start small-text">{index + 1}</th>
-                      <td className="text-start small-text">{region.name} Region</td>
+                      <td className="text-start small-text">{region.name}</td>
+                      <td className="text-start small-text">{region.country}</td>
                       <td className="text-start small-text">{region.customers}</td>
                       <td className="text-start small-text">{region.salesAgents}</td>
                       <td className="text-start small-text">
@@ -217,7 +220,7 @@ const RegionsLayer = () => {
 
         {/* Add Region Modal */}
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-sm modal-dialog-centered">
+          <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
@@ -230,6 +233,39 @@ const RegionsLayer = () => {
                       Region <span className="text-danger">*</span>
                     </label>
                     <input type="text" className="form-control" placeholder="Enter Region Name" />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Country <span className="text-danger">*</span>
+                    </label>
+                    <div className="position-relative">
+                      <div
+                        className="form-control d-flex justify-content-between align-items-center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                      >
+                        <span>{newRegion.country || "Select Country"}</span>
+                        <i className="dropdown-toggle ms-2"/>
+                      </div>
+                      {showCountryDropdown && (
+                        <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
+                          {["Kenya", "Uganda", "Tanzania", "USA"].map((country, index) => (
+                            <li key={index}>
+                              <button
+                                type="button"
+                                className="dropdown-item"
+                                onClick={() => {
+                                  setNewRegion({ ...newRegion, country });
+                                  setShowCountryDropdown(false); // Close dropdown after selection
+                                }}
+                              >
+                                {country}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary">Save</button>
@@ -260,6 +296,18 @@ const RegionsLayer = () => {
                       placeholder="Enter Region Name"
                       value={editRegion.name}
                       onChange={(e) => setEditRegion({ ...editRegion, name: e.target.value })}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Country <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Country Name"
+                      value={editRegion.country}
+                      onChange={(e) => setEditRegion({ ...editRegion, country: parseInt(e.target.value) || 0 })}
                     />
                   </div>
                   <div className="mb-3">

@@ -11,6 +11,7 @@ const UsersListLayer = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [query, setQuery] = useState('');
   const [userToDelete, setUserToDelete] = useState(null);
+  const [userToView, setUserToView] = useState(null); // New state for viewing
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [roles, setRoles] = useState([]);
@@ -176,6 +177,10 @@ const UsersListLayer = () => {
         userModelModulePermissions: [],
       });
     }
+  };
+
+  const handleViewClick = (user) => {
+    setUserToView(user); // Set the user to view
   };
 
   const handleEditSubmit = async (e) => {
@@ -370,7 +375,13 @@ const UsersListLayer = () => {
                             </button>
                             <ul className="dropdown-menu">
                               <li>
-                                <Link className="dropdown-item" to={`/users/${user.id}`}>
+                                <Link
+                                  className="dropdown-item"
+                                  to="#"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#viewUserModal"
+                                  onClick={() => handleViewClick(user)}
+                                >
                                   View
                                 </Link>
                               </li>
@@ -602,6 +613,53 @@ const UsersListLayer = () => {
                   </button>
                 </div>
               </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* View User Modal */}
+      <div className="modal fade" id="viewUserModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                User Details
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </h6>
+              {userToView && (
+                <div className="mt-3">
+                  <p className="mb-2">
+                    <strong>ID:</strong> {userToView.id}
+                  </p>
+                  <p className="mb-2">
+                    <strong>First Name:</strong> {userToView.firstName}
+                  </p>
+                  <p className="mb-2">
+                    <strong>Last Name:</strong> {userToView.lastName}
+                  </p>
+                  <p className="mb-2">
+                    <strong>Email:</strong> {userToView.email}
+                  </p>
+                  <p className="mb-2">
+                    <strong>Phone Number:</strong> {userToView.phoneNo}
+                  </p>
+                  <p className="mb-2">
+                    <strong>Role:</strong> {userToView.role?.name || 'N/A'}
+                  </p>
+                  <p className="mb-2">
+                    <strong>Status:</strong> {userToView.status}
+                  </p>
+                  <p className="mb-2">
+                    <strong>Country Code:</strong> {userToView.countryCode || 'N/A'}
+                  </p>
+                </div>
+              )}
+              <div className="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                  Close
+                </button>
+              </div>
             </div>
           </div>
         </div>

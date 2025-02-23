@@ -4,15 +4,15 @@ import { Link } from "react-router-dom";
 
 const SubCategoryLayer = () => {
   const [subCategories, setSubCategories] = useState([
-    { name: "Laptops", category: "Electronics", date: "27 Feb 2025" },
-    { name: "Furniture", category: "Home Goods", date: "27 Feb 2025" },
-    { name: "Skin Care", category: "Beauty Products", date: "27 Feb 2025" },
-    { name: "Swimming Gear", category: "Sports Wear", date: "27 Feb 2025" },
+    { name: "Laptops", category: "Electronics", numberOfProducts: "200", date: "27 Feb 2025" },
+    { name: "Furniture", category: "Home Goods", numberOfProducts: "200", date: "27 Feb 2025" },
+    { name: "Skin Care", category: "Beauty Products", numberOfProducts: "200", date: "27 Feb 2025" },
+    { name: "Swimming Gear", category: "Sports Wear", numberOfProducts: "200", date: "27 Feb 2025" },
   ]);
 
-  const [editSubCategory, setEditSubCategory] = useState({ name: '', category: '', date: ''});
+  const [editSubCategory, setEditSubCategory] = useState({ name: '', category: '', numberOfProducts: ''});
   const [SubCategoryToDelete, setSubCategoryToDelete] = useState(null);
-  const [newSubCategory, setNewSubCategory] = useState({ name: '', category: '' }); // State for new sub-category form
+  const [newSubCategory, setNewSubCategory] = useState({ name: '', category: '', numberOfProducts: '' }); // State for new sub-category form
   const [showDropdown, setShowDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set items per page to 10
@@ -27,7 +27,7 @@ const SubCategoryLayer = () => {
       subCategory.name === editSubCategory.name ? { ...subCategory, ...editSubCategory } : subCategory
     );
     setSubCategories(updatedSubCategories);
-    setEditSubCategory({ name: '', category: '', date: ''});
+    setEditSubCategory({ name: '', category: '', numberOfProducts: ''});
   };
 
   const handleDeleteClick = (subCategory) => {
@@ -50,11 +50,6 @@ const SubCategoryLayer = () => {
     });
   };
 
-  // Handle input change for date
-  const handleDateChange = (e) => {
-    setNewSubCategory({ ...newSubCategory, date: e.target.value });
-  };
-
   const handleAddSubCategory = (e) => {
     e.preventDefault();
     if (!newSubCategory.name.trim()) {
@@ -68,7 +63,7 @@ const SubCategoryLayer = () => {
       
     };
     setSubCategories([...subCategories, newSubCategoryData]);
-    setNewSubCategory({ name: '', category: '', date: '' }); // Reset form state
+    setNewSubCategory({ name: '', category: '', numberOfProducts: '' }); // Reset form state
   };
 
     // Pagination logic
@@ -112,6 +107,7 @@ const SubCategoryLayer = () => {
                     <th className="text-start">#</th> 
                     <th className="text-start">Name</th>
                     <th className="text-start">Category</th>
+                    <th className="text-start">No. of Products</th>
                     <th className="text-start">Date Created</th>
                     <th className="text-start">Action</th>
                   </tr>
@@ -122,6 +118,7 @@ const SubCategoryLayer = () => {
                       <th scope="row" className="text-start small-text">{index + 1}</th>
                       <td className="text-start small-text">{subCategory.name} </td>
                       <td className="text-start small-text">{subCategory.category}</td>
+                      <td className="text-start small-text">{subCategory.numberOfProducts}</td>
                       <td className="text-start small-text">{formatDate(subCategory.date)}</td>
                       <td className="text-start small-text">
                         <div className="dropdown">
@@ -266,6 +263,18 @@ const SubCategoryLayer = () => {
                     )}
                   </div>
                 </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Number of Products <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="Enter Number of Products"
+                    value={newSubCategory.numberOfProducts}
+                    onChange={(e) => setNewSubCategory({ ...newSubCategory, numberOfProducts: e.target.value })}
+                  />
+                </div>
                 <div className="d-flex justify-content-end gap-2">
                   <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
                 </div>
@@ -311,14 +320,14 @@ const SubCategoryLayer = () => {
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Date Created <span className="text-danger">*</span>
+                      Number of Products <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="date"
+                      type="text"
                       className="form-control w-100"
-                      placeholder="Enter Date Created"
-                      value={editSubCategory.date}
-                      onChange={handleDateChange}
+                      placeholder="Enter Number of Products"
+                      value={editSubCategory.numberOfProducts}
+                      onChange={(e) => setEditSubCategory({ ...editSubCategory, numberOfProducts: e.target.value })}
                       required
                     />
                   </div>

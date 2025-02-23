@@ -4,23 +4,17 @@ import { Link } from "react-router-dom";
 
 const RoutesLayer = () => {
   const [routes, setRoutes] = React.useState([
-    { name: "Kegonga", subRegion: "Kuria East", region: "Nyanza", customers: 150, salesAgents: 38 },
-    { name: "Bofa", subRegion: "Kilifi", region: "Mombasa", customers: 135, salesAgents: 27 },
-    { name: "Lenana", subRegion: "Vihiga", region: "Western", customers: 118, salesAgents: 19 },
-    { name: "Uhuru Highway", subRegion: "CBD", region: "Nairobi", customers: 256, salesAgents: 44 },
-    // { name: "Route 5", subRegion: "Sub 5", region: "Region 5", customers: 100, salesAgents: 10 },
-    // { name: "Route 6", subRegion: "Sub 6", region: "Region 6", customers: 110, salesAgents: 11 },
-    // { name: "Route 7", subRegion: "Sub 7", region: "Region 7", customers: 120, salesAgents: 12 },
-    // { name: "Route 8", subRegion: "Sub 8", region: "Region 8", customers: 130, salesAgents: 13 },
-    // { name: "Route 9", subRegion: "Sub 9", region: "Region 9", customers: 140, salesAgents: 14 },
-    // { name: "Route 10", subRegion: "Sub 10", region: "Region 10", customers: 150, salesAgents: 15 },
-    // { name: "Route 11", subRegion: "Sub 11", region: "Region 11", customers: 160, salesAgents: 16 },
+    { name: "Kegonga", subRegion: "Kuria East", region: "Nyanza", country: "Kenya", customers: 150, salesAgents: 38 },
+    { name: "Bofa", subRegion: "Kilifi", region: "Mombasa", country: "Uganda", customers: 135, salesAgents: 27 },
+    { name: "Lenana", subRegion: "Vihiga", region: "Western", country: "Tanzania", customers: 118, salesAgents: 19 },
+    { name: "Uhuru Highway", subRegion: "CBD", region: "Nairobi", country: "USA", customers: 256, salesAgents: 44 },
   ]);
-
+  const [newRegion, setNewRegion] = useState({ name: '', subRegion: "", country: '' });
   const [editRoute, setEditRoute] = React.useState({ name: '', subRegion: '', region: '', customers: 0, salesAgents: 0 });
   const [routeToDelete, setRouteToDelete] = React.useState(null);
   const [newRoute, setNewRoute] = useState({ name: '', subRegion: '' });
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set items per page to 10
 
@@ -148,6 +142,7 @@ const RoutesLayer = () => {
                     <th className="text-start">Name</th>
                     <th className="text-start">Sub Regions</th>
                     <th className="text-start">Regions</th>
+                    <th className="text-start">Country</th>
                     <th className="text-start">Customers</th>
                     <th className="text-start">Sales Agents</th>
                     <th className="text-start">Action</th>
@@ -160,6 +155,7 @@ const RoutesLayer = () => {
                       <td className="text-start small-text">{route.name} Route</td>
                       <td className="text-start small-text">{route.subRegion}</td>
                       <td className="text-start small-text">{route.region}</td>
+                      <td className="text-start small-text">{route.country}</td>
                       <td className="text-start small-text">{route.customers}</td>
                       <td className="text-start small-text">{route.salesAgents}</td>
                       <td className="text-start small-text">
@@ -250,7 +246,7 @@ const RoutesLayer = () => {
 
         {/* Add Route Modal */}
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-sm modal-dialog-centered">
+          <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
@@ -304,6 +300,39 @@ const RoutesLayer = () => {
                         </ul>
                       )}
                     </div>
+                    <div className="mb-3">
+                      <label className="form-label">
+                        Country <span className="text-danger">*</span>
+                      </label>
+                      <div className="position-relative">
+                        <div
+                          className="form-control d-flex justify-content-between align-items-center"
+                          style={{ cursor: "pointer" }}
+                          onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                        >
+                          <span>{newRegion.country || "Select Country"}</span>
+                          <i className="dropdown-toggle ms-2"/>
+                        </div>
+                        {showCountryDropdown && (
+                          <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
+                            {["Kenya", "Uganda", "Tanzania", "USA"].map((country, index) => (
+                              <li key={index}>
+                                <button
+                                  type="button"
+                                  className="dropdown-item"
+                                  onClick={() => {
+                                    setNewRegion({ ...newRegion, country });
+                                    setShowCountryDropdown(false); // Close dropdown after selection
+                                  }}
+                                >
+                                  {country}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
@@ -316,7 +345,7 @@ const RoutesLayer = () => {
 
         {/* Edit Route Modal */}
         <div className="modal fade" id="editModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-dialog modal-lg modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
@@ -358,6 +387,18 @@ const RoutesLayer = () => {
                       placeholder="Enter Region Name"
                       value={editRoute.region}
                       onChange={(e) => setEditRoute({ ...editRoute, region: e.target.value })}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Country <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Region Name"
+                      value={editRoute.country}
+                      onChange={(e) => setEditRoute({ ...editRoute, country: e.target.value })}
                     />
                   </div>
                   <div className="mb-3">

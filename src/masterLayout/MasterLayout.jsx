@@ -271,7 +271,7 @@ const MasterLayout = ({ children }) => {
               <ul className='sidebar-submenu'>
                 <li>
                   <NavLink
-                    to='/users-list'
+                    to='/users'
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
                     }
@@ -432,7 +432,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li> */}
 
-              {/* Suppliers Management */}
+              {/* Supplier Management */}
             <li className='dropdown'>
               <Link to='#'>
                 <Icon icon='ri-clipboard-fill' className='menu-icon' />

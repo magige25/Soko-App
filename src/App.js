@@ -238,7 +238,7 @@ function App() {
           <Route path="/tooltip" element={<TooltipPage />} />
           <Route path="/typography" element={<TypographyPage />} />
           <Route path="/users-grid" element={<UsersGridPage />} />
-          <Route path="/users-list" element={<UsersListPage />} />
+          <Route path="/users" element={<UsersListPage />} />
           <Route path="/view-details" element={<ViewDetailsPage />} />
           <Route path="/video-generator" element={<VideoGeneratorPage />} />
           <Route path="/videos" element={<VideosPage />} />

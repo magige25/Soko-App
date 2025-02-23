@@ -189,7 +189,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
         onUserAdded(newUser);
       }
 
-      navigate('/users-list');
+      navigate('/users');
 
     } catch (error) {
       console.error("Error adding user:", error.response?.data || error.message);
