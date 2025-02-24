@@ -42,6 +42,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
         const allModules = [];
         const permissionsMap = {};
         rolesArray.forEach((role) => {
+          permissionsMap[role.roleId] = {};
           role.roleModulePermissions.forEach((module) => {
             if (!allModules.some((m) => m.moduleId === module.moduleId)) {
               allModules.push({
@@ -49,10 +50,10 @@ const AddUsersLayer = ({ onUserAdded }) => {
                 name: module.name,
               });
             }
-            if (!permissionsMap[role.roleId]) permissionsMap[role.roleId] = {};
             permissionsMap[role.roleId][module.moduleId] = module.rolePermissions.map((p) => ({
               code: p.code,
               name: p.name || p.code,
+              assigned: p.assigned,
             }));
           });
         });
@@ -76,9 +77,9 @@ const AddUsersLayer = ({ onUserAdded }) => {
         setRolePermissions({
           1: {
             1: [
-              { code: 'CRT', name: 'Create' },
-              { code: 'DLT', name: 'Delete' },
-              { code: 'RD', name: 'Read' },
+              { code: 'CRT', name: 'Create', assigned: false },
+              { code: 'DLT', name: 'Delete', assigned: false },
+              { code: 'RD', name: 'Read', assigned: true },
             ],
             2: [],
           },
@@ -88,6 +89,24 @@ const AddUsersLayer = ({ onUserAdded }) => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (formData.roleId && rolePermissions[formData.roleId]) {
+      const initialPermissions = [];
+      Object.entries(rolePermissions[formData.roleId]).forEach(([moduleId, perms]) => {
+        const assignedCodes = perms
+          .filter((p) => p.assigned)
+          .map((p) => p.code);
+        if (assignedCodes.length > 0) {
+          initialPermissions.push({
+            moduleId: parseInt(moduleId),
+            permissionsCodes: assignedCodes,
+          });
+        }
+      });
+      setFormData((prev) => ({ ...prev, userPermissions: initialPermissions }));
+    }
+  }, [formData.roleId, rolePermissions]);
 
   const validateField = (field, value) => {
     if (!value.trim() && field !== 'userPermissions') {
@@ -107,7 +126,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
     const error = validateField(field, value);
     setErrors((prev) => ({
       ...prev,
-      [field]: error
+      [field]: error,
     }));
   };
 
@@ -190,7 +209,6 @@ const AddUsersLayer = ({ onUserAdded }) => {
       }
 
       navigate('/users');
-
     } catch (error) {
       console.error("Error adding user:", error.response?.data || error.message);
       setErrors({ submit: error.response?.data?.message || "Failed to add user. Please try again." });

@@ -1,16 +1,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Icon } from "@iconify/react";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 import axios from "axios";
 
-// Mapping of module names to IDs as per your API
 const moduleMapping = {
   "User Management": 1,
   "Region Management": 2,
   "Payment Management": 3,
 };
 
-// Mapping of our permission names to API codes
 const permissionMapping = {
   view: "RD",
   create: "CRT",
@@ -25,29 +23,22 @@ const RolesLayer = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-  // Create Role Form state
   const [newRole, setNewRole] = useState({
     name: "",
     entityType: "",
     modulePermissions: {},
   });
 
-  // Edit Role state
   const [editRole, setEditRole] = useState(null);
-
-  // View Role state
   const [selectedRole, setSelectedRole] = useState(null);
 
-  // API endpoints
   const fetchRolesAPI = "https://biz-system-production.up.railway.app/v1/roles";
   const createRoleAPI = "https://biz-system-production.up.railway.app/v1/roles";
   const updateRoleAPI = (roleId) =>
     `https://biz-system-production.up.railway.app/v1/roles/${roleId}`;
 
-  // Create a ref for the Create Role modal content
   const addModalRef = useRef(null);
 
-  // Fetch roles on component mount
   useEffect(() => {
     const fetchRoles = async () => {
       try {
@@ -65,7 +56,6 @@ const RolesLayer = () => {
     fetchRoles();
   }, []);
 
-  // Helper: Format a date (expected format: dd Month yyyy)
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -73,7 +63,6 @@ const RolesLayer = () => {
     return date.toLocaleDateString(undefined, options);
   };
 
-  // Build modulePermissions payload for API
   const buildModulePermissionsPayload = (modulesState) => {
     return Object.entries(modulesState)
       .filter(([moduleId, perms]) => perms && perms.length > 0)
@@ -83,7 +72,6 @@ const RolesLayer = () => {
       }));
   };
 
-  // Handle Create Role form submission
   const handleCreateRole = () => {
     const payload = {
       name: newRole.name,
@@ -102,15 +90,14 @@ const RolesLayer = () => {
       })
       .then((res) => {
         setRoles([...roles, res.data.data]);
-        // Reset form
         resetCreateForm();
+        addModalRef.current?.querySelector(".btn-close")?.click();
       })
       .catch((err) => {
         console.error("Error creating role", err);
       });
   };
 
-  // Reset the Create Role form
   const resetCreateForm = () => {
     setNewRole({
       name: "",
@@ -119,7 +106,6 @@ const RolesLayer = () => {
     });
   };
 
-  // Click-outside handler for Create Role modal to reset the form
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (addModalRef.current && !addModalRef.current.contains(event.target)) {
@@ -136,9 +122,10 @@ const RolesLayer = () => {
     };
   }, [newRole]);
 
-  // Handle Edit Role form submission
   const handleEditRoleSubmit = (e) => {
     e.preventDefault();
+    if (!editRole) return; // Prevent submission if editRole is null
+
     const payload = {
       name: editRole.name,
       entityType: editRole.entityType,
@@ -158,14 +145,13 @@ const RolesLayer = () => {
           role.roleId === editRole.roleId ? updatedRole : role
         );
         setRoles(updatedRoles);
-        setEditRole(null);
+        setEditRole(null); // Reset edit state
       })
       .catch((err) => {
         console.error("Error updating role", err);
       });
   };
 
-  // Open edit modal and transform API data to local edit state
   const openEditModal = (role) => {
     const modulePermissions = {};
     role.roleModulePermissions.forEach((mod) => {
@@ -182,14 +168,12 @@ const RolesLayer = () => {
     });
   };
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = roles.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(roles.length / itemsPerPage);
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  // Handle checkbox changes for both create and edit forms
   const handleCheckboxChange = (formType, moduleName, permKey, checked) => {
     const moduleId = moduleMapping[moduleName];
     const code = permissionMapping[permKey];
@@ -206,7 +190,7 @@ const RolesLayer = () => {
         updatedModules[moduleId] = updatedModules[moduleId].filter((p) => p !== code);
       }
       setNewRole({ ...newRole, modulePermissions: updatedModules });
-    } else if (formType === "edit") {
+    } else if (formType === "edit" && editRole) {
       const updatedModules = { ...editRole.modulePermissions };
       if (!updatedModules[moduleId]) {
         updatedModules[moduleId] = [];
@@ -222,7 +206,6 @@ const RolesLayer = () => {
     }
   };
 
-  // Inline style for spacing between checkboxes and labels
   const checkboxContainerStyle = {
     marginRight: "1rem",
   };
@@ -230,18 +213,17 @@ const RolesLayer = () => {
   return (
     <div className="page-wrapper">
       <div className="row">
-        {/* Header with Create Role button */}
         <div className="d-flex justify-content-end align-items-center mb-3">
           <button
             className="btn btn-primary"
             data-bs-toggle="modal"
             data-bs-target="#createRoleModal"
+            aria-label="Add Role"
           >
             + Add Role
           </button>
         </div>
 
-        {/* Roles Table */}
         <div className="card shadow-sm full-width-card">
           <div className="card-body">
             <div className="table-responsive">
@@ -255,43 +237,42 @@ const RolesLayer = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((role, index) => (
-                    <tr key={role.roleId || index}>
+                  {currentItems.map((role) => (
+                    <tr key={role.roleId}>
                       <td>{role.roleName}</td>
                       <td>{formatDate(role.dateCreated)}</td>
-                      <td>
-                        {role.entityType && role.entityType.name
-                          ? role.entityType.name
-                          : "N/A"}
-                      </td>
+                      <td>{role.entityType?.name || "N/A"}</td>
                       <td>
                         <div className="dropdown">
                           <button
                             className="btn btn-light dropdown-toggle btn-sm"
+                            type="button"
                             data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            aria-label="Role actions"
                           >
                             Actions
                           </button>
                           <ul className="dropdown-menu">
                             <li>
-                              <Link
+                              <button
                                 className="dropdown-item"
                                 data-bs-toggle="modal"
                                 data-bs-target="#viewRoleModal"
                                 onClick={() => setSelectedRole(role)}
                               >
                                 View
-                              </Link>
+                              </button>
                             </li>
                             <li>
-                              <Link
+                              <button
                                 className="dropdown-item"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editRoleModal"
                                 onClick={() => openEditModal(role)}
                               >
                                 Edit
-                              </Link>
+                              </button>
                             </li>
                             <li>
                               <button
@@ -335,7 +316,6 @@ const RolesLayer = () => {
           </div>
         </div>
 
-        {/* Pagination */}
         <div className="d-flex justify-content-between align-items-start mt-3">
           <div className="text-muted">
             <span>
@@ -350,6 +330,7 @@ const RolesLayer = () => {
                   className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
+                  aria-label="Previous page"
                 >
                   <Icon icon="ep:d-arrow-left" />
                 </button>
@@ -369,6 +350,7 @@ const RolesLayer = () => {
                   className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
+                  aria-label="Next page"
                 >
                   <Icon icon="ep:d-arrow-right" />
                 </button>
@@ -378,12 +360,18 @@ const RolesLayer = () => {
         </div>
 
         {/* Create Role Modal */}
-        <div className="modal fade" id="createRoleModal" tabIndex="-1">
+        <div className="modal fade" id="createRoleModal" tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content" ref={addModalRef}>
               <div className="modal-header">
                 <h6 className="modal-title">Add Role</h6>
-                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={resetCreateForm}
+                ></button>
               </div>
               <div className="modal-body">
                 <div className="row g-3 mb-3">
@@ -394,9 +382,9 @@ const RolesLayer = () => {
                       className="form-control"
                       placeholder="Enter Role Name"
                       value={newRole.name}
-                      onChange={(e) =>
-                        setNewRole({ ...newRole, name: e.target.value })
-                      }
+                      onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
+                      required
+                      aria-required="true"
                     />
                   </div>
                   <div className="col-md-6">
@@ -404,9 +392,9 @@ const RolesLayer = () => {
                     <select
                       className="form-select"
                       value={newRole.entityType}
-                      onChange={(e) =>
-                        setNewRole({ ...newRole, entityType: e.target.value })
-                      }
+                      onChange={(e) => setNewRole({ ...newRole, entityType: e.target.value })}
+                      required
+                      aria-required="true"
                     >
                       <option value="">Select</option>
                       <option value="S_ADM">System Admin</option>
@@ -416,7 +404,6 @@ const RolesLayer = () => {
                   </div>
                 </div>
 
-                {/* Modules and Permissions */}
                 <div className="mb-3">
                   <h6>Modules and Permissions</h6>
                   <table className="table table-borderless">
@@ -475,6 +462,7 @@ const RolesLayer = () => {
                   className="btn btn-primary"
                   onClick={handleCreateRole}
                   data-bs-dismiss="modal"
+                  aria-label="Save"
                 >
                   Save
                 </button>
@@ -484,15 +472,21 @@ const RolesLayer = () => {
         </div>
 
         {/* Edit Role Modal */}
-        {editRole && (
-          <div className="modal fade" id="editRoleModal" tabIndex="-1">
-            <div className="modal-dialog modal-md modal-dialog-centered">
-              <div className="modal-content">
-                <div className="modal-header">
-                  <h6 className="modal-title">Edit Role</h6>
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div className="modal-body">
+        <div className="modal fade" id="editRoleModal" tabIndex="-1" aria-hidden="true">
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h6 className="modal-title">Edit Role</h6>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                  onClick={() => setEditRole(null)}
+                ></button>
+              </div>
+              <div className="modal-body">
+                {editRole ? (
                   <form onSubmit={handleEditRoleSubmit}>
                     <div className="row g-3 mb-3">
                       <div className="col-md-6">
@@ -504,6 +498,8 @@ const RolesLayer = () => {
                           onChange={(e) =>
                             setEditRole({ ...editRole, name: e.target.value })
                           }
+                          required
+                          aria-required="true"
                         />
                       </div>
                       <div className="col-md-6">
@@ -514,6 +510,8 @@ const RolesLayer = () => {
                           onChange={(e) =>
                             setEditRole({ ...editRole, entityType: e.target.value })
                           }
+                          required
+                          aria-required="true"
                         >
                           <option value="">Select</option>
                           <option value="S_ADM">System Admin</option>
@@ -547,9 +545,9 @@ const RolesLayer = () => {
                                       className="form-check-input"
                                       id={`edit-${moduleName}-${permKey}`}
                                       checked={
-                                        editRole.modulePermissions[moduleMapping[moduleName]]?.includes(
-                                          permissionMapping[permKey]
-                                        ) || false
+                                        editRole.modulePermissions[
+                                          moduleMapping[moduleName]
+                                        ]?.includes(permissionMapping[permKey]) || false
                                       }
                                       onChange={(e) =>
                                         handleCheckboxChange(
@@ -576,24 +574,36 @@ const RolesLayer = () => {
                       </table>
                     </div>
                     <div className="d-flex justify-content-end">
-                      <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">
+                      <button
+                        type="submit"
+                        className="btn btn-primary"
+                        data-bs-dismiss="modal"
+                        aria-label="Save Changes"
+                      >
                         Save Changes
                       </button>
                     </div>
                   </form>
-                </div>
+                ) : (
+                  <p>No role selected for editing</p>
+                )}
               </div>
             </div>
           </div>
-        )}
+        </div>
 
         {/* View Role Modal */}
-        <div className="modal fade" id="viewRoleModal" tabIndex="-1">
+        <div className="modal fade" id="viewRoleModal" tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
                 <h6 className="modal-title">Role Details</h6>
-                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  aria-label="Close"
+                ></button>
               </div>
               <div className="modal-body">
                 {selectedRole && (

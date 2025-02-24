@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import PrivateRouteLayer from "./components/PrivateRouteLayer";
 import HomePageOne from "./pages/HomePageOne";
 import HomePageTwo from "./pages/HomePageTwo";
@@ -124,6 +124,7 @@ function App() {
       <RouteScrollToTop />
       <Routes>
         {/* Public Routes */}
+        <Route path="/" element={<SignInPage />} /> {/* Start at sign-in */}
         <Route path="/sign-in" element={<SignInPage />} />
         <Route path="/otp" element={<OtpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -134,7 +135,6 @@ function App() {
 
         {/* Protected Routes */}
         <Route element={<PrivateRouteLayer />}>
-          <Route path="/" element={<HomePageOne />} /> {/* Dashboard at root */}
           <Route path="/index-1" element={<HomePageOne />} />
           <Route path="/index-2" element={<HomePageTwo />} />
           <Route path="/index-3" element={<HomePageThree />} />
@@ -252,9 +252,6 @@ function App() {
           <Route path="/widgets" element={<WidgetsPage />} />
           <Route path="/wizard" element={<WizardPage />} />
         </Route>
-
-        {/* Redirect root to sign-in for unauthenticated users */}
-        <Route path="/" element={<Navigate to="/sign-in" replace />} />
 
         {/* Catch-all route */}
         <Route path="*" element={<ErrorPage />} />

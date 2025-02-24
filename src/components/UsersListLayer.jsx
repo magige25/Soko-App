@@ -11,11 +11,12 @@ const UsersListLayer = () => {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [query, setQuery] = useState('');
   const [userToDelete, setUserToDelete] = useState(null);
-  const [userToView, setUserToView] = useState(null); // New state for viewing
+  const [userToView, setUserToView] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [roles, setRoles] = useState([]);
   const [modules, setModules] = useState([]);
+  const [rolePermissions, setRolePermissions] = useState({});
   const [editUser, setEditUser] = useState({
     id: '',
     firstName: '',
@@ -30,35 +31,37 @@ const UsersListLayer = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    console.log('Component mounted, fetching users and roles...');
     fetchUsers();
     fetchRolesAndModules();
 
     const editModal = document.getElementById("editUserModal");
-    const resetEditForm = () => !isLoading && setEditUser({
-      id: '',
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNo: '',
-      roleId: '',
-      countryCode: '',
-      userModelModulePermissions: [],
-    });
+    const resetEditForm = () => {
+      if (!isLoading) {
+        console.log('Resetting edit form');
+        setEditUser({
+          id: '',
+          firstName: '',
+          lastName: '',
+          email: '',
+          phoneNo: '',
+          roleId: '',
+          countryCode: '',
+          userModelModulePermissions: [],
+        });
+      }
+    };
 
     editModal?.addEventListener("hidden.bs.modal", resetEditForm);
-
-    return () => {
-      editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
-    };
+    return () => editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
   }, [isLoading]);
 
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
+      console.log('Fetching users with token:', token);
       const response = await axios.get(`${API_URL}/system`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Fetch Users Response:', response.data);
       const data = response.data.data || [];
@@ -75,13 +78,11 @@ const UsersListLayer = () => {
   const fetchRolesAndModules = async () => {
     try {
       const token = localStorage.getItem('token');
+      console.log('Fetching roles with token:', token);
       const response = await axios.get(ROL_URL, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       console.log('Fetch Roles Response:', response.data);
-
       const rolesData = Array.isArray(response.data) ? response.data : response.data.data || [];
       const roleList = rolesData.map(role => ({
         roleId: role.roleId,
@@ -89,27 +90,38 @@ const UsersListLayer = () => {
       }));
       setRoles(roleList);
 
-      const moduleMap = new Map();
-      rolesData.forEach(role => {
-        role.roleModulePermissions.forEach(module => {
-          if (!moduleMap.has(module.moduleId)) {
-            moduleMap.set(module.moduleId, {
+      const allModules = [];
+      const permissionsMap = {};
+      rolesData.forEach((role) => {
+        permissionsMap[role.roleId] = {};
+        role.roleModulePermissions.forEach((module) => {
+          if (!allModules.some((m) => m.moduleId === module.moduleId)) {
+            allModules.push({
               moduleId: module.moduleId,
               name: module.name,
-              rolePermissions: module.rolePermissions || [],
             });
           }
+          permissionsMap[role.roleId][module.moduleId] = module.rolePermissions.map((p) => ({
+            code: p.code,
+            name: p.name || p.code,
+            assigned: p.assigned,
+          }));
         });
       });
-      setModules(Array.from(moduleMap.values()));
+      console.log('Modules:', allModules);
+      console.log('Role Permissions:', permissionsMap);
+      setModules(allModules);
+      setRolePermissions(permissionsMap);
     } catch (error) {
       console.error('Error fetching roles and modules:', error);
       setRoles([]);
       setModules([]);
+      setRolePermissions({});
     }
   };
 
   const handlePermissionChange = (moduleId, permissionCode, isChecked) => {
+    console.log(`Permission Change: moduleId=${moduleId}, code=${permissionCode}, checked=${isChecked}`);
     setEditUser((prev) => {
       const updatedPermissions = [...prev.userModelModulePermissions];
       const moduleIndex = updatedPermissions.findIndex((up) => up.moduleId === moduleId);
@@ -118,52 +130,76 @@ const UsersListLayer = () => {
         updatedPermissions.push({
           moduleId,
           moduleName: modules.find(m => m.moduleId === moduleId)?.name || '',
-          permissions: [{ code: permissionCode, name: '', assigned: isChecked }],
+          permissions: [{ code: permissionCode, name: permissionCode, assigned: isChecked }],
         });
       } else {
         const permissions = updatedPermissions[moduleIndex].permissions;
         const permIndex = permissions.findIndex(p => p.code === permissionCode);
         if (permIndex === -1) {
-          permissions.push({ code: permissionCode, name: '', assigned: isChecked });
+          permissions.push({ code: permissionCode, name: permissionCode, assigned: isChecked });
         } else {
           permissions[permIndex].assigned = isChecked;
         }
       }
 
+      console.log('Updated Permissions:', updatedPermissions);
       return { ...prev, userModelModulePermissions: updatedPermissions };
     });
   };
 
-  const handleEditClick = (user) => {
+  const handleEditClick = async (user) => {
+    console.log('Edit clicked for user:', user);
     try {
       const token = localStorage.getItem('token');
-      axios.get(`${API_URL}/system/${user.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }).then(response => {
-        console.log('User Details Response:', response.data);
-        const userData = response.data.data;
-
-        setEditUser({
-          id: userData.id || user.id,
-          firstName: userData.firstName || user.firstName || '',
-          lastName: userData.lastName || user.lastName || '',
-          email: userData.email || user.email || '',
-          phoneNo: userData.phoneNo || user.phoneNo || '',
-          roleId: userData.role?.id || user.role?.id || '',
-          countryCode: userData.countryCode || user.countryCode || 'KE',
-          userModelModulePermissions: userData.userModelModulePermissions?.map(module => ({
-            moduleId: module.moduleId,
-            moduleName: module.name,
-            permissions: (module.rolePermissions || []).map(perm => ({
-              code: perm.code,
-              name: perm.name,
-              assigned: perm.assigned,
-            })),
-          })) || [],
-        });
+      const response = await axios.get(`${API_URL}/system/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
+      const userData = response.data.data;
+      console.log('User Data:', userData);
+
+      const roleId = userData.role?.id || user.role?.id || '';
+      console.log('Role ID:', roleId);
+      const rolePerms = rolePermissions[roleId] || {};
+      console.log('Role Permissions for roleId', roleId, ':', rolePerms);
+
+      const userPerms = userData.userModelModulePermissions?.reduce((acc, module) => {
+        acc[module.moduleId] = module.permissions.map(perm => ({
+          code: perm.code,
+          name: perm.name || perm.code,
+          assigned: true,
+        }));
+        return acc;
+      }, {}) || {};
+      console.log('User Permissions:', userPerms);
+
+      const mergedPermissions = modules.map(module => {
+        const roleModulePerms = rolePerms[module.moduleId] || [];
+        const userModulePerms = userPerms[module.moduleId] || [];
+        const permissions = roleModulePerms.map(rolePerm => ({
+          code: rolePerm.code,
+          name: rolePerm.name,
+          assigned: userModulePerms.some(up => up.code === rolePerm.code),
+        }));
+        return {
+          moduleId: module.moduleId,
+          moduleName: module.name,
+          permissions,
+        };
+      }).filter(m => m.permissions.length > 0);
+      console.log('Merged Permissions:', mergedPermissions);
+
+      const updatedEditUser = {
+        id: userData.id || user.id,
+        firstName: userData.firstName || user.firstName || '',
+        lastName: userData.lastName || user.lastName || '',
+        email: userData.email || user.email || '',
+        phoneNo: userData.phoneNo || user.phoneNo || '',
+        roleId: roleId,
+        countryCode: userData.countryCode || user.countryCode || 'KE',
+        userModelModulePermissions: mergedPermissions,
+      };
+      setEditUser(updatedEditUser);
+      console.log('Edit User State Set:', updatedEditUser);
     } catch (error) {
       console.error('Error fetching user details:', error);
       setEditUser({
@@ -176,22 +212,36 @@ const UsersListLayer = () => {
         countryCode: user.countryCode || 'KE',
         userModelModulePermissions: [],
       });
+      setError('Failed to fetch user details.');
     }
   };
 
-  const handleViewClick = (user) => {
-    setUserToView(user); // Set the user to view
+  const handleViewClick = async (user) => {
+    console.log('View clicked for user:', user);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/system/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const userData = response.data.data;
+      console.log('View User Data:', userData);
+      setUserToView(userData);
+    } catch (error) {
+      console.error('Error fetching user details for view:', error);
+      setUserToView(user); // Fallback to basic user data if API fails
+      setError('Failed to fetch detailed user data.');
+    }
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editUser) return;
+    console.log('Submitting edit form:', editUser);
 
     try {
       setIsLoading(true);
       setError(null);
       const token = localStorage.getItem('token');
-      console.log('Submitting changes:', editUser);
 
       const payload = {
         firstName: editUser.firstName,
@@ -200,23 +250,21 @@ const UsersListLayer = () => {
         phoneNumber: editUser.phoneNo,
         roleId: parseInt(editUser.roleId),
         countryCode: editUser.countryCode,
-        userPermissions: editUser.userModelModulePermissions.map(module => ({
-          moduleId: module.moduleId,
-          permissionsCodes: module.permissions
-            .filter(perm => perm.assigned)
-            .map(perm => perm.code),
-        })).filter(module => module.permissionsCodes.length > 0),
+        userPermissions: editUser.userModelModulePermissions
+          .map(module => ({
+            moduleId: module.moduleId,
+            permissionsCodes: module.permissions
+              .filter(perm => perm.assigned)
+              .map(perm => perm.code),
+          }))
+          .filter(module => module.permissionsCodes.length > 0),
       };
-
-      console.log('Transformed payload:', payload);
+      console.log('Submit Payload:', payload);
 
       const response = await axios.put(`${API_URL}/register/update/${editUser.id}`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
-
-      console.log('User updated successfully:', response.data);
+      console.log('Update Response:', response.data);
 
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
@@ -227,33 +275,26 @@ const UsersListLayer = () => {
       await fetchUsers();
     } catch (error) {
       console.error('Error updating user:', error);
-      if (error.response) {
-        setError(error.response.data?.message || "Failed to update user.");
-        console.log('Server error response:', JSON.stringify(error.response.data, null, 2));
-      } else {
-        setError("Network error occurred. Please try again.");
-      }
+      setError(error.response?.data?.message || "Failed to update user.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteClick = (user) => {
+    console.log('Delete clicked for user:', user);
     setUserToDelete(user);
   };
 
   const handleDeleteConfirm = async () => {
+    console.log('Confirming delete for user:', userToDelete);
     try {
       setIsLoading(true);
       setError(null);
       const token = localStorage.getItem('token');
-      console.log('Deleting user ID:', userToDelete.id);
-      const response = await axios.delete(`${API_URL}/system/${userToDelete.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      await axios.delete(`${API_URL}/system/${userToDelete.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
       });
-      console.log('API Response (Delete User):', response.data);
       const updatedUsers = users.filter((user) => user.id !== userToDelete.id);
       setUsers(updatedUsers);
       setFilteredUsers(updatedUsers);
@@ -297,6 +338,12 @@ const UsersListLayer = () => {
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
+  const getPermissionOptionsForModule = (moduleId) => {
+    const perms = rolePermissions[userToView?.role?.id]?.[moduleId] || [];
+    console.log(`Permissions for module ${moduleId} for role ${userToView?.role?.id}:`, perms);
+    return perms;
+  };
+
   return (
     <div className="page-wrapper">
       <div className="row">
@@ -330,6 +377,7 @@ const UsersListLayer = () => {
                   className="form-control"
                   style={{ maxWidth: "300px" }}
                 />
+                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: "visible" }}>
@@ -547,7 +595,7 @@ const UsersListLayer = () => {
                   </label>
                   <select
                     className="form-control"
-                    value={editUser.roleId}
+                    value={editUser.roleId || ''}
                     onChange={(e) => setEditUser({ ...editUser, roleId: e.target.value })}
                     required
                   >
@@ -558,47 +606,70 @@ const UsersListLayer = () => {
                       </option>
                     ))}
                   </select>
+                  {console.log('Current roleId in select:', editUser.roleId)}
                 </div>
 
-                <div className="mb-3">
-                  <label className="form-label">
-                    Permissions <span className="text-danger">*</span>
-                  </label>
-                  <div className="table-responsive">
-                    <table className="table table-borderless">
-                      <thead>
-                        <tr>
-                          <th>Module</th>
-                          <th>Permissions</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {modules.map((module) => (
-                          <tr key={module.moduleId}>
-                            <td>{module.name}</td>
-                            <td>
-                              <div className="d-flex flex-wrap gap-3">
-                                {module.rolePermissions.map((perm) => (
-                                  <div key={perm.code} className="form-check" style={{ display: 'flex', alignItems: 'center' }}>
-                                    <input
-                                      type="checkbox"
-                                      className="form-check-input me-2"
-                                      checked={editUser.userModelModulePermissions
-                                        .find((up) => up.moduleId === module.moduleId)
-                                        ?.permissions.some((p) => p.code === perm.code && p.assigned) || false}
-                                      onChange={(e) => handlePermissionChange(module.moduleId, perm.code, e.target.checked)}
-                                    />
-                                    <label className="form-check-label" style={{ marginBottom: 0 }}>{perm.name}</label>
-                                  </div>
-                                ))}
-                              </div>
-                            </td>
+                {editUser.roleId ? (
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Permissions <span className="text-danger">*</span>
+                    </label>
+                    <div className="table-responsive">
+                      <table className="table table-borderless">
+                        <thead>
+                          <tr>
+                            <th>Module</th>
+                            <th>Permissions</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody>
+                          {modules.length > 0 ? (
+                            modules.map((module) => {
+                              const perms = getPermissionOptionsForModule(module.moduleId);
+                              if (perms.length === 0) return null;
+                              const userModule = editUser.userModelModulePermissions.find(
+                                (up) => up.moduleId === module.moduleId
+                              ) || { permissions: [] };
+                              return (
+                                <tr key={module.moduleId}>
+                                  <td>{module.name}</td>
+                                  <td>
+                                    <div className="d-flex flex-wrap gap-3">
+                                      {perms.map((perm) => {
+                                        const isChecked = userModule.permissions.some(
+                                          (p) => p.code === perm.code && p.assigned
+                                        );
+                                        console.log(`Module: ${module.name}, Perm: ${perm.code}, Assigned: ${perm.assigned}, Checked: ${isChecked}`);
+                                        return (
+                                          <div key={perm.code} className="form-check" style={{ display: 'flex', alignItems: 'center' }}>
+                                            <input
+                                              type="checkbox"
+                                              className="form-check-input me-2"
+                                              checked={isChecked}
+                                              onChange={(e) => handlePermissionChange(module.moduleId, perm.code, e.target.checked)}
+                                            />
+                                            <label className="form-check-label" style={{ marginBottom: 0 }}>{perm.name}</label>
+                                          </div>
+                                        );
+                                      })}
+                                    </div>
+                                  </td>
+                                </tr>
+                              );
+                            })
+                          ) : (
+                            <tr>
+                              <td colSpan="2">No modules available</td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <p>Select a role to view permissions</p>
+                )}
+
                 <div className="text-muted small mt-3">
                   Fields marked with <span className="text-danger">*</span> are required.
                 </div>
@@ -620,7 +691,7 @@ const UsersListLayer = () => {
 
       {/* View User Modal */}
       <div className="modal fade" id="viewUserModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
+        <div className="modal-dialog modal-lg modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body">
               <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
@@ -629,30 +700,57 @@ const UsersListLayer = () => {
               </h6>
               {userToView && (
                 <div className="mt-3">
-                  <p className="mb-2">
-                    <strong>ID:</strong> {userToView.id}
-                  </p>
-                  <p className="mb-2">
-                    <strong>First Name:</strong> {userToView.firstName}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Last Name:</strong> {userToView.lastName}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Email:</strong> {userToView.email}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Phone Number:</strong> {userToView.phoneNo}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Role:</strong> {userToView.role?.name || 'N/A'}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Status:</strong> {userToView.status}
-                  </p>
-                  <p className="mb-2">
-                    <strong>Country Code:</strong> {userToView.countryCode || 'N/A'}
-                  </p>
+                  <p className="mb-2"><strong>ID:</strong> {userToView.id}</p>
+                  <p className="mb-2"><strong>First Name:</strong> {userToView.firstName}</p>
+                  <p className="mb-2"><strong>Last Name:</strong> {userToView.lastName}</p>
+                  <p className="mb-2"><strong>Email:</strong> {userToView.email}</p>
+                  <p className="mb-2"><strong>Phone Number:</strong> {userToView.phoneNo}</p>
+                  <p className="mb-2"><strong>Role:</strong> {userToView.role?.name || 'N/A'}</p>
+                  <p className="mb-2"><strong>Status:</strong> {userToView.status || 'N/A'}</p>
+                  <p className="mb-2"><strong>Country Code:</strong> {userToView.countryCode || 'N/A'}</p>
+
+                  {/* Module Permissions Section */}
+                  <div className="mt-4">
+                    <h6 className="mb-3">Module Permissions</h6>
+                    {userToView.userModelModulePermissions && userToView.userModelModulePermissions.length > 0 ? (
+                      <table className="table table-bordered">
+                        <thead>
+                          <tr>
+                            <th>Module</th>
+                            <th>Permissions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {userToView.userModelModulePermissions.map((module) => {
+                            const rolePerms = getPermissionOptionsForModule(module.moduleId);
+                            const activePerms = module.permissions.map(p => p.code);
+                            const permissionsList = rolePerms.map(perm => ({
+                              name: perm.name,
+                              active: activePerms.includes(perm.code),
+                            }));
+                            return (
+                              <tr key={module.moduleId}>
+                                <td>{module.moduleName}</td>
+                                <td>
+                                  {permissionsList.length > 0 ? (
+                                    permissionsList.map((perm, index) => (
+                                      <span key={index} className={perm.active ? 'text-success' : 'text-muted'}>
+                                        {perm.name}{perm.active ? '' : ' (Inactive)'}{index < permissionsList.length - 1 ? ', ' : ''}
+                                      </span>
+                                    ))
+                                  ) : (
+                                    'No permissions assigned'
+                                  )}
+                                </td>
+                              </tr>
+                            );
+                          })}
+                        </tbody>
+                      </table>
+                    ) : (
+                      <p>No module permissions assigned to this user.</p>
+                    )}
+                  </div>
                 </div>
               )}
               <div className="d-flex justify-content-end gap-2 mt-3">

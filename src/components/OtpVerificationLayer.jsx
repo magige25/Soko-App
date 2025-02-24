@@ -100,8 +100,8 @@ const OtpVerificationLayer = () => {
         }
       );
 
-      console.log("OTP Validation Full Response:", response);
-      console.log("OTP Validation Response Data:", response.data);
+      console.log("Full API Response:", response);
+      console.log("Response Data:", response.data);
 
       if (response.status === 200 && response.data.status?.code === 0) {
         toast.success("OTP Verified Successfully", {
@@ -110,11 +110,15 @@ const OtpVerificationLayer = () => {
           icon: "✅",
         });
 
-        localStorage.setItem("token", response.data.data.accessToken);
-
-        setTimeout(() => {
-          navigate("/");
-        }, 2000);
+        const token = response.data.data?.accessToken;
+        if (token) {
+          localStorage.setItem("token", token);
+          console.log("Token set successfully:", localStorage.getItem("token"));
+          navigate("/index-1"); // Navigate to dashboard at root
+        } else {
+          console.error("No access token found in response!");
+          toast.error("Authentication failed: No token received.");
+        }
       } else {
         toast.error("Invalid OTP. Please try again.", {
           position: "top-right",

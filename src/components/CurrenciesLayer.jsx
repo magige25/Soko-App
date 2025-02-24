@@ -203,6 +203,7 @@ const CurrenciesLayer = () => {
                   className="form-control"
                   style={{ maxWidth: "300px" }}
                 />
+                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: "visible" }}>
