@@ -16,7 +16,6 @@ const AddUserPage = () => {
         {/* AddUserLayer */}
         <AddUserLayer />
 
-
       </MasterLayout>
     </>
   );

@@ -4,16 +4,17 @@ import { Link } from "react-router-dom";
 
 const SubRegionsLayer = () => {
   const [subRegions, setSubRegions] = useState([
-    { name: "Kisumu", region: "Nyanza Region", customers: 250, salesAgents: 20 },
-    { name: "Mombasa", region: "Coastal Region", customers: 300, salesAgents: 25 },
-    { name: "Kakamega", region: "Western Region", customers: 220, salesAgents: 18 },
-    { name: "Westlands", region: "Nairobi Region", customers: 400, salesAgents: 30 },
+    { name: "Kisumu", region: "Nyanza Region", country: "Kenya", customers: 250, salesAgents: 20 },
+    { name: "Mombasa", region: "Coastal Region", country: "Uganda", customers: 300, salesAgents: 25 },
+    { name: "Kakamega", region: "Western Region", country: "Tanzania", customers: 220, salesAgents: 18 },
+    { name: "Westlands", region: "Nairobi Region", country: "USA", customers: 400, salesAgents: 30 },
   ]);
 
   const [editSubRegion, setEditSubRegion] = useState({ name: '', region: '', customers: 0, salesAgents: 0 });
   const [SubRegionToDelete, setSubRegionToDelete] = useState(null);
-  const [newSubRegion, setNewSubRegion] = useState({ name: '', region: '' }); // State for new sub-region form
-  const [showDropdown, setShowDropdown] = useState(false);
+  const [newSubRegion, setNewSubRegion] = useState({ name: '', region: '', country: '' }); // State for new sub-region form
+  const [showRegionDropdown, setShowRegionDropdown] = useState(false);
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // Set items per page to 10
 
@@ -41,22 +42,22 @@ const SubRegionsLayer = () => {
 
   const handleAddSubRegion = (e) => {
     e.preventDefault();
-    if (!newSubRegion.name || !newSubRegion.region) {
+    if (!newSubRegion.name || !newSubRegion.region || !newSubRegion.country) {
       alert("Please fill in all fields before saving.");
       return;
     }
     const newSubRegionData = {
       name: newSubRegion.name,
       region: newSubRegion.region,
+      country: newSubRegion.country,
       customers: 0,
       salesAgents: 0,
     };
     setSubRegions([...subRegions, newSubRegionData]);
-    setNewSubRegion({ name: '', region: '' }); // Reset form state
-    e.target.reset(); // Reset the form
+    setNewSubRegion({ name: '', region: '', country: '' }); // Reset form state
   };
 
-    // Pagination logic
+  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = subRegions.slice(indexOfFirstItem, indexOfLastItem);
@@ -132,6 +133,7 @@ const SubRegionsLayer = () => {
                     <th className="text-start">#</th> 
                     <th className="text-start">Name</th>
                     <th className="text-start">Regions</th>
+                    <th className="text-start">Country</th>
                     <th className="text-start">Customers</th>
                     <th className="text-start">Sales Agents</th>
                     <th className="text-start">Action</th>
@@ -141,8 +143,9 @@ const SubRegionsLayer = () => {
                   {currentItems.map((subRegion, index) => (
                     <tr key={index}>
                       <th scope="row" className="text-start small-text">{index + 1}</th>
-                      <td className="text-start small-text">{subRegion.name} Sub Region</td>
+                      <td className="text-start small-text">{subRegion.name}</td>
                       <td className="text-start small-text">{subRegion.region}</td>
+                      <td className="text-start small-text">{subRegion.country}</td>
                       <td className="text-start small-text">{subRegion.customers}</td>
                       <td className="text-start small-text">{subRegion.salesAgents}</td>
                       <td className="text-start small-text">
@@ -233,7 +236,7 @@ const SubRegionsLayer = () => {
 
         {/* Add Sub Region Modal */}
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-sm modal-dialog-centered">
+          <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
@@ -263,34 +266,67 @@ const SubRegionsLayer = () => {
                       <div
                         className="form-control d-flex justify-content-between align-items-center"
                         style={{ cursor: "pointer" }}
-                        onClick={() => setShowDropdown(!showDropdown)}
+                        onClick={() => setShowRegionDropdown(!showRegionDropdown)}
                       >
                         <span>{newSubRegion.region || "Select Region"}</span>
-                        <i className=" dropdown-toggle ms-2"></i> {/* This ensures the arrow is there */}
+                        <i className="dropdown-toggle ms-2"/>
+                      </div>
+                      {showRegionDropdown && (
+                        <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
+                          {["Nairobi Region", "Coastal Region", "Western Region", "Nyanza Region"].map((region, index) => (
+                            <li key={index}>
+                              <button
+                                type="button"
+                                className="dropdown-item"
+                                onClick={() => {
+                                  setNewSubRegion({ ...newSubRegion, region });
+                                  setShowRegionDropdown(false); // Close dropdown after selection
+                                }}
+                              >
+                                {region}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
-                    {showDropdown && (
-                      <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
-                        {["Nairobi Region", "Coastal Region", "Western Region", "Nyanza Region"].map((region, index) => (
-                          <li key={index}>
-                            <button
-                              type="button"
-                              className="dropdown-item"
-                              onClick={() => {
-                                setNewSubRegion({ ...newSubRegion, region });
-                                setShowDropdown(false); // Close dropdown after selection
-                              }}
-                            >
-                              {region}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
                   </div>
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
-                </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Country <span className="text-danger">*</span>
+                    </label>
+                    <div className="position-relative">
+                      <div
+                        className="form-control d-flex justify-content-between align-items-center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                      >
+                        <span>{newSubRegion.country || "Select Country"}</span>
+                        <i className="dropdown-toggle ms-2"/>
+                      </div>
+                      {showCountryDropdown && (
+                        <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
+                          {["Kenya", "Uganda", "Tanzania", "USA"].map((country, index) => (
+                            <li key={index}>
+                              <button
+                                type="button"
+                                className="dropdown-item"
+                                onClick={() => {
+                                  setNewSubRegion({ ...newSubRegion, country });
+                                  setShowCountryDropdown(false); // Close dropdown after selection
+                                }}
+                              >
+                                {country}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                  </div>
+                  <div className="d-flex justify-content-end gap-2">
+                    <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
+                  </div>
                 </form>
               </div>
             </div>
@@ -308,7 +344,9 @@ const SubRegionsLayer = () => {
                 </h6>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-3">
-                    <label className="form-label">Sub Region Name</label>
+                    <label className="form-label">
+                      Sub Region <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -318,7 +356,9 @@ const SubRegionsLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Region</label>
+                    <label className="form-label">
+                      Region <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="text"
                       className="form-control"
@@ -328,7 +368,21 @@ const SubRegionsLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Customers</label>
+                    <label className="form-label">
+                      Country <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Enter Region Name"
+                      value={editSubRegion.country}
+                      onChange={(e) => setEditSubRegion({ ...editSubRegion, country: e.target.value })}
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Customer <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="number"
                       className="form-control"
@@ -338,7 +392,9 @@ const SubRegionsLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">Sales Agents</label>
+                    <label className="form-label">
+                      Sales Agent <span className="text-danger">*</span>
+                    </label>
                     <input
                       type="number"
                       className="form-control"
@@ -346,6 +402,9 @@ const SubRegionsLayer = () => {
                       value={editSubRegion.salesAgents}
                       onChange={(e) => setEditSubRegion({ ...editSubRegion, salesAgents: parseInt(e.target.value) || 0 })}
                     />
+                  </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary " data-bs-dismiss="modal">Save</button>

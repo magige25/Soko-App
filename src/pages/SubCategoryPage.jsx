@@ -1,9 +1,9 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import SuppliersLayer from "../components/SuppliersLayer";
+import SubCategoryLayer from "../components/SubCategoryLayer";
 
-const SuppliersPage= () => {
+const SubCategoryPage= () => {
   return (
     <>
 
@@ -11,14 +11,14 @@ const SuppliersPage= () => {
         <MasterLayout>
 
           {/* Breadcrumb */}
-          <Breadcrumb title="Suppliers" />
+          <Breadcrumb title="Sub Category" />
 
-            {/* SuppliersLayer */}
-          <SuppliersLayer/>
+            {/* SubCategoryLayer */}
+          <SubCategoryLayer/>
 
         </MasterLayout>
     </>
   );
 };
 
-export default SuppliersPage; 
+export default SubCategoryPage; 
