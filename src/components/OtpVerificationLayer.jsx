@@ -113,7 +113,7 @@ const OtpVerificationLayer = () => {
         localStorage.setItem("token", response.data.data.accessToken);
 
         setTimeout(() => {
-          navigate("/index-1");
+          navigate("/");
         }, 2000);
       } else {
         toast.error("Invalid OTP. Please try again.", {

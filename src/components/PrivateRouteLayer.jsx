@@ -8,7 +8,7 @@ const PrivateRouteLayer = () => {
   console.log("PrivateRouteLayer - Token:", token);
   console.log("PrivateRouteLayer - Is Authenticated:", isAuthenticated);
 
-  return isAuthenticated ? <Outlet /> : <Navigate to="/sign-in" replace />;
+  return token ? <Outlet /> : <Navigate to="/sign-in" replace />;
 };
 
 export default PrivateRouteLayer;

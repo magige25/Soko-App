@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import PrivateRouteLayer from "./components/PrivateRouteLayer";
 import HomePageOne from "./pages/HomePageOne";
 import HomePageTwo from "./pages/HomePageTwo";
@@ -116,6 +116,7 @@ import CategoryPage from "./pages/CategoryPage";
 import SubCategoryPage from "./pages/SubCategoryPage";
 import BrandsPage from "./pages/BrandsPage";
 import ProductsPage from "./pages/ProductsPage";
+import CountriesPage from "./pages/CountriesPage";
 
 function App() {
   return (
@@ -123,7 +124,6 @@ function App() {
       <RouteScrollToTop />
       <Routes>
         {/* Public Routes */}
-        <Route path="/" element={<SignInPage />} />
         <Route path="/sign-in" element={<SignInPage />} />
         <Route path="/otp" element={<OtpPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
@@ -134,6 +134,7 @@ function App() {
 
         {/* Protected Routes */}
         <Route element={<PrivateRouteLayer />}>
+          <Route path="/" element={<HomePageOne />} /> {/* Dashboard at root */}
           <Route path="/index-1" element={<HomePageOne />} />
           <Route path="/index-2" element={<HomePageTwo />} />
           <Route path="/index-3" element={<HomePageThree />} />
@@ -179,6 +180,7 @@ function App() {
           <Route path="/sub-category" element={<SubCategoryPage />} />
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/countries" element={<CountriesPage />} />
 
           <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
           <Route path="/colors" element={<ColorsPage />} />
@@ -251,7 +253,10 @@ function App() {
           <Route path="/wizard" element={<WizardPage />} />
         </Route>
 
-        {/* Catch-all route at the end */}
+        {/* Redirect root to sign-in for unauthenticated users */}
+        <Route path="/" element={<Navigate to="/sign-in" replace />} />
+
+        {/* Catch-all route */}
         <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
