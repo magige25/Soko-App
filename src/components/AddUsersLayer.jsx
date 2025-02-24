@@ -1,278 +1,332 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const AddUsersLayer = () => {
+const API_URL = "https://biz-system-production.up.railway.app/v1/user/register";
+const ROLES_URL = "https://biz-system-production.up.railway.app/v1/roles";
+const COUNTRIES_URL = "https://biz-system-production.up.railway.app/v1/countries";
+
+const AddUsersLayer = ({ onUserAdded }) => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    roleId: '',
+    countryCode: '',
+    userPermissions: [],
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [roles, setRoles] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [rolePermissions, setRolePermissions] = useState({});
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrors({ submit: "No authentication token found. Please log in." });
+        return;
+      }
+
+      try {
+        const rolesResponse = await axios.get(ROLES_URL, {
+          headers: { "Authorization": `Bearer ${token}` },
+        });
+        const rolesData = rolesResponse.data.data || [];
+        const rolesArray = Array.isArray(rolesData) ? rolesData : [rolesData];
+        setRoles(rolesArray);
+
+        const allModules = [];
+        const permissionsMap = {};
+        rolesArray.forEach((role) => {
+          role.roleModulePermissions.forEach((module) => {
+            if (!allModules.some((m) => m.moduleId === module.moduleId)) {
+              allModules.push({
+                moduleId: module.moduleId,
+                name: module.name,
+              });
+            }
+            if (!permissionsMap[role.roleId]) permissionsMap[role.roleId] = {};
+            permissionsMap[role.roleId][module.moduleId] = module.rolePermissions.map((p) => ({
+              code: p.code,
+              name: p.name || p.code,
+            }));
+          });
+        });
+        setModules(allModules);
+        setRolePermissions(permissionsMap);
+
+        const countriesResponse = await axios.get(COUNTRIES_URL, {
+          headers: { "Authorization": `Bearer ${token}` },
+        });
+        const countryCode = countriesResponse.data.data?.[0]?.code || 'KE';
+        setFormData((prev) => ({ ...prev, countryCode }));
+
+      } catch (err) {
+        console.error("Error fetching data:", err.response?.data || err.message);
+        setErrors({ submit: "Failed to load initial data. Using defaults." });
+        setRoles([{ roleId: 1, roleName: 'Super Admin' }]);
+        setModules([
+          { moduleId: 1, name: 'User Management' },
+          { moduleId: 2, name: 'Region Management' },
+        ]);
+        setRolePermissions({
+          1: {
+            1: [
+              { code: 'CRT', name: 'Create' },
+              { code: 'DLT', name: 'Delete' },
+              { code: 'RD', name: 'Read' },
+            ],
+            2: [],
+          },
+        });
+        setFormData((prev) => ({ ...prev, countryCode: 'KE' }));
+      }
+    };
+    fetchData();
+  }, []);
+
+  const validateField = (field, value) => {
+    if (!value.trim() && field !== 'userPermissions') {
+      return `${field === 'roleId' ? 'Role' : field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+    }
+    if (field === 'email' && value && !/\S+@\S+\.\S+/.test(value)) {
+      return 'Please enter a valid email address';
+    }
+    if (field === 'phoneNumber' && value && !/^\+?\d{9,}$/.test(value)) {
+      return 'Please enter a valid phone number';
+    }
+    return '';
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    const error = validateField(field, value);
+    setErrors((prev) => ({
+      ...prev,
+      [field]: error
+    }));
+  };
+
+  const handlePermissionChange = (moduleId, code, checked) => {
+    const validPermissions = rolePermissions[formData.roleId]?.[moduleId] || [];
+    if (!validPermissions.some((p) => p.code === code)) {
+      console.warn(`Permission ${code} not available for module ${moduleId}`);
+      return;
+    }
+
+    setFormData((prev) => {
+      const existingModule = prev.userPermissions.find((p) => p.moduleId === moduleId);
+      if (checked) {
+        if (existingModule) {
+          return {
+            ...prev,
+            userPermissions: prev.userPermissions.map((p) =>
+              p.moduleId === moduleId
+                ? { ...p, permissionsCodes: [...p.permissionsCodes, code] }
+                : p
+            ),
+          };
+        } else {
+          return {
+            ...prev,
+            userPermissions: [...prev.userPermissions, { moduleId, permissionsCodes: [code] }],
+          };
+        }
+      } else {
+        return {
+          ...prev,
+          userPermissions: prev.userPermissions
+            .map((p) =>
+              p.moduleId === moduleId
+                ? { ...p, permissionsCodes: p.permissionsCodes.filter((c) => c !== code) }
+                : p
+            )
+            .filter((p) => p.permissionsCodes.length > 0),
+        };
+      }
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const newErrors = {};
+    Object.keys(formData).forEach((field) => {
+      if (field !== 'userPermissions') {
+        const error = validateField(field, formData[field]);
+        if (error) newErrors[field] = error;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setErrors({});
+      const token = localStorage.getItem("token");
+      const response = await axios.post(API_URL, formData, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (onUserAdded && response.data.data) {
+        const newUser = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          phoneNumber: formData.phoneNumber,
+          role: roles.find((r) => r.roleId === formData.roleId)?.roleName || 'Unknown',
+        };
+        onUserAdded(newUser);
+      }
+
+      navigate('/users');
+
+    } catch (error) {
+      console.error("Error adding user:", error.response?.data || error.message);
+      setErrors({ submit: error.response?.data?.message || "Failed to add user. Please try again." });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getPermissionOptionsForModule = (moduleId) => {
+    return rolePermissions[formData.roleId]?.[moduleId] || [];
+  };
+
   return (
     <div className="card h-100 p-0 radius-12">
-        <div className="card-body">
-           
-                <form>
-                  {/* Names */}
-                  <div className="row gx-3">
-                    <div className="col-md-6 mb-20">
-                        <label htmlFor="name" className="form-label fw-semibold text-primary-light text-sm mb-8">
-                            First Name <span className="text-danger-600">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            className="form-control radius-8"
-                            id="name"
-                            placeholder="Enter First Name"
-                        />
-                    </div>
-                    <div className="col-md-6 mb-20">
-                        <label htmlFor="email" className="form-label fw-semibold text-primary-light text-sm mb-8">
-                            Last Name <span className="text-danger-600">*</span>
-                        </label>
-                        <input
-                        type="text"
-                        className="form-control radius-8"
-                        id="name"
-                        placeholder="Enter Last Name"
-                        />
-                    </div>
-                    </div>
+      <div className="card-body">
+        {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
+        <form onSubmit={handleSubmit}>
+          <div className="row gx-3">
+            {['firstName', 'lastName'].map((field) => (
+              <div className="col-md-6 mb-3" key={field}>
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  {field === 'firstName' ? 'First' : 'Last'} Name <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className={`form-control radius-8 ${errors[field] ? 'is-invalid' : ''}`}
+                  placeholder={`Enter ${field === 'firstName' ? 'First' : 'Last'} Name`}
+                  value={formData[field]}
+                  onChange={(e) => handleInputChange(field, e.target.value)}
+                />
+                {errors[field] && <div className="invalid-feedback">{errors[field]}</div>}
+              </div>
+            ))}
+          </div>
 
-                  {/* Phone & Department */}
-                <div className="row gx-3">
-                    <div className="col-md-6 mb-20">
-                        <label htmlFor="number" className="form-label fw-semibold text-primary-light text-sm mb-8">
-                            Phone
-                        </label>
-                        <input
-                            type="tel"
-                            className="form-control radius-8"
-                            id="number"
-                            placeholder="Enter phone number"
-                        />
-                    </div>
-                    <div className="col-md-6 mb-20">
-                        <label htmlFor="depart" className="form-label fw-semibold text-primary-light text-sm mb-8">
-                            Email 
-                        <span className="text-danger-600">*</span>
-                        </label>
-                        <input
-                        type="email"
-                        className="form-control radius-8"
-                        id="email"
-                        placeholder="Enter Email Address"
-                        />
-                    </div>
-                </div>
+          <div className="row gx-3">
+            {[
+              { label: 'Phone', type: 'tel', id: 'phoneNumber', placeholder: 'Enter phone number' },
+              { label: 'Email', type: 'email', id: 'email', placeholder: 'Enter Email Address', required: true },
+            ].map(({ label, type, id, placeholder }) => (
+              <div className="col-md-6 mb-3" key={id}>
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  {label} <span className="text-danger">*</span>
+                </label>
+                <input
+                  type={type}
+                  className={`form-control radius-8 ${errors[id] ? 'is-invalid' : ''}`}
+                  id={id}
+                  placeholder={placeholder}
+                  value={formData[id]}
+                  onChange={(e) => handleInputChange(id, e.target.value)}
+                />
+                {errors[id] && <div className="invalid-feedback">{errors[id]}</div>}
+              </div>
+            ))}
+          </div>
 
-                  {/* Role Dropdown */}
-                <div className="col-md-6 relative w-full">
-                    <label htmlFor="role" className="form-label fw-semibold text-primary-light text-sm mb-2">
-                        Role <span className="text-danger-600">*</span>
-                    </label>
-                    <select
-    //w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-light focus:border-primary-light bg-white
-                    className="form-control w-full radius-6 form-select pr-20 bg-white appearance-none " 
-                    id="role">
-                        <option value="" disabled selected>
-                            Select Role
-                            </option>
-                        <option value="sales">Sales Person</option>
-                        <option value="manager">Manager</option>
-                        <option value="customer">Customer</option>
-                        <option value="distributor">Distributor</option>
-                        </select>
-                        <div className="absolute right-4 top-1/2 pointer-events-none">
+          <div className="col-md-4 mb-3">
+            <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+              Role <span className="text-danger">*</span>
+            </label>
+            <select
+              className={`form-control rounded-lg form-select pr-4 bg-white ${errors.roleId ? 'is-invalid' : ''}`}
+              value={formData.roleId}
+              onChange={(e) => handleInputChange('roleId', e.target.value)}
+            >
+              <option value="" disabled>Select Role</option>
+              {roles.map((role) => (
+                <option key={role.roleId} value={role.roleId}>
+                  {role.roleName}
+                </option>
+              ))}
+            </select>
+            {errors.roleId && <div className="invalid-feedback">{errors.roleId}</div>}
+          </div>
 
-                        </div>
-                </div>
-
-                  {/* Permissions Table */}
-                {/* <div className="col-md-12 "> */}
-                    {/* <div className="card"> */}
-                        {/* <div className="card-body p-2"> */}
-                            <div className="table-responsive px-0 py-4 fw-medium text-sm">
-                                <table className="table table-borderless mb-2 mt-12">
-                                    <thead>
-                                        <tr>
-                                            <th>Modules</th>
-                                            <th>Permissions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                
-                                        <tr>
-                                            <td>
-                                                User Management                                                
-                                            </td>
-                                            <td>
-                                                    <div className="d-flex align-items-center">
-                                                    <div className="d-flex flex-row flex-grow-1 gap-2">
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                        <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                        <label className="form-check-label">View</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                    <label className="form-check-label">Write</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                        />
-                                                    <label className="form-check-label">Create</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                    <label className="form-check-label">Delete</label>
-                                                    </div>
-                                                    </div>
-                                                    </div> 
-                                            </td>
-                                            
-                                        </tr>
-                                            <tr>
-                                                <td>
-                                                    Financial Management
-                                                </td>
-                                                <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="d-flex flex-row flex-grow-1 gap-2">
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                        <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                        <label className="form-check-label">View</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                    <label className="form-check-label">Write</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                        />
-                                                    <label className="form-check-label">Create</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                    <label className="form-check-label">Delete</label>
-                                                    </div>
-                                                    </div>
-                                                    </div> 
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                Order Management
-                                                </td>
-                                                <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="d-flex flex-row flex-grow-1 gap-2">
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2 gap-2">
-                                                        <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                        <label className="form-check-label">View</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                    <label className="form-check-label">Write</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                        />
-                                                    <label className="form-check-label">Create</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                    <label className="form-check-label">Delete</label>
-                                                    </div>
-                                                    </div>
-                                                    </div> 
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td>
-                                                    {/* JUST INCASE "fs-14 fw-normal text-light-9" */}
-                                                        Stock Management
-                                                </td>
-                                                <td>
-                                                <div className="d-flex align-items-center">
-                                                    <div className="d-flex flex-row flex-grow-1 gap-2">
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                        <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                        <label className="form-check-label">View</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                    <label className="form-check-label">Write</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                        <input
-                                                            className="form-check-input"
-                                                            type="checkbox"
-                                                        />
-                                                    <label className="form-check-label">Create</label>
-                                                    </div>
-                                                    <div className="form-check form-check-md d-flex align-items-center gap-2">
-                                                    <input
-                                                        className="form-check-input"
-                                                        type="checkbox"
-                                                    />
-                                                    <label className="form-check-label">Delete</label>
-                                                    </div>
-                                                    </div>
-                                                    </div> 
-                                                </td>
-                                            </tr>
-                                    
-                                    </tbody>
-                                </table>
+          {formData.roleId && (
+            <div className="mb-3">
+              <div className="table-responsive px-0 py-4 fw-medium text-sm">
+                <table className="table table-borderless mb-2 mt-12">
+                  <thead>
+                    <tr>
+                      <th>Modules</th>
+                      <th>Permissions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {modules.map((module) => {
+                      const perms = getPermissionOptionsForModule(module.moduleId);
+                      if (perms.length === 0) return null;
+                      return (
+                        <tr key={module.moduleId}>
+                          <td>{module.name}</td>
+                          <td>
+                            <div className="d-flex flex-row flex-grow-1 gap-2">
+                              {perms.map((perm) => (
+                                <div className="form-check form-check-md d-flex align-items-center gap-2" key={perm.code}>
+                                  <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    checked={
+                                      formData.userPermissions
+                                        .find((p) => p.moduleId === module.moduleId)?.permissionsCodes.includes(perm.code) || false
+                                    }
+                                    onChange={(e) => handlePermissionChange(module.moduleId, perm.code, e.target.checked)}
+                                  />
+                                  <label className="form-check-label">{perm.name}</label>
+                                </div>
+                              ))}
                             </div>
-                        {/* </div> */}
-                    {/* </div>*/}
-                
-
-                  <div className="d-flex align-items-end justify-content-end gap-3">
-
-                    <button
-                      type="submit"
-                      className="btn btn-primary border border-primary-600 text-md px-56 py-2 radius-5"
-                    >
-                      Save
-                    </button>
-                  </div>
-                </form>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </div>
+          )}
+
+          <div className="text-muted small mt-3">
+            Fields marked with <span className="text-danger">*</span> are required.
+          </div>
+
+          <div className="d-flex justify-content-end gap-2">
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={isLoading}
+            >
+              {isLoading ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 

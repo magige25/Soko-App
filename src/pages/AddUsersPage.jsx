@@ -13,7 +13,7 @@ const AddUsersPage = () => {
         {/* Breadcrumb */}
         <Breadcrumb title="Users" />
 
-        {/* RoleAccessLayer */}
+        {/* AddUsersLayer */}
         <AddUsersLayer />
 
       </MasterLayout>

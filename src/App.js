@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import PrivateRouteLayer from "./components/PrivateRouteLayer";
 import HomePageOne from "./pages/HomePageOne";
 import HomePageTwo from "./pages/HomePageTwo";
 import HomePageThree from "./pages/HomePageThree";
@@ -96,7 +97,7 @@ import AccessDeniedPage from "./pages/AccessDeniedPage";
 import MaintenancePage from "./pages/MaintenancePage";
 import BlankPagePage from "./pages/BlankPagePage";
 import OtpPage from "./pages/OtpPage";
-import ResetPasswordPage from"./pages/ResetPasswordPage";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
 import RegionsPage from "./pages/RegionsPage";
 import SubRegionsPage from "./pages/SubRegionsPage";
 import RoutesPage from "./pages/RoutesPage";
@@ -106,145 +107,152 @@ import RoutesDetailsPage from "./pages/RoutesDetailsPage";
 import AddUsersPage from "./pages/AddUsersPage";
 import RolesListPage from "./pages/RolesListPage";
 import CreateRolePage from "./pages/CreateRolePage";
-
+import SuppliersPage from "./pages/SuppliersPage";
+import PaginationTablePage from "./pages/PaginationTablePage";
+import PendingSuppliesPage from "./pages/PendingSuppliesPage";
+import UnpaidSuppliesPage from "./pages/UnpaidSuppliesPage";
+import SettledSuppliesPage from "./pages/SettledSuppliesPage";
+import CategoryPage from "./pages/CategoryPage";
+import SubCategoryPage from "./pages/SubCategoryPage";
+import BrandsPage from "./pages/BrandsPage";
+import ProductsPage from "./pages/ProductsPage";
 
 function App() {
   return (
     <BrowserRouter>
       <RouteScrollToTop />
       <Routes>
-        <Route exact path="/" element={<SignInPage />} />
-        <Route exact path='/index-1' element={<HomePageOne />} />
-        <Route exact path='/index-2' element={<HomePageTwo />} />
-        <Route exact path='/index-3' element={<HomePageThree />} />
-        <Route exact path='/index-4' element={<HomePageFour />} />
-        <Route exact path='/index-5' element={<HomePageFive />} />
-        <Route exact path='/index-6' element={<HomePageSix />} />
-        <Route exact path='/index-7' element={<HomePageSeven />} />
-        <Route exact path='/index-8' element={<HomePageEight />} />
-        <Route exact path='/index-9' element={<HomePageNine />} />
-        <Route exact path='/index-10' element={<HomePageTen />} />
-        <Route exact path='/index-11' element={<HomePageEleven />} />
+        {/* Public Routes */}
+        <Route path="/" element={<SignInPage />} />
+        <Route path="/sign-in" element={<SignInPage />} />
+        <Route path="/otp" element={<OtpPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
+        <Route path="/coming-soon" element={<ComingSoonPage />} />
+        <Route path="/access-denied" element={<AccessDeniedPage />} />
+        <Route path="/maintenance" element={<MaintenancePage />} />
 
-        {/* SL */}
-        <Route exact path='/add-user' element={<AddUserPage />} />
-        <Route exact path='/alert' element={<AlertPage />} />
-        <Route exact path='/assign-role' element={<AssignRolePage />} />
-        <Route exact path='/avatar' element={<AvatarPage />} />
-        <Route exact path='/badges' element={<BadgesPage />} />
-        <Route exact path='/button' element={<ButtonPage />} />
-        <Route exact path='/calendar-main' element={<CalendarMainPage />} />
-        <Route exact path='/calendar' element={<CalendarMainPage />} />
-        <Route exact path='/card' element={<CardPage />} />
-        <Route exact path='/carousel' element={<CarouselPage />} />
-        <Route exact path='/chat-empty' element={<ChatEmptyPage />} />
-        <Route exact path='/chat-message' element={<ChatMessagePage />} />
-        <Route exact path='/chat-profile' element={<ChatProfilePage />} />
-        <Route exact path='/code-generator' element={<CodeGeneratorPage />} />
-        <Route exact path='/regions' element={<RegionsPage/>} />
-        <Route exact path='/sub-regions' element={<SubRegionsPage/>} />
-        <Route exact path='/routes' element={<RoutesPage/>} />
-        <Route exact path='/regions/:regionName' element={<RegionsDetailsPage />} />
-        <Route exact path='/sub-regions/:sub-regionName' element={<SubRegionsDetailsPage />} />
-        <Route exact path='/routes/:regionName' element={<RoutesDetailsPage />} />
-        <Route exact path='/add-users' element={<AddUsersPage/>} />
-        <Route exact path='/roles-list' element={<RolesListPage/>} />
-        <Route exact path='/create-role' element={<CreateRolePage/>} />
-        <Route
-          exact
-          path='/code-generator-new'
-          element={<CodeGeneratorNewPage />}
-        />
-        <Route exact path='/colors' element={<ColorsPage />} />
-        <Route exact path='/column-chart' element={<ColumnChartPage />} />
-        <Route exact path='/company' element={<CompanyPage />} />
-        <Route exact path='/currencies' element={<CurrenciesPage />} />
-        <Route exact path='/dropdown' element={<DropdownPage />} />
-        <Route exact path='/email' element={<EmailPage />} />
-        <Route exact path='/faq' element={<FaqPage />} />
-        <Route exact path='/forgot-password' element={<ForgotPasswordPage />} />
-        <Route exact path='/form-layout' element={<FormLayoutPage />} />
-        <Route exact path='/form-validation' element={<FormValidationPage />} />
-        <Route exact path='/form' element={<FormPage />} />
-        <Route exact path='/reset-password' element={<ResetPasswordPage />} />
+        {/* Protected Routes */}
+        <Route element={<PrivateRouteLayer />}>
+          <Route path="/index-1" element={<HomePageOne />} />
+          <Route path="/index-2" element={<HomePageTwo />} />
+          <Route path="/index-3" element={<HomePageThree />} />
+          <Route path="/index-4" element={<HomePageFour />} />
+          <Route path="/index-5" element={<HomePageFive />} />
+          <Route path="/index-6" element={<HomePageSix />} />
+          <Route path="/index-7" element={<HomePageSeven />} />
+          <Route path="/index-8" element={<HomePageEight />} />
+          <Route path="/index-9" element={<HomePageNine />} />
+          <Route path="/index-10" element={<HomePageTen />} />
+          <Route path="/index-11" element={<HomePageEleven />} />
 
-        <Route exact path='/gallery' element={<GalleryPage />} />
-        <Route exact path='/gallery-grid' element={<GalleryGridPage />} />
-        <Route exact path='/gallery-masonry' element={<GalleryMasonryPage />} />
-        <Route exact path='/gallery-hover' element={<GalleryHoverPage />} />
+          {/* SL */}
+          <Route path="/add-user" element={<AddUserPage />} />
+          <Route path="/alert" element={<AlertPage />} />
+          <Route path="/assign-role" element={<AssignRolePage />} />
+          <Route path="/avatar" element={<AvatarPage />} />
+          <Route path="/badges" element={<BadgesPage />} />
+          <Route path="/button" element={<ButtonPage />} />
+          <Route path="/calendar-main" element={<CalendarMainPage />} />
+          <Route path="/calendar" element={<CalendarMainPage />} />
+          <Route path="/card" element={<CardPage />} />
+          <Route path="/carousel" element={<CarouselPage />} />
+          <Route path="/chat-empty" element={<ChatEmptyPage />} />
+          <Route path="/chat-message" element={<ChatMessagePage />} />
+          <Route path="/chat-profile" element={<ChatProfilePage />} />
+          <Route path="/code-generator" element={<CodeGeneratorPage />} />
+          <Route path="/regions" element={<RegionsPage />} />
+          <Route path="/sub-regions" element={<SubRegionsPage />} />
+          <Route path="/routes" element={<RoutesPage />} />
+          <Route path="/regions/:regionName" element={<RegionsDetailsPage />} />
+          <Route path="/sub-regions/:sub-regionName" element={<SubRegionsDetailsPage />} />
+          <Route path="/routes/:regionName" element={<RoutesDetailsPage />} />
+          <Route path="/add-users" element={<AddUsersPage />} />
+          <Route path="/roles-list" element={<RolesListPage />} />
+          <Route path="/create-role" element={<CreateRolePage />} />
+          <Route path="/suppliers" element={<SuppliersPage />} />
+          <Route path="/pagination-table" element={<PaginationTablePage />} />
+          <Route path="/pending-supplies" element={<PendingSuppliesPage />} />
+          <Route path="/unpaid-supplies" element={<UnpaidSuppliesPage />} />
+          <Route path="/settled-supplies" element={<SettledSuppliesPage />} />
+          <Route path="/category" element={<CategoryPage />} />
+          <Route path="/sub-category" element={<SubCategoryPage />} />
+          <Route path="/brands" element={<BrandsPage />} />
+          <Route path="/products" element={<ProductsPage />} />
 
-        <Route exact path='/blog' element={<BlogPage />} />
-        <Route exact path='/blog-details' element={<BlogDetailsPage />} />
-        <Route exact path='/add-blog' element={<AddBlogPage />} />
+          <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
+          <Route path="/colors" element={<ColorsPage />} />
+          <Route path="/column-chart" element={<ColumnChartPage />} />
+          <Route path="/company" element={<CompanyPage />} />
+          <Route path="/currencies" element={<CurrenciesPage />} />
+          <Route path="/dropdown" element={<DropdownPage />} />
+          <Route path="/email" element={<EmailPage />} />
+          <Route path="/faq" element={<FaqPage />} />
+          <Route path="/form-layout" element={<FormLayoutPage />} />
+          <Route path="/form-validation" element={<FormValidationPage />} />
+          <Route path="/form" element={<FormPage />} />
 
-        <Route exact path='/testimonials' element={<TestimonialsPage />} />
-        <Route exact path='/coming-soon' element={<ComingSoonPage />} />
-        <Route exact path='/access-denied' element={<AccessDeniedPage />} />
-        <Route exact path='/maintenance' element={<MaintenancePage />} />
-        <Route exact path='/blank-page' element={<BlankPagePage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/gallery-grid" element={<GalleryGridPage />} />
+          <Route path="/gallery-masonry" element={<GalleryMasonryPage />} />
+          <Route path="/gallery-hover" element={<GalleryHoverPage />} />
 
-        <Route exact path='/image-generator' element={<ImageGeneratorPage />} />
-        <Route exact path='/image-upload' element={<ImageUploadPage />} />
-        <Route exact path='/invoice-add' element={<InvoiceAddPage />} />
-        <Route exact path='/invoice-edit' element={<InvoiceEditPage />} />
-        <Route exact path='/invoice-list' element={<InvoiceListPage />} />
-        <Route exact path='/invoice-preview' element={<InvoicePreviewPage />} />
-        <Route exact path='/kanban' element={<KanbanPage />} />
-        <Route exact path='/language' element={<LanguagePage />} />
-        <Route exact path='/line-chart' element={<LineChartPage />} />
-        <Route exact path='/list' element={<ListPage />} />
-        <Route
-          exact
-          path='/marketplace-details'
-          element={<MarketplaceDetailsPage />}
-        />
-        <Route exact path='/marketplace' element={<MarketplacePage />} />
-        <Route
-          exact
-          path='/notification-alert'
-          element={<NotificationAlertPage />}
-        />
-        <Route exact path='/notification' element={<NotificationPage />} />
-        <Route exact path='/pagination' element={<PaginationPage />} />
-        <Route exact path='/payment-gateway' element={<PaymentGatewayPage />} />
-        <Route exact path='/pie-chart' element={<PieChartPage />} />
-        <Route exact path='/portfolio' element={<PortfolioPage />} />
-        <Route exact path='/pricing' element={<PricingPage />} />
-        <Route exact path='/progress' element={<ProgressPage />} />
-        <Route exact path='/radio' element={<RadioPage />} />
-        <Route exact path='/role-access' element={<RoleAccessPage />} />
-        <Route exact path='/sign-in' element={<SignInPage />} />
-        <Route exact path='/star-rating' element={<StarRatingPage />} />
-        <Route exact path='/starred' element={<StarredPage />} />
-        <Route exact path='/switch' element={<SwitchPage />} />
-        <Route exact path='/table-basic' element={<TableBasicPage />} />
-        <Route exact path='/table-data' element={<TableDataPage />} />
-        <Route exact path='/tabs' element={<TabsPage />} />
-        <Route exact path='/tags' element={<TagsPage />} />
-        <Route exact path='/terms-condition' element={<TermsConditionPage />} />
-        <Route exact path='/otp' element={<OtpPage/>} />
-        
-        <Route
-          exact
-          path='/text-generator-new'
-          element={<TextGeneratorNewPage />}
-        />
-        <Route exact path='/text-generator' element={<TextGeneratorPage />} />
-        <Route exact path='/theme' element={<ThemePage />} />
-        <Route exact path='/tooltip' element={<TooltipPage />} />
-        <Route exact path='/typography' element={<TypographyPage />} />
-        <Route exact path='/users-grid' element={<UsersGridPage />} />
-        <Route exact path='/users-list' element={<UsersListPage />} />
-        <Route exact path='/view-details' element={<ViewDetailsPage />} />
-        <Route exact path='/video-generator' element={<VideoGeneratorPage />} />
-        <Route exact path='/videos' element={<VideosPage />} />
-        <Route exact path='/view-profile' element={<ViewProfilePage />} />
-        <Route exact path='/voice-generator' element={<VoiceGeneratorPage />} />
-        <Route exact path='/wallet' element={<WalletPage />} />
-        <Route exact path='/widgets' element={<WidgetsPage />} />
-        <Route exact path='/wizard' element={<WizardPage />} />
+          <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog-details" element={<BlogDetailsPage />} />
+          <Route path="/add-blog" element={<AddBlogPage />} />
 
-        <Route exact path='*' element={<ErrorPage />} />
+          <Route path="/testimonials" element={<TestimonialsPage />} />
+          <Route path="/blank-page" element={<BlankPagePage />} />
+
+          <Route path="/image-generator" element={<ImageGeneratorPage />} />
+          <Route path="/image-upload" element={<ImageUploadPage />} />
+          <Route path="/invoice-add" element={<InvoiceAddPage />} />
+          <Route path="/invoice-edit" element={<InvoiceEditPage />} />
+          <Route path="/invoice-list" element={<InvoiceListPage />} />
+          <Route path="/invoice-preview" element={<InvoicePreviewPage />} />
+          <Route path="/kanban" element={<KanbanPage />} />
+          <Route path="/language" element={<LanguagePage />} />
+          <Route path="/line-chart" element={<LineChartPage />} />
+          <Route path="/list" element={<ListPage />} />
+          <Route path="/marketplace-details" element={<MarketplaceDetailsPage />} />
+          <Route path="/marketplace" element={<MarketplacePage />} />
+          <Route path="/notification-alert" element={<NotificationAlertPage />} />
+          <Route path="/notification" element={<NotificationPage />} />
+          <Route path="/pagination" element={<PaginationPage />} />
+          <Route path="/payment-gateway" element={<PaymentGatewayPage />} />
+          <Route path="/pie-chart" element={<PieChartPage />} />
+          <Route path="/portfolio" element={<PortfolioPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
+          <Route path="/progress" element={<ProgressPage />} />
+          <Route path="/radio" element={<RadioPage />} />
+          <Route path="/role-access" element={<RoleAccessPage />} />
+          <Route path="/star-rating" element={<StarRatingPage />} />
+          <Route path="/starred" element={<StarredPage />} />
+          <Route path="/switch" element={<SwitchPage />} />
+          <Route path="/table-basic" element={<TableBasicPage />} />
+          <Route path="/table-data" element={<TableDataPage />} />
+          <Route path="/tabs" element={<TabsPage />} />
+          <Route path="/tags" element={<TagsPage />} />
+          <Route path="/terms-condition" element={<TermsConditionPage />} />
+          <Route path="/text-generator" element={<TextGeneratorPage />} />
+          <Route path="/text-generator-new" element={<TextGeneratorNewPage />} />
+          <Route path="/theme" element={<ThemePage />} />
+          <Route path="/tooltip" element={<TooltipPage />} />
+          <Route path="/typography" element={<TypographyPage />} />
+          <Route path="/users-grid" element={<UsersGridPage />} />
+          <Route path="/users" element={<UsersListPage />} />
+          <Route path="/view-details" element={<ViewDetailsPage />} />
+          <Route path="/video-generator" element={<VideoGeneratorPage />} />
+          <Route path="/videos" element={<VideosPage />} />
+          <Route path="/view-profile" element={<ViewProfilePage />} />
+          <Route path="/voice-generator" element={<VoiceGeneratorPage />} />
+          <Route path="/wallet" element={<WalletPage />} />
+          <Route path="/widgets" element={<WidgetsPage />} />
+          <Route path="/wizard" element={<WizardPage />} />
+        </Route>
+
+        {/* Catch-all route at the end */}
+        <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
   );

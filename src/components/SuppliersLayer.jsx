@@ -1,89 +1,80 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
+import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 
-const RoutesLayer = () => {
-  const [routes, setRoutes] = React.useState([
-    { name: "Kegonga", subRegion: "Kuria East", region: "Nyanza", country: "Kenya", customers: 150, salesAgents: 38 },
-    { name: "Bofa", subRegion: "Kilifi", region: "Mombasa", country: "Uganda", customers: 135, salesAgents: 27 },
-    { name: "Lenana", subRegion: "Vihiga", region: "Western", country: "Tanzania", customers: 118, salesAgents: 19 },
-    { name: "Uhuru Highway", subRegion: "CBD", region: "Nairobi", country: "USA", customers: 256, salesAgents: 44 },
+const SuppliersLayer = () => {
+  const [suppliers, setSuppliers] = useState([
+    { name: "Apexio Company", email: "apexio@gmail.com", phoneNo: "756453475", country: "Kenya", paymentMethod: "Cash", status: "Active" },
+    { name: "Joy Link Ventures", email: "joylink@gmail.com", phoneNo: "756453475", country: "Uganda", paymentMethod: "Bank", status: "Active" },
+    { name: "Charmie Enterprises", email: "charmie@gmail.com", phoneNo: "756453475", country: "Tanzania", paymentMethod: "Cash", status: "Active" },
+    { name: "Customs Limited", email: "customs@gmail.com", phoneNo: "756453475", country: "USA", paymentMethod: "Paybill", status: "Inactive" },
+    { name: "Plastic Company", email: "plastic@gmail.com", phoneNo: "756453475", country: "Nigeria", paymentMethod: "Cash", status: "Active" },
+    { name: "Wesa Ventures", email: "wesa@gmail.com", phoneNo: "756453475", country: "United Kingdom", paymentMethod: "Paybill", status: "Active" },
   ]);
-  const [newRegion, setNewRegion] = useState({ name: '', subRegion: "", country: '' });
-  const [editRoute, setEditRoute] = React.useState({ name: '', subRegion: '', region: '', customers: 0, salesAgents: 0 });
-  const [routeToDelete, setRouteToDelete] = React.useState(null);
-  const [newRoute, setNewRoute] = useState({ name: '', subRegion: '' });
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Set items per page to 10
 
-  // Handle edit click
-  const handleEditClick = (route) => {
-    setEditRoute(route);
+  const [editSupplier, setEditSupplier] = useState({ name: '', email: '', phoneNo: '', country: '', paymentMethod: '', status: '' });
+  const [newSupplier, setNewSupplier] = useState({ name: '', email: '', phoneNo: '', country: '', paymentMethod: '', status: '' });
+  const [supplierToDelete, setSupplierToDelete] = useState(null);
+  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+  const [showPaymentDropdown, setShowPaymentDropdown] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+
+  const handleEditClick = (supplier) => {
+    setEditSupplier(supplier);
   };
 
-  // Handle edit submit
   const handleEditSubmit = (e) => {
     e.preventDefault();
-    const updatedRoutes = routes.map((r) =>
-      r.name === editRoute.name ? { ...r, ...editRoute } : r
+    const updatedSuppliers = suppliers.map((r) =>
+      r.name === editSupplier.name ? { ...r, ...editSupplier } : r
     );
-    setRoutes(updatedRoutes);
+    setSuppliers(updatedSuppliers);
+    setEditSupplier({ name: '', email: '', phoneNo: '', country: '', paymentMethod: '', status: '' });
   };
 
-  // Handle delete click
-  const handleDeleteClick = (route) => {
-    setRouteToDelete(route);
+  const handleDeleteClick = (supplier) => {
+    setSupplierToDelete(supplier);
   };
 
-  // Handle delete confirm
   const handleDeleteConfirm = () => {
-    const updatedRoutes = routes.filter((r) => r.name !== routeToDelete.name);
-    setRoutes(updatedRoutes);
-    setRouteToDelete(null);
+    const updatedSuppliers = suppliers.filter((r) => r.name !== supplierToDelete.name);
+    setSuppliers(updatedSuppliers);
+    setSupplierToDelete(null);
   };
 
-  // Handle add route
-  const handleAddRoute = (e) => {
+  const handleAddSupplier = (e) => {
     e.preventDefault();
-    if (!newRoute.name || !newRoute.subRegion) {
-      alert("Please fill in all fields before saving.");
+    if (!newSupplier.name || !newSupplier.email || !newSupplier.phoneNo || !newSupplier.country || !newSupplier.paymentMethod || !newSupplier.status) {
+      alert("Please fill in all required fields before saving.");
       return;
     }
-    const newRouteData = {
-      name: newRoute.name,
-      subRegion: newRoute.subRegion,
-      customers: 0,
-      salesAgents: 0,
+    const newSupplierData = {
+      name: newSupplier.name,
+      email: newSupplier.email,
+      phoneNo: newSupplier.phoneNo,
+      country: newSupplier.country,
+      paymentMethod: newSupplier.paymentMethod,
+      status: newSupplier.status,
     };
-    setRoutes([...routes, newRouteData]);
-    setNewRoute({ name: '', subRegion: '' }); // Reset form state
-    e.target.reset(); // Reset the form
+    setSuppliers([...suppliers, newSupplierData]);
+    setNewSupplier({ name: '', email: '', phoneNo: '', country: '', paymentMethod: '', status: '' });
   };
 
   // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = routes.slice(indexOfFirstItem, indexOfLastItem);
-
-  const totalPages = Math.ceil(routes.length / itemsPerPage);
+  const currentItems = suppliers.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(suppliers.length / itemsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  // Stats data
-  const stats = [
-    { title: "Total Employees", count: 1007, icon: "mdi:account-group", color: "bg-dark" },
-    { title: "Active", count: 1007, icon: "mdi:account-check", color: "bg-success" },
-    { title: "Inactive", count: 1007, icon: "mdi:account-off", color: "bg-danger" },
-    { title: "New Joiners", count: 67, icon: "mdi:account-plus", color: "bg-info" },
-  ];
-
   return (
     <div className="page-wrapper">
       <div className="row">
+        {/* Add Supplier */}
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <button
@@ -93,45 +84,18 @@ const RoutesLayer = () => {
               data-bs-target="#exampleModal"
             >
               <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Add Route
+              Add Supplier
             </button>
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="row g-2">
-          {stats.map((item, index) => (
-            <div className="col-lg-3 col-md-6 col-sm-12 d-flex" key={index}>
-              <div className="card flex-fill full-width-card">
-                <div className="card-body d-flex align-items-center justify-content-between">
-                  <div className="d-flex align-items-center">
-                    <div className={`avatar avatar-lg ${item.color} rounded-circle d-flex align-items-center justify-content-center`}>
-                      <Icon icon={item.icon} width="24" height="24" className="text-white" />
-                    </div>
-                    <div className="ms-2">
-                      <p className="fs-8 fw-medium mb-1 text-truncate">{item.title}</p>
-                      <h6 className="mb-0 fs-8 fw-bold">{item.count}</h6>
-                    </div>
-                  </div>
-                  <div className="stat-change">
-                    <span className="badge bg-light text-dark px-1 py-1 d-flex align-items-center gap-1">
-                      <Icon icon="mdi:trending-up" className="text-xs text-success" />
-                      <small className="fs-8">+19.01%</small>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* Table */}
+        {/* Suppliers table */}
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
           <div className="card-body">
             <div>
               <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}>
-                <input type='text' name='search' placeholder='Search' />
-                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
+                <input type="text" name="search" placeholder="Search" />
+                <Icon icon="ion:search-outline" className="icon" style={{ width: '16px', height: '16px' }} />
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: 'visible' }}>
@@ -140,24 +104,24 @@ const RoutesLayer = () => {
                   <tr>
                     <th className="text-start">#</th>
                     <th className="text-start">Name</th>
-                    <th className="text-start">Sub Regions</th>
-                    <th className="text-start">Regions</th>
+                    <th className="text-start">Email</th>
+                    <th className="text-start">Phone No.</th>
                     <th className="text-start">Country</th>
-                    <th className="text-start">Customers</th>
-                    <th className="text-start">Sales Agents</th>
+                    <th className="text-start">Payment Method</th>
+                    <th className="text-start">Status</th>
                     <th className="text-start">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((route, index) => (
+                  {currentItems.map((supplier, index) => (
                     <tr key={index}>
                       <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
-                      <td className="text-start small-text">{route.name} Route</td>
-                      <td className="text-start small-text">{route.subRegion}</td>
-                      <td className="text-start small-text">{route.region}</td>
-                      <td className="text-start small-text">{route.country}</td>
-                      <td className="text-start small-text">{route.customers}</td>
-                      <td className="text-start small-text">{route.salesAgents}</td>
+                      <td className="text-start small-text">{supplier.name}</td>
+                      <td className="text-start small-text">{supplier.email}</td>
+                      <td className="text-start small-text">{supplier.phoneNo}</td>
+                      <td className="text-start small-text">{supplier.country}</td>
+                      <td className="text-start small-text">{supplier.paymentMethod}</td>
+                      <td className="text-start small-text">{supplier.status}</td>
                       <td className="text-start small-text">
                         <div className="dropdown">
                           <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
@@ -167,8 +131,8 @@ const RoutesLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/routes/${route.name}`}
-                                state={{ route }}
+                                to={`/suppliers/${supplier.name}`}
+                                state={{ supplier }}
                               >
                                 View
                               </Link>
@@ -179,7 +143,7 @@ const RoutesLayer = () => {
                                 to="#"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editModal"
-                                onClick={() => handleEditClick(route)}
+                                onClick={() => handleEditClick(supplier)}
                               >
                                 Edit
                               </Link>
@@ -187,7 +151,7 @@ const RoutesLayer = () => {
                             <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(route)}
+                                onClick={() => handleDeleteClick(supplier)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
@@ -206,7 +170,7 @@ const RoutesLayer = () => {
             {/* Pagination */}
             <div className="d-flex justify-content-between align-items-start mt-3">
               <div className="text-muted">
-                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, routes.length)} of {routes.length} entries</span>
+                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, suppliers.length)} of {suppliers.length} entries</span>
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
@@ -244,16 +208,16 @@ const RoutesLayer = () => {
           </div>
         </div>
 
-        {/* Add Route Modal */}
+        {/* Add Supplier Modal */}
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Add Route
+                  Add Supplier
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </h6>
-                <form onSubmit={handleAddRoute}>
+                <form onSubmit={handleAddSupplier}>
                   <div className="mb-3">
                     <label className="form-label">
                       Name <span className="text-danger">*</span>
@@ -262,77 +226,124 @@ const RoutesLayer = () => {
                       type="text"
                       className="form-control w-100"
                       name="name"
-                      placeholder="Enter Route Name"
-                      value={newRoute.name}
-                      onChange={(e) => setNewRoute({ ...newRoute, name: e.target.value })}
+                      placeholder="Enter Supplier Name"
+                      value={newSupplier.name}
+                      onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Email <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      className="form-control w-100"
+                      name="email"
+                      placeholder="Enter Email"
+                      value={newSupplier.email}
+                      onChange={(e) => setNewSupplier({ ...newSupplier, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Phone No <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control w-100"
+                      name="phoneNo"
+                      placeholder="Enter Phone Number"
+                      value={newSupplier.phoneNo}
+                      onChange={(e) => setNewSupplier({ ...newSupplier, phoneNo: e.target.value })}
                       required
                     />
                   </div>
                   <div className="mb-3">
                     <div className="position-relative">
                       <label className="form-label">
-                        Sub Region <span className="text-danger">*</span>
+                        Country <span className="text-danger">*</span>
                       </label>
                       <div
                         className="form-control d-flex justify-content-between align-items-center"
                         style={{ cursor: "pointer" }}
-                        onClick={() => setShowDropdown(!showDropdown)}
+                        onClick={() => setShowCountryDropdown(!showCountryDropdown)}
                       >
-                        <span>{newRoute.subRegion || "Select Sub Region"}</span>
+                        <span>{newSupplier.country || "Select Country"}</span>
                         <i className="dropdown-toggle ms-2"></i>
                       </div>
-                      {showDropdown && (
+                      {showCountryDropdown && (
                         <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
-                          {["Westlands", "Kilifi", "Vihiga", "Kuria East"].map((subRegion, index) => (
+                          {["Kenya", "Uganda", "Tanzania", "USA", "Nigeria", "United Kingdom"].map((country, index) => (
                             <li key={index}>
                               <button
                                 type="button"
                                 className="dropdown-item"
                                 onClick={() => {
-                                  setNewRoute({ ...newRoute, subRegion });
-                                  setShowDropdown(false);
+                                  setNewSupplier({ ...newSupplier, country });
+                                  setShowCountryDropdown(false);
                                 }}
                               >
-                                {subRegion}
+                                {country}
                               </button>
                             </li>
                           ))}
                         </ul>
                       )}
                     </div>
-                    <div className="mb-3">
+                  </div>
+                  <div className="mb-3">
+                    <div className="position-relative">
                       <label className="form-label">
-                        Country <span className="text-danger">*</span>
+                        Payment Method <span className="text-danger">*</span>
                       </label>
-                      <div className="position-relative">
-                        <div
-                          className="form-control d-flex justify-content-between align-items-center"
-                          style={{ cursor: "pointer" }}
-                          onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                        >
-                          <span>{newRegion.country || "Select Country"}</span>
-                          <i className="dropdown-toggle ms-2"/>
-                        </div>
-                        {showCountryDropdown && (
-                          <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
-                            {["Kenya", "Uganda", "Tanzania", "USA"].map((country, index) => (
-                              <li key={index}>
-                                <button
-                                  type="button"
-                                  className="dropdown-item"
-                                  onClick={() => {
-                                    setNewRegion({ ...newRegion, country });
-                                    setShowCountryDropdown(false); // Close dropdown after selection
-                                  }}
-                                >
-                                  {country}
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                      <div
+                        className="form-control d-flex justify-content-between align-items-center"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => setShowPaymentDropdown(!showPaymentDropdown)}
+                      >
+                        <span>{newSupplier.paymentMethod || "Select Payment Method"}</span>
+                        <i className="dropdown-toggle ms-2"></i>
                       </div>
+                      {showPaymentDropdown && (
+                        <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
+                          {["Cash", "Bank", "Paybill"].map((paymentMethod, index) => (
+                            <li key={index}>
+                              <button
+                                type="button"
+                                className="dropdown-item"
+                                onClick={() => {
+                                  setNewSupplier({ ...newSupplier, paymentMethod });
+                                  setShowPaymentDropdown(false);
+                                }}
+                              >
+                                {paymentMethod}
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Status <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-control"
+                      name="status"
+                      value={newSupplier.status}
+                      onChange={(e) => setNewSupplier({ ...newSupplier, status: e.target.value })}
+                      required
+                    >
+                      <option value="">Select Status</option>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                  </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
                     <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
@@ -343,50 +354,53 @@ const RoutesLayer = () => {
           </div>
         </div>
 
-        {/* Edit Route Modal */}
+        {/* Edit Supplier Modal */}
         <div className="modal fade" id="editModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-lg modal-dialog-centered">
+          <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Edit Route
+                  Edit Supplier
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </h6>
                 <form onSubmit={handleEditSubmit}>
                   <div className="mb-3">
                     <label className="form-label">
-                      Route Name <span className="text-danger">*</span>
+                      Name <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter Route Name"
-                      value={editRoute.name}
-                      onChange={(e) => setEditRoute({ ...editRoute, name: e.target.value })}
+                      placeholder="Enter Supplier Name"
+                      value={editSupplier.name}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, name: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Sub Region <span className="text-danger">*</span>
+                      Email <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="text"
+                      type="email"
                       className="form-control"
-                      placeholder="Enter Sub Region Name"
-                      value={editRoute.subRegion}
-                      onChange={(e) => setEditRoute({ ...editRoute, subRegion: e.target.value })}
+                      placeholder="Enter Email"
+                      value={editSupplier.email}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, email: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Region <span className="text-danger">*</span>
+                      Phone No <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter Region Name"
-                      value={editRoute.region}
-                      onChange={(e) => setEditRoute({ ...editRoute, region: e.target.value })}
+                      placeholder="Enter Phone Number"
+                      value={editSupplier.phoneNo}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, phoneNo: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
@@ -396,34 +410,39 @@ const RoutesLayer = () => {
                     <input
                       type="text"
                       className="form-control"
-                      placeholder="Enter Region Name"
-                      value={editRoute.country}
-                      onChange={(e) => setEditRoute({ ...editRoute, country: e.target.value })}
+                      placeholder="Enter Country"
+                      value={editSupplier.country}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, country: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Customer <span className="text-danger">*</span>
+                      Payment Method <span className="text-danger">*</span>
                     </label>
                     <input
-                      type="number"
+                      type="text"
                       className="form-control"
-                      placeholder="Enter Number of Customers"
-                      value={editRoute.customers}
-                      onChange={(e) => setEditRoute({ ...editRoute, customers: parseInt(e.target.value) || 0 })}
+                      placeholder="Enter Payment Method"
+                      value={editSupplier.paymentMethod}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, paymentMethod: e.target.value })}
+                      required
                     />
                   </div>
                   <div className="mb-3">
                     <label className="form-label">
-                      Sales Agent <span className="text-danger">*</span>
+                      Status <span className="text-danger">*</span>
                     </label>
-                    <input
-                      type="number"
+                    <select
                       className="form-control"
-                      placeholder="Enter Number of Sales Agents"
-                      value={editRoute.salesAgents}
-                      onChange={(e) => setEditRoute({ ...editRoute, salesAgents: parseInt(e.target.value) || 0 })}
-                    />
+                      value={editSupplier.status}
+                      onChange={(e) => setEditSupplier({ ...editSupplier, status: e.target.value })}
+                      required
+                    >
+                      <option value="">Select Status</option>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
                   </div>
                   <div className="text-muted small mt-3">
                     Fields marked with <span className="text-danger">*</span> are required.
@@ -443,11 +462,11 @@ const RoutesLayer = () => {
             <div className="modal-content">
               <div className="modal-body pt-3 ps-18 pe-18">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h6 className="modal-title fs-6">Delete Route</h6>
+                  <h6 className="modal-title fs-6">Delete Supplier</h6>
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <p className="pb-3 mb-0">
-                  Are you sure you want to delete the <strong>{routeToDelete?.name}</strong> route permanently? This action cannot be undone.
+                  Are you sure you want to delete the <strong>{supplierToDelete?.name}</strong> supplier permanently? This action cannot be undone.
                 </p>
               </div>
               <div className="d-flex justify-content-end gap-2 px-12 pb-3">
@@ -462,4 +481,4 @@ const RoutesLayer = () => {
   );
 };
 
-export default RoutesLayer;
+export default SuppliersLayer;

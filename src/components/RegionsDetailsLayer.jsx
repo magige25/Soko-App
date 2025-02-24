@@ -6,6 +6,7 @@ const RegionDetails = () => {
   const location = useLocation();
   const { regionName } = useParams();
   const { region } = location.state || { region: { name: "Default Region" } };
+  console.log("Region data:", region);
 
   const [selectedTable, setSelectedTable] = useState("customers");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -48,6 +49,8 @@ const RegionDetails = () => {
     : tables.orders.filter(order => order.status === selectedStatus);
 
   const renderTable = () => {
+  console.log("Selected table:", selectedTable); // Log the selected table
+  console.log("Table data:", tables[selectedTable]); 
     switch (selectedTable) {
       case "customers":
         return (
@@ -205,8 +208,6 @@ const RegionDetails = () => {
             </div>
           </div>
           {renderTable()}
-          {/* <Link to="/regions" className="btn btn-primary">
-          </Link> */}
         </div>
       </div>
     </div>

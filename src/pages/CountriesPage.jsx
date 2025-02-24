@@ -1,24 +1,25 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import AddUserLayer from "../components/AddUserLayer";
+import CountriesLayer from "../components/CountriesLayer";
 
 
-const AddUserPage = () => {
+const CountriesPage = () => {
   return (
     <>
       {/* MasterLayout */}
       <MasterLayout>
 
         {/* Breadcrumb */}
-        <Breadcrumb title="Add User" />
+        <Breadcrumb title="Settings - Countries" />
 
-        {/* AddUserLayer */}
-        <AddUserLayer />
+        {/* CountriesLayer */}
+        <CountriesLayer />
+
 
       </MasterLayout>
     </>
   );
 };
 
-export default AddUserPage;
+export default CountriesPage;
