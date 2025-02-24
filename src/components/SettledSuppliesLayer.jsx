@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { Link } from "react-router-dom";
+//import { Link } from "react-router-dom";
 
 const SettledSuppliesLayer = () => {
-  const [SettledSupplies, setSettledSupplies] = useState([
+  const [settledSupplies, setSettledSupplies] = useState([
     { name: "Kantaram Company", country: "KENYA", orderNo: "ORD123", numberOfItems: "22", amount: 1025, dateSettled: "2024 Jan 20", status: "Settled" },
     { name: "Morwabe Ventures", country: "KENYA", orderNo: "ORD123", numberOfItems: "11", amount: 455, dateSettled: "2024 Jan 5", status: "Settled" },
     { name: "Kireki Enterprises", country: "KENYA", orderNo: "ORD123", numberOfItems: "15", amount: 675, dateSettled: "2024 Jan 25", status: "Settled" },
@@ -21,32 +21,33 @@ const SettledSuppliesLayer = () => {
   ]);
 
   const [searchItem, setSearchItem] = useState("");
-  const filteredItems = SettledSupplies.filter((supply) =>
+  const filteredItems = settledSupplies.filter((supply) =>
     supply.name.toLowerCase().includes(searchItem.toLowerCase())
   );
 
-  const [SettledSuppliesToDelete, setSettledSuppliesToDelete] = useState(null);
+  const [settledSuppliesToDelete, setSettledSuppliesToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
-  const [selectedSupply, setsSelectedSupply] = useState(null);
+  const itemsPerPage = 10; // Changed to constant since it’s not updated
+  const [selectedSupply, setSelectedSupply] = useState(null); // Fixed typo
 
   const handleDeleteClick = (supply) => {
     setSettledSuppliesToDelete(supply);
   };
 
   const handleDeleteConfirm = () => {
-    const updatedSettledSupplies = SettledSupplies.filter((r) => r.name !== SettledSuppliesToDelete.name);
+    const updatedSettledSupplies = settledSupplies.filter(
+      (r) => r.name !== settledSuppliesToDelete.name
+    );
     setSettledSupplies(updatedSettledSupplies);
     setSettledSuppliesToDelete(null);
   };
 
-  // Pagination logic
+  // Pagination logic using filteredItems
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = SettledSupplies.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(SettledSupplies.length / itemsPerPage);
+  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
 
-  // Handle page change
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -55,25 +56,25 @@ const SettledSuppliesLayer = () => {
     <div className="page-wrapper">
       <div className="row">
         {/* Settled Supplies table */}
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
+        <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
             <div>
               <form
                 className="navbar-search"
-                style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}
+                style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "20px" }}
               >
                 <input
-                  type='text'
-                  name='search'
-                  placeholder='Search'
+                  type="text"
+                  name="search"
+                  placeholder="Search"
                   value={searchItem}
                   onChange={(e) => setSearchItem(e.target.value)}
                 />
-                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
+                <Icon icon="ion:search-outline" className="icon" style={{ width: "16px", height: "16px" }} />
               </form>
             </div>
-            <div className="table-responsive" style={{ overflow: 'visible' }}>
-              <table className="table table-borderless text-start small-text" style={{ width: '100%' }}>
+            <div className="table-responsive" style={{ overflow: "visible" }}>
+              <table className="table table-borderless text-start small-text" style={{ width: "100%" }}>
                 <thead className="table-light text-start small-text">
                   <tr>
                     <th className="text-start">#</th>
@@ -90,7 +91,9 @@ const SettledSuppliesLayer = () => {
                 <tbody>
                   {currentItems.map((supply, index) => (
                     <tr key={index}>
-                      <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
+                      <th scope="row" className="text-start small-text">
+                        {indexOfFirstItem + index + 1}
+                      </th>
                       <td className="text-start small-text">{supply.name}</td>
                       <td className="text-start small-text">{supply.country}</td>
                       <td className="text-start small-text">{supply.orderNo}</td>
@@ -100,21 +103,24 @@ const SettledSuppliesLayer = () => {
                       <td className="text-start small-text">{supply.status}</td>
                       <td className="text-start small-text">
                         <div className="dropdown">
-                          <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
+                          <button
+                            className="btn btn-light dropdown-toggle btn-sm"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                          >
                             Actions
                           </button>
                           <ul className="dropdown-menu">
                             <li>
-                              <Link
+                              <button
                                 className="dropdown-item"
-                                to={`/Settled-supplies/${supply.name}`}
                                 data-bs-toggle="modal"
                                 data-bs-target="#viewModal"
-                                state={{ supply }}
-                                onClick={() => setsSelectedSupply(supply)}
+                                onClick={() => setSelectedSupply(supply)}
                               >
                                 View
-                              </Link>
+                              </button>
                             </li>
                             <li>
                               <button
@@ -138,23 +144,27 @@ const SettledSuppliesLayer = () => {
             <div className="d-flex justify-content-between align-items-start mt-3">
               <div className="text-muted">
                 <span>
-                  Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, SettledSupplies.length)} of {SettledSupplies.length} entries
+                  Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredItems.length)} of{" "}
+                  {filteredItems.length} entries
                 </span>
               </div>
               <nav aria-label="Page navigation">
                 <ul className="pagination mb-0">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                     <button
+                      type="button"
                       className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
                       onClick={() => handlePageChange(currentPage - 1)}
                       disabled={currentPage === 1}
+                      aria-label="Previous page"
                     >
                       <Icon icon="ep:d-arrow-left" />
                     </button>
                   </li>
                   {Array.from({ length: totalPages }, (_, i) => (
-                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                    <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
                       <button
+                        type="button"
                         className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
                         onClick={() => handlePageChange(i + 1)}
                       >
@@ -162,11 +172,13 @@ const SettledSuppliesLayer = () => {
                       </button>
                     </li>
                   ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                     <button
+                      type="button"
                       className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
                       onClick={() => handlePageChange(currentPage + 1)}
                       disabled={currentPage === totalPages}
+                      aria-label="Next page"
                     >
                       <Icon icon="ep:d-arrow-right" />
                     </button>
@@ -184,7 +196,7 @@ const SettledSuppliesLayer = () => {
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
                   Settled Supplies
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </h6>
                 {selectedSupply && (
                   <>
@@ -214,30 +226,35 @@ const SettledSuppliesLayer = () => {
         </div>
 
         {/* Delete Confirmation Modal */}
-        <div className="modal fade" id="deleteModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal fade" id="deleteModal" tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body pt-3 ps-18 pe-18">
                 <div className="d-flex justify-content-between align-items-center mb-3">
                   <h6 className="modal-title fs-6">Delete Settled Supplies</h6>
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <p className="pb-3 mb-0">
-                  Are you sure you want to delete the <strong>{SettledSuppliesToDelete?.name}</strong> Settled Supply permanently? This action cannot be undone.
+                  Are you sure you want to delete the <strong>{settledSuppliesToDelete?.name}</strong> Settled Supply
+                  permanently? This action cannot be undone.
                 </p>
               </div>
               <div className="d-flex justify-content-end gap-2 px-12 pb-3">
                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
                   Cancel
                 </button>
-                <button type="button" className="btn btn-danger" data-bs-dismiss="modal" onClick={handleDeleteConfirm}>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  data-bs-dismiss="modal"
+                  onClick={handleDeleteConfirm}
+                >
                   Delete
                 </button>
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );

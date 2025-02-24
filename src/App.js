@@ -111,10 +111,11 @@ import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
 import PendingSuppliesPage from "./pages/PendingSuppliesPage";
 import UnpaidSuppliesPage from "./pages/UnpaidSuppliesPage";
-import CompletedSuppliesPage from "./pages/CompletedSuppliesPage";
+import SettledSuppliesPage from "./pages/SettledSuppliesPage";
 import CategoryPage from "./pages/CategoryPage";
 import SubCategoryPage from "./pages/SubCategoryPage";
 import BrandsPage from "./pages/BrandsPage";
+import ProductsPage from "./pages/ProductsPage";
 
 function App() {
   return (
@@ -173,10 +174,11 @@ function App() {
           <Route path="/pagination-table" element={<PaginationTablePage />} />
           <Route path="/pending-supplies" element={<PendingSuppliesPage />} />
           <Route path="/unpaid-supplies" element={<UnpaidSuppliesPage />} />
-          <Route path="/completed-supplies" element={<CompletedSuppliesPage />} />
+          <Route path="/settled-supplies" element={<SettledSuppliesPage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/sub-category" element={<SubCategoryPage />} />
           <Route path="/brands" element={<BrandsPage />} />
+          <Route path="/products" element={<ProductsPage />} />
 
           <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
           <Route path="/colors" element={<ColorsPage />} />

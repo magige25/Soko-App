@@ -160,25 +160,25 @@ const ResetPasswordLayer = () => {
               Enter your new password
             </p>
           </div>
-          <form>
+          <form onSubmit={handleSubmit}>
             {["password", "confirmPassword"].map((field) => (
               <div className="position-relative mb-20" key={field}>
                 <div
                   className="icon-field mb-16"
                   style={{
                     position: "relative",
-                    height: "56px", // Fixed height to prevent shifting
+                    height: "56px",
                   }}
                 >
                   <span
                     className="icon"
                     style={{
                       position: "absolute",
-                      left: "12px", // Adjusted for better spacing
+                      left: "12px",
                       top: "50%",
                       transform: "translateY(-50%)",
                       zIndex: 1,
-                      width: "24px", // Fixed width for consistency
+                      width: "24px",
                       display: "flex",
                       alignItems: "center",
                     }}
@@ -194,12 +194,12 @@ const ResetPasswordLayer = () => {
                     onChange={handlePasswordChange}
                     required
                     style={{
-                      paddingLeft: "44px", // Increased to fully clear the lock icon
-                      paddingRight: "44px", // Increased to fully clear the eye icon
+                      paddingLeft: "44px",
+                      paddingRight: "44px",
                       height: "100%",
                       position: "relative",
                       zIndex: 0,
-                      boxSizing: "border-box", // Ensures padding doesn't affect dimensions
+                      boxSizing: "border-box",
                     }}
                   />
                   <span
@@ -211,11 +211,11 @@ const ResetPasswordLayer = () => {
                     title={passwordVisibility[field] ? "Hide password" : "Show password"}
                     style={{
                       position: "absolute",
-                      right: "12px", // Adjusted for better spacing
+                      right: "12px",
                       top: "50%",
                       transform: "translateY(-50%)",
                       zIndex: 1,
-                      width: "24px", // Fixed width for consistency
+                      width: "24px",
                       display: "flex",
                       alignItems: "center",
                     }}
@@ -233,7 +233,6 @@ const ResetPasswordLayer = () => {
             <button
               type="submit"
               className="btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-32"
-              onClick={handleClick}
               disabled={
                 loading ||
                 !formData.password ||

@@ -436,7 +436,7 @@ const MasterLayout = ({ children }) => {
             <li className='dropdown'>
               <Link to='#'>
                 <Icon icon='ri-clipboard-fill' className='menu-icon' />
-                  <span>Suppliers Management</span>
+                  <span>Supplier Management</span>
               </Link>
               <ul className='sidebar-submenu'>
                 <li>
@@ -481,17 +481,6 @@ const MasterLayout = ({ children }) => {
                   >
                     <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
                     Settled Supplies
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/products'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Products
                   </NavLink>
                 </li>
               </ul>
