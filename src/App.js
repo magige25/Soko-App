@@ -117,6 +117,15 @@ import SubCategoryPage from "./pages/SubCategoryPage";
 import BrandsPage from "./pages/BrandsPage";
 import ProductsPage from "./pages/ProductsPage";
 import CountriesPage from "./pages/CountriesPage";
+import SalespersonsPage from "./pages/SalespersonsPage";
+import CustomersPage from "./pages/CustomersPage";
+import CustomerTypePage from "./pages/CustomerTypePage";
+import PricingCategoriesPage from "./pages/PricingCategoriesPage";
+import CreditorsRequestPage from "./pages/CreditorsRequestPage";
+import PendingOrdersPage from "./pages/PendingOrdersPage";
+import PendingDeliveriesPage from "./pages/PendingDeliveriesPage";
+import SettledOrdersPage from "./pages/SettledOrdersPage";
+import UnitsOfMeasurePage from "./pages/UnitsOfMeasurePage";
 
 function App() {
   return (
@@ -181,6 +190,15 @@ function App() {
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/countries" element={<CountriesPage />} />
+          <Route path="/salespersons" element={<SalespersonsPage />} />
+          <Route path="/customers" element={<CustomersPage />} />
+          <Route path="/customer-type" element={<CustomerTypePage />} />
+          <Route path="/pricing-categories" element={<PricingCategoriesPage />} />
+          <Route path="/creditors-request" element={<CreditorsRequestPage />} />
+          <Route path="/pending-orders" element={<PendingOrdersPage />} />
+          <Route path="/pending-deliveries" element={<PendingDeliveriesPage />} />
+          <Route path="/settled-orders" element={<SettledOrdersPage />} />
+          <Route path="/units-of-measure" element={<UnitsOfMeasurePage />} />
 
           <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
           <Route path="/colors" element={<ColorsPage />} />

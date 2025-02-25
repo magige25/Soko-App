@@ -283,7 +283,147 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
-               {/* Regions Dropdown */}
+              {/* Customer Management  */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon
+                  icon='ri-user-line'
+                  className='menu-icon'
+                />
+                <span>Customer Management</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/customers'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Customers
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/creditors-request'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Creditors Request
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
+             {/* Orders */}
+             <li className='dropdown'>
+              <Link to='#'>
+                <Icon
+                  icon='ri-shopping-cart-line'
+                  className='menu-icon'
+                />
+                <span>Order Management</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/pending-orders'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Pending Orders
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/pending-deliveries'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Pending Deliveries
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/settled-orders'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Settled Orders
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
+              {/* Salespersons  */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon
+                  icon='ri-group-line'
+                  className='menu-icon'
+                />
+                <span>Salesperson Operation</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/salespersons'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Salespersons
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
+              {/* Payment  */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon
+                  icon='ri-wallet-line'
+                  className='menu-icon'
+                />
+                <span>Payment Management</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/payments'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Payments
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/creditors-payment'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Creditors Payment
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
+              {/* Regions Dropdown */}
             <li className='dropdown'>
               <Link to='#'>
                 <i className='ri-map-pin-line' />
@@ -329,8 +469,8 @@ const MasterLayout = ({ children }) => {
             {/* Product Catalogue */}
             <li className='dropdown'>
               <Link to='#'>
-                <i className='ri-book-3-fill' />
-                <span>Products Catalogue </span>
+                <i class="ri-archive-2-line"></i>
+                <span>Product Catalogue </span>
               </Link>
               <ul className='sidebar-submenu'>
               <li>
@@ -379,63 +519,11 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-            {/* <li className='dropdown'>
-              <Link to='#'>
-                <i className='ri-book-3-fill' />
-                <span>Product Catalogue </span>
-              </Link>
-              <ul className='sidebar-menu'>
-                <li>
-                  <NavLink
-                    to='/categories'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
-                    Categories
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/sub-categories'
-                    className={(navData) => 
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Sub Categories
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/brands'
-                    className={(navData) => 
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Brands
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to='/products'
-                    className={(navData) => 
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Products
-                  </NavLink>
-                </li>
-              </ul>
-            </li> */}
-
+            
               {/* Supplier Management */}
             <li className='dropdown'>
               <Link to='#'>
-                <Icon icon='ri-clipboard-fill' className='menu-icon' />
+                <Icon icon='ri-clipboard-line' className='menu-icon' />
                   <span>Supplier Management</span>
               </Link>
               <ul className='sidebar-submenu'>
@@ -481,6 +569,54 @@ const MasterLayout = ({ children }) => {
                   >
                     <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
                     Settled Supplies
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
+              {/* Warehouse Management  */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon
+                  icon='ri-store-3-line'
+                  className='menu-icon'
+                />
+                <span>Warehouse Management</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/warehouses'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Warehouses
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
+              {/* Stock Reconciliation  */}
+            <li className='dropdown'>
+              <Link to='#'>
+                <Icon
+                  icon='ri-equalizer-line'
+                  className='menu-icon'
+                />
+                <span>Stock Reconciliation</span>
+              </Link>
+              <ul className='sidebar-submenu'>
+                <li>
+                  <NavLink
+                    to='/reconciled'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Reconciled Stock
                   </NavLink>
                 </li>
               </ul>
@@ -1437,6 +1573,28 @@ const MasterLayout = ({ children }) => {
                 </li>
                 <li>
                   <NavLink
+                    to='/customer-type'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
+                    Customer Type
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/pricing-categories'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
+                    Pricing Categories
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
                     to='/currencies'
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
@@ -1444,6 +1602,17 @@ const MasterLayout = ({ children }) => {
                   >
                     <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
                     Currencies
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to='/units-of-measure'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-danger-main w-auto' />{" "}
+                    Units of Measure
                   </NavLink>
                 </li>
                 <li>

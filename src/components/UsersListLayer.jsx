@@ -56,6 +56,9 @@ const UsersListLayer = () => {
     return () => editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
   }, [isLoading]);
 
+  useEffect(() => {
+  }, [editUser]);
+
   const fetchUsers = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -142,7 +145,7 @@ const UsersListLayer = () => {
         }
       }
 
-      console.log('Updated Permissions:', updatedPermissions);
+      console.log('Updated Permissions after change:', updatedPermissions);
       return { ...prev, userModelModulePermissions: updatedPermissions };
     });
   };
@@ -158,7 +161,6 @@ const UsersListLayer = () => {
       console.log('User Data:', userData);
 
       const roleId = userData.role?.id || user.role?.id || '';
-      console.log('Role ID:', roleId);
       const rolePerms = rolePermissions[roleId] || {};
       console.log('Role Permissions for roleId', roleId, ':', rolePerms);
 
@@ -166,7 +168,7 @@ const UsersListLayer = () => {
         acc[module.moduleId] = module.permissions.map(perm => ({
           code: perm.code,
           name: perm.name || perm.code,
-          assigned: true,
+          assigned: true, // Server-side assigned permissions are true
         }));
         return acc;
       }, {}) || {};
@@ -178,7 +180,7 @@ const UsersListLayer = () => {
         const permissions = roleModulePerms.map(rolePerm => ({
           code: rolePerm.code,
           name: rolePerm.name,
-          assigned: userModulePerms.some(up => up.code === rolePerm.code),
+          assigned: userModulePerms.some(up => up.code === rolePerm.code), // Only check if explicitly assigned by user data
         }));
         return {
           moduleId: module.moduleId,
@@ -199,7 +201,7 @@ const UsersListLayer = () => {
         userModelModulePermissions: mergedPermissions,
       };
       setEditUser(updatedEditUser);
-      console.log('Edit User State Set:', updatedEditUser);
+      
     } catch (error) {
       console.error('Error fetching user details:', error);
       setEditUser({
@@ -228,7 +230,7 @@ const UsersListLayer = () => {
       setUserToView(userData);
     } catch (error) {
       console.error('Error fetching user details for view:', error);
-      setUserToView(user); // Fallback to basic user data if API fails
+      setUserToView(user);
       setError('Failed to fetch detailed user data.');
     }
   };
@@ -338,9 +340,10 @@ const UsersListLayer = () => {
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  const getPermissionOptionsForModule = (moduleId) => {
-    const perms = rolePermissions[userToView?.role?.id]?.[moduleId] || [];
-    console.log(`Permissions for module ${moduleId} for role ${userToView?.role?.id}:`, perms);
+  const getPermissionOptionsForModule = (moduleId, isEditMode = false) => {
+    const roleId = isEditMode ? editUser.roleId : userToView?.role?.id;
+    const perms = rolePermissions[roleId]?.[moduleId] || [];
+    console.log(`Permissions for module ${moduleId} for role ${roleId} (Edit Mode: ${isEditMode}):`, perms);
     return perms;
   };
 
@@ -625,7 +628,7 @@ const UsersListLayer = () => {
                         <tbody>
                           {modules.length > 0 ? (
                             modules.map((module) => {
-                              const perms = getPermissionOptionsForModule(module.moduleId);
+                              const perms = getPermissionOptionsForModule(module.moduleId, true);
                               if (perms.length === 0) return null;
                               const userModule = editUser.userModelModulePermissions.find(
                                 (up) => up.moduleId === module.moduleId
@@ -709,7 +712,6 @@ const UsersListLayer = () => {
                   <p className="mb-2"><strong>Status:</strong> {userToView.status || 'N/A'}</p>
                   <p className="mb-2"><strong>Country Code:</strong> {userToView.countryCode || 'N/A'}</p>
 
-                  {/* Module Permissions Section */}
                   <div className="mt-4">
                     <h6 className="mb-3">Module Permissions</h6>
                     {userToView.userModelModulePermissions && userToView.userModelModulePermissions.length > 0 ? (
@@ -754,7 +756,7 @@ const UsersListLayer = () => {
                 </div>
               )}
               <div className="d-flex justify-content-end gap-2 mt-3">
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" className="btn btn-primary" data-bs-dismiss="modal">
                   Close
                 </button>
               </div>
