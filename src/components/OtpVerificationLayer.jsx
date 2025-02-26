@@ -63,6 +63,19 @@ const OtpVerificationLayer = () => {
     }
   };
 
+  const handleKeyDown = (index, e) => {
+    if (e.key === "Backspace" && !formData.otp[index] && index > 0) {
+      e.preventDefault();
+      inputRefs.current[index - 1].focus();
+      const newOtp = [...formData.otp];
+      newOtp[index - 1] = ""; // Optionally clear the previous field
+      setFormData((prevData) => ({
+        ...prevData,
+        otp: newOtp,
+      }));
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -114,7 +127,7 @@ const OtpVerificationLayer = () => {
         if (token) {
           localStorage.setItem("token", token);
           console.log("Token set successfully:", localStorage.getItem("token"));
-          navigate("/index-1"); // Navigate to dashboard at root
+          navigate("/dashboard");
         } else {
           console.error("No access token found in response!");
           toast.error("Authentication failed: No token received.");
@@ -263,6 +276,7 @@ const OtpVerificationLayer = () => {
                     value={digit}
                     maxLength="1"
                     onChange={(e) => handleOtpChange(index, e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(index, e)}
                     ref={(el) => (inputRefs.current[index] = el)}
                     style={{
                       width: "50px",
@@ -302,7 +316,7 @@ const OtpVerificationLayer = () => {
               disabled={resendDisabled || loading}
               style={{ fontSize: "16px" }}
             >
-              {loading ? <div className="spinner"></div> : "Resend"}
+             Resend
             </button>
           </p>
         </div>
