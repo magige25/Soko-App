@@ -483,6 +483,17 @@ const MasterLayout = ({ children }) => {
                     Settled Supplies
                   </NavLink>
                 </li>
+                <li>
+                  <NavLink
+                    to='/supply-residence'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
+                    Supply Residence
+                  </NavLink>
+                </li>
               </ul>
             </li>
 

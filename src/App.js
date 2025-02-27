@@ -116,6 +116,8 @@ import CategoryPage from "./pages/CategoryPage";
 import SubCategoryPage from "./pages/SubCategoryPage";
 import BrandsPage from "./pages/BrandsPage";
 import ProductsPage from "./pages/ProductsPage";
+import CountriesPage from "./pages/CountriesPage";
+import SupplyResidencePage from "./pages/SupplyResidencePage";
 
 function App() {
   return (
@@ -179,6 +181,8 @@ function App() {
           <Route path="/sub-category" element={<SubCategoryPage />} />
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/products" element={<ProductsPage />} />
+          <Route path="/countries" element={<CountriesPage />} />
+          <Route path="/supply-residence" element={<SupplyResidencePage />} />
 
           <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
           <Route path="/colors" element={<ColorsPage />} />
