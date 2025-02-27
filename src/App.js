@@ -1,12 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import PrivateRouteLayer from "./components/PrivateRouteLayer";
 import HomePageOne from "./pages/HomePageOne";
-// import HomePageTwo from "./pages/HomePageTwo";
-// import HomePageThree from "./pages/HomePageThree";
-// import HomePageFour from "./pages/HomePageFour";
-// import HomePageFive from "./pages/HomePageFive";
-// import HomePageSix from "./pages/HomePageSix";
-// import HomePageSeven from "./pages/HomePageSeven";
 import EmailPage from "./pages/EmailPage";
 import AddUserPage from "./pages/AddUserPage";
 import AlertPage from "./pages/AlertPage";
@@ -81,10 +75,6 @@ import WidgetsPage from "./pages/WidgetsPage";
 import WizardPage from "./pages/WizardPage";
 import RouteScrollToTop from "./helper/RouteScrollToTop";
 import TextGeneratorNewPage from "./pages/TextGeneratorNewPage";
-// import HomePageEight from "./pages/HomePageEight";
-// import HomePageNine from "./pages/HomePageNine";
-// import HomePageTen from "./pages/HomePageTen";
-// import HomePageEleven from "./pages/HomePageEleven";
 import GalleryGridPage from "./pages/GalleryGridPage";
 import GalleryMasonryPage from "./pages/GalleryMasonryPage";
 import GalleryHoverPage from "./pages/GalleryHoverPage";
@@ -126,6 +116,9 @@ import PendingOrdersPage from "./pages/PendingOrdersPage";
 import PendingDeliveriesPage from "./pages/PendingDeliveriesPage";
 import SettledOrdersPage from "./pages/SettledOrdersPage";
 import UnitsOfMeasurePage from "./pages/UnitsOfMeasurePage";
+import AddSuppliersPage from "./pages/AddSuppliersPage";
+import SuppliersDetailsPage from "./pages/SuppliersDetailsPage";
+import EditSuppliersPage from "./pages/EditSuppliersPage";
 
 function App() {
   return (
@@ -145,16 +138,6 @@ function App() {
         {/* Protected Routes */}
         <Route element={<PrivateRouteLayer />}>
           <Route path="/dashboard" element={<HomePageOne />} />
-          {/* <Route path="/index-2" element={<HomePageTwo />} />
-          <Route path="/index-3" element={<HomePageThree />} />
-          <Route path="/index-4" element={<HomePageFour />} />
-          <Route path="/index-5" element={<HomePageFive />} />
-          <Route path="/index-6" element={<HomePageSix />} />
-          <Route path="/index-7" element={<HomePageSeven />} />
-          <Route path="/index-8" element={<HomePageEight />} /> */}
-          {/* <Route path="/index-9" element={<HomePageNine />} />
-          <Route path="/index-10" element={<HomePageTen />} />
-          <Route path="/index-11" element={<HomePageEleven />} /> */}
 
           {/* SL */}
           <Route path="/add-user" element={<AddUserPage />} />
@@ -177,10 +160,14 @@ function App() {
           <Route path="/regions/:regionName" element={<RegionsDetailsPage />} />
           <Route path="/sub-regions/:sub-regionName" element={<SubRegionsDetailsPage />} />
           <Route path="/routes/:regionName" element={<RoutesDetailsPage />} />
-          <Route path="/add-users" element={<AddUsersPage />} />
+          <Route path="/users" element={<UsersListPage />} />
+          <Route path="/users/add-user" element={<AddUsersPage />} />
           <Route path="/roles-list" element={<RolesListPage />} />
           <Route path="/create-role" element={<CreateRolePage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
+          <Route path="/suppliers/add-supplier" element={<AddSuppliersPage />} />
+          <Route path="/suppliers/:supplierId" element={<SuppliersDetailsPage />} />
+          <Route path="/edit-suppliers/:id" element={<EditSuppliersPage />} />
           <Route path="/pagination-table" element={<PaginationTablePage />} />
           <Route path="/pending-supplies" element={<PendingSuppliesPage />} />
           <Route path="/unpaid-supplies" element={<UnpaidSuppliesPage />} />
@@ -260,7 +247,6 @@ function App() {
           <Route path="/tooltip" element={<TooltipPage />} />
           <Route path="/typography" element={<TypographyPage />} />
           <Route path="/users-grid" element={<UsersGridPage />} />
-          <Route path="/users" element={<UsersListPage />} />
           <Route path="/view-details" element={<ViewDetailsPage />} />
           <Route path="/video-generator" element={<VideoGeneratorPage />} />
           <Route path="/videos" element={<VideosPage />} />

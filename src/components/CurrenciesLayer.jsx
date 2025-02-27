@@ -11,7 +11,7 @@ const CurrenciesLayer = () => {
   const [editCurrency, setEditCurrency] = useState({ code: "", name: "", sign: "" });
   const [newCurrency, setNewCurrency] = useState({ code: "", name: "", sign: "" });
   const [currencyToDelete, setCurrencyToDelete] = useState(null);
-  const [currencyToView, setCurrencyToView] = useState(null); // New state for viewing
+  const [currencyToView, setCurrencyToView] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
@@ -136,7 +136,7 @@ const CurrenciesLayer = () => {
   };
 
   const handleViewClick = (currency) => {
-    setCurrencyToView(currency); // Set the currency to view
+    setCurrencyToView(currency);
   };
 
   const handleSearch = (e) => {
@@ -207,10 +207,10 @@ const CurrenciesLayer = () => {
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: "visible" }}>
-              <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
+              <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%", fontSize: "15px" }}>
                 <thead className="table-light text-start small-text">
                   <tr>
-                    <th className="text-start py-3 px-4">#</th>
+                    <th className="text-center py-3 px-6" style={{ width: "50px" }}>#</th>
                     <th className="text-start py-3 px-4">Currency Code</th>
                     <th className="text-start py-3 px-4" style={{ width: "220px" }}>Currency Name</th>
                     <th className="text-start py-3 px-4">Currency Sign</th>
@@ -218,11 +218,11 @@ const CurrenciesLayer = () => {
                     <th className="text-start py-3 px-4">Action</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ fontSize: "14px" }}>
                   {currentItems.length > 0 ? (
                     currentItems.map((currency) => (
                       <tr key={currency.code} style={{ transition: "background-color 0.2s" }}>
-                        <td className="text-start small-text py-3 px-4">
+                        <td className="text-center small-text py-3 px-6">
                           {indexOfFirstItem + currentItems.indexOf(currency) + 1}
                         </td>
                         <td className="text-start small-text py-3 px-4">{currency.code}</td>

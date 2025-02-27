@@ -661,6 +661,129 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
 
+            {/* Settings Dropdown */}
+            <li className="dropdown">
+              <Link to="#">
+                <Icon
+                  icon="icon-park-outline:setting-two"
+                  className="menu-icon"
+                />
+                <span>Settings</span>
+              </Link>
+              <ul className="sidebar-submenu">
+                <li>
+                  <NavLink
+                    to="/company"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Company
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/notification"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Notification
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/notification-alert"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Notification Alert
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/theme"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Theme
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/customer-type"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Customer Type
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/pricing-categories"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Pricing Categories
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/currencies"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Currencies
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/units-of-measure"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Units of Measure
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/countries"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Countries
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/language"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Languages
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/payment-gateway"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    Payment Gateway
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+
             <li className="sidebar-menu-group-title">Application</li>
             <li>
               <NavLink
@@ -1439,129 +1562,6 @@ const MasterLayout = ({ children }) => {
                 <span>Blank Page</span>
               </NavLink>
             </li>
-
-            {/* Settings Dropdown */}
-            <li className="dropdown">
-              <Link to="#">
-                <Icon
-                  icon="icon-park-outline:setting-two"
-                  className="menu-icon"
-                />
-                <span>Settings</span>
-              </Link>
-              <ul className="sidebar-submenu">
-                <li>
-                  <NavLink
-                    to="/company"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Company
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/notification"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Notification
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/notification-alert"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Notification Alert
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/theme"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Theme
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/customer-type"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Customer Type
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/pricing-categories"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Pricing Categories
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/currencies"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Currencies
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/units-of-measure"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Units of Measure
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/countries"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Countries
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/language"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Languages
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/payment-gateway"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Payment Gateway
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
           </ul>
         </div>
       </aside>
@@ -2225,7 +2225,15 @@ const MasterLayout = ({ children }) => {
             </div>
           </div>
         </div>
-        <div className="dashboard-main-body">{children}</div>
+        <div className="dashboard-main-body">
+          {children || (
+            <div className= "card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}> 
+              <div className="card-body"> 
+                <p>No content available. Please check the URL or refresh.</p>
+              </div>
+            </div>
+          )}
+        </div>
         <footer className="d-footer">
           <div className="row align-items-center justify-content-between">
             <div className="col-auto">

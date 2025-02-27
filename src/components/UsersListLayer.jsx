@@ -353,7 +353,7 @@ const UsersListLayer = () => {
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <Link
-              to="/add-users"
+              to="/users/add-user"
               className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
             >
               <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
@@ -385,9 +385,9 @@ const UsersListLayer = () => {
             </div>
             <div className="table-responsive" style={{ overflow: "visible" }}>
               <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
-                <thead className="table-light text-start small-text">
+                <thead className="table-light text-start small-text" style={{fontSize: "15px"}}>
                   <tr>
-                    <th className="text-start py-3 px-4">#</th>
+                    <th className="text-center py-3 px-6" style={{ width: "50px"}}>#</th>
                     <th className="text-start py-3 px-4">First Name</th>
                     <th className="text-start py-3 px-4">Last Name</th>
                     <th className="text-start py-3 px-4">Email</th>
@@ -397,11 +397,11 @@ const UsersListLayer = () => {
                     <th className="text-start py-3 px-4">Action</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ fontSize: "14px" }}>
                   {currentItems.length > 0 ? (
                     currentItems.map((user) => (
                       <tr key={user.id} style={{ transition: "background-color 0.2s" }}>
-                        <td className="text-start small-text py-3 px-4">
+                        <td className="text-center small-text py-3 px-6">
                           {indexOfFirstItem + currentItems.indexOf(user) + 1}
                         </td>
                         <td className="text-start small-text py-3 px-4">{user.firstName}</td>
