@@ -1,25 +1,20 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const API_URL = "https://api.bizchain.co.ke/v1/suppliers";
 
 const SuppliersDetailsLayer = () => {
-  const { supplierId } = useParams();
+  const location = useLocation();
+  const supplierId = location.state?.supplierId;
   const navigate = useNavigate();
   const [viewSupplier, setViewSupplier] = useState(null);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log("Current URL:", window.location.pathname);
-    console.log("Raw supplierId from useParams:", supplierId);
-    console.log("Type of supplierId:", typeof supplierId);
-    console.log("All params:", useParams);
-
     if (!supplierId) {
-      setError("No supplier ID provided in URL");
-      setIsLoading(false);
+      navigate("suppliers")
       return;
     }
 

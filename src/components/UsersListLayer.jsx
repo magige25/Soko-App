@@ -184,7 +184,8 @@ const UsersListLayer = () => {
                               <li>
                                 <Link
                                   className="dropdown-item"
-                                  to={`/users/details/${user.id}`}
+                                  to="/users/details"
+                                  state={{ userId: user.id }}
                                 >
                                   Details
                                 </Link>
@@ -192,7 +193,8 @@ const UsersListLayer = () => {
                               <li>
                                 <Link
                                   className="dropdown-item"
-                                  to={`/users/edit-users/${user.id}`}
+                                  to="/users/edit-user"
+                                  state={{ userId: user.id }}
                                 >
                                   Edit
                                 </Link>

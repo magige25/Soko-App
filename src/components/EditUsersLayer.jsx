@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = "https://api.bizchain.co.ke/v1/user";
 const ROL_URL = "https://api.bizchain.co.ke/v1/roles";
 
 const EditUsersLayer = () => {
-  const { userId } = useParams();
+  const location = useLocation();
+  const userId = location.state?.userId
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     id: '',
@@ -25,6 +26,9 @@ const EditUsersLayer = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!userId) {
+      navigate("/users")
+    }
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -100,7 +104,7 @@ const EditUsersLayer = () => {
 
     fetchUserData();
     fetchRolesAndModules();
-  }, [userId]); // Only userId is a dependency
+  }, [userId, navigate]);
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -200,7 +204,6 @@ const EditUsersLayer = () => {
     <div className="page-wrapper">
       <div className="card shadow-sm mt-3" style={{ width: "100%" }}>
         <div className="card-body">
-          <h6 className="mb-4">Edit User</h6>
           {error && <div className="alert alert-danger">{error}</div>}
           {formData.id ? (
             <form onSubmit={handleSubmit}>

@@ -266,7 +266,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
             ))}
           </div>
 
-          <div className="col-md-4 mb-3">
+          <div className="col-md-4 mb-3" style={{ fontSize: "12px"}}>
             <label className="form-label fw-semibold text-primary-light text-sm mb-2">
               Role <span className="text-danger">*</span>
             </label>

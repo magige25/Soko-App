@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { useNavigate, useParams } from "react-router-dom";
 
 const API_URL = "https://api.bizchain.co.ke/v1/suppliers";
 const DISBURSEMENT_CRITERIA_API = "https://api.bizchain.co.ke/v1/disbursement-criteria";
@@ -9,8 +9,9 @@ const TRANSPORT_MODE_API = "https://api.bizchain.co.ke/v1/transport-mode";
 const SUPPLIER_RESIDENCE_API = "https://api.bizchain.co.ke/v1/supplier-residence";
 
 const EditSuppliersLayer = () => {
+  const location = useLocation();
+  const supplierId = location.state?.supplierId;
   const navigate = useNavigate();
-  const { id } = useParams();
   const [formData, setFormData] = useState({
     id: "",
     firstName: "",
@@ -31,7 +32,7 @@ const EditSuppliersLayer = () => {
     expansionCapacity: "",
     contactPersonName: "",
     contactPersonPhoneNumber: "",
-    paymentCycle: "WKLY", // Changed to string instead of object
+    paymentCycle: "WKLY",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -41,6 +42,10 @@ const EditSuppliersLayer = () => {
   const [residences, setResidences] = useState([]);
 
   useEffect(() => {
+    if (!supplierId) {
+      navigate("/suppliers");
+    }
+
     const fetchData = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
@@ -50,7 +55,7 @@ const EditSuppliersLayer = () => {
 
       try {
         const [supplierRes, criteriaRes, methodsRes, modesRes, residencesRes] = await Promise.all([
-          axios.get(`${API_URL}/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_URL}/${supplierId}`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(DISBURSEMENT_CRITERIA_API, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(DISBURSEMENT_METHODS_API, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(TRANSPORT_MODE_API, { headers: { Authorization: `Bearer ${token}` } }),
@@ -91,7 +96,7 @@ const EditSuppliersLayer = () => {
       }
     };
     fetchData();
-  }, [id]);
+  }, [supplierId, navigate]);
 
   const validateField = (field, value) => {
     if (field === "expansionSpace" || field === "pendingBills" || field === "unpaidBills") return "";

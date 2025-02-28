@@ -1,5 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
 import PrivateRouteLayer from "./components/PrivateRouteLayer";
+import OtpRoutePage from "./pages/OtpRoutePage";
 import HomePageOne from "./pages/HomePageOne";
 import EmailPage from "./pages/EmailPage";
 import AddUserPage from "./pages/AddUserPage";
@@ -125,145 +127,142 @@ import UsersDetailsPage from "./pages/UsersDetailsPage";
 function App() {
   return (
     <BrowserRouter>
-      <RouteScrollToTop />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<SignInPage />} /> {/* Start at sign-in */}
-        <Route path="/sign-in" element={<SignInPage />} />
-        <Route path="/otp" element={<OtpPage />} />
-        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-        <Route path="/reset-password" element={<ResetPasswordPage />} />
-        <Route path="/coming-soon" element={<ComingSoonPage />} />
-        <Route path="/access-denied" element={<AccessDeniedPage />} />
-        <Route path="/maintenance" element={<MaintenancePage />} />
+      <AuthProvider>
+        <RouteScrollToTop />
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<SignInPage />} />
+          <Route path="/sign-in" element={<SignInPage />} />
+          <Route element={<OtpRoutePage />}>
+            <Route path="/otp" element={<OtpPage />} />
+          </Route>
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/coming-soon" element={<ComingSoonPage />} />
+          <Route path="/access-denied" element={<AccessDeniedPage />} />
+          <Route path="/maintenance" element={<MaintenancePage />} />
 
-        {/* Protected Routes */}
-        <Route element={<PrivateRouteLayer />}>
-          <Route path="/dashboard" element={<HomePageOne />} />
+          {/* Protected Routes */}
+          <Route element={<PrivateRouteLayer />}>
+            <Route path="/dashboard" element={<HomePageOne />} />
+            <Route path="/add-user" element={<AddUserPage />} />
+            <Route path="/alert" element={<AlertPage />} />
+            <Route path="/assign-role" element={<AssignRolePage />} />
+            <Route path="/avatar" element={<AvatarPage />} />
+            <Route path="/badges" element={<BadgesPage />} />
+            <Route path="/button" element={<ButtonPage />} />
+            <Route path="/calendar-main" element={<CalendarMainPage />} />
+            <Route path="/calendar" element={<CalendarMainPage />} />
+            <Route path="/card" element={<CardPage />} />
+            <Route path="/carousel" element={<CarouselPage />} />
+            <Route path="/chat-empty" element={<ChatEmptyPage />} />
+            <Route path="/chat-message" element={<ChatMessagePage />} />
+            <Route path="/chat-profile" element={<ChatProfilePage />} />
+            <Route path="/code-generator" element={<CodeGeneratorPage />} />
+            <Route path="/regions" element={<RegionsPage />} />
+            <Route path="/sub-regions" element={<SubRegionsPage />} />
+            <Route path="/routes" element={<RoutesPage />} />
+            <Route path="/regions/:regionName" element={<RegionsDetailsPage />} />
+            <Route path="/sub-regions/:sub-regionName" element={<SubRegionsDetailsPage />} />
+            <Route path="/routes/:regionName" element={<RoutesDetailsPage />} />
+            <Route path="/users" element={<UsersListPage />} />
+            <Route path="/users/add-user" element={<AddUsersPage />} />
+            <Route path="/users/details" element={<UsersDetailsPage />} />
+            <Route path="/users/edit-user" element={<EditUsersPage />} />
+            <Route path="/roles-list" element={<RolesListPage />} />
+            <Route path="/create-role" element={<CreateRolePage />} />
+            <Route path="/suppliers" element={<SuppliersPage />} />
+            <Route path="/suppliers/add-supplier" element={<AddSuppliersPage />} />
+            <Route path="/suppliers/details" element={<SuppliersDetailsPage />} />
+            <Route path="/suppliers/edit-supplier" element={<EditSuppliersPage />} />
+            <Route path="/pagination-table" element={<PaginationTablePage />} />
+            <Route path="/pending-supplies" element={<PendingSuppliesPage />} />
+            <Route path="/unpaid-supplies" element={<UnpaidSuppliesPage />} />
+            <Route path="/settled-supplies" element={<SettledSuppliesPage />} />
+            <Route path="/category" element={<CategoryPage />} />
+            <Route path="/sub-category" element={<SubCategoryPage />} />
+            <Route path="/brands" element={<BrandsPage />} />
+            <Route path="/products" element={<ProductsPage />} />
+            <Route path="/countries" element={<CountriesPage />} />
+            <Route path="/salespersons" element={<SalespersonsPage />} />
+            <Route path="/customers" element={<CustomersPage />} />
+            <Route path="/customer-type" element={<CustomerTypePage />} />
+            <Route path="/pricing-categories" element={<PricingCategoriesPage />} />
+            <Route path="/creditors-request" element={<CreditorsRequestPage />} />
+            <Route path="/pending-orders" element={<PendingOrdersPage />} />
+            <Route path="/pending-deliveries" element={<PendingDeliveriesPage />} />
+            <Route path="/settled-orders" element={<SettledOrdersPage />} />
+            <Route path="/units-of-measure" element={<UnitsOfMeasurePage />} />
+            <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
+            <Route path="/colors" element={<ColorsPage />} />
+            <Route path="/column-chart" element={<ColumnChartPage />} />
+            <Route path="/company" element={<CompanyPage />} />
+            <Route path="/currencies" element={<CurrenciesPage />} />
+            <Route path="/dropdown" element={<DropdownPage />} />
+            <Route path="/email" element={<EmailPage />} />
+            <Route path="/faq" element={<FaqPage />} />
+            <Route path="/form-layout" element={<FormLayoutPage />} />
+            <Route path="/form-validation" element={<FormValidationPage />} />
+            <Route path="/form" element={<FormPage />} />
+            <Route path="/gallery" element={<GalleryPage />} />
+            <Route path="/gallery-grid" element={<GalleryGridPage />} />
+            <Route path="/gallery-masonry" element={<GalleryMasonryPage />} />
+            <Route path="/gallery-hover" element={<GalleryHoverPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog-details" element={<BlogDetailsPage />} />
+            <Route path="/add-blog" element={<AddBlogPage />} />
+            <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="/blank-page" element={<BlankPagePage />} />
+            <Route path="/image-generator" element={<ImageGeneratorPage />} />
+            <Route path="/image-upload" element={<ImageUploadPage />} />
+            <Route path="/invoice-add" element={<InvoiceAddPage />} />
+            <Route path="/invoice-edit" element={<InvoiceEditPage />} />
+            <Route path="/invoice-list" element={<InvoiceListPage />} />
+            <Route path="/invoice-preview" element={<InvoicePreviewPage />} />
+            <Route path="/kanban" element={<KanbanPage />} />
+            <Route path="/language" element={<LanguagePage />} />
+            <Route path="/line-chart" element={<LineChartPage />} />
+            <Route path="/list" element={<ListPage />} />
+            <Route path="/marketplace-details" element={<MarketplaceDetailsPage />} />
+            <Route path="/marketplace" element={<MarketplacePage />} />
+            <Route path="/notification-alert" element={<NotificationAlertPage />} />
+            <Route path="/notification" element={<NotificationPage />} />
+            <Route path="/pagination" element={<PaginationPage />} />
+            <Route path="/payment-gateway" element={<PaymentGatewayPage />} />
+            <Route path="/pie-chart" element={<PieChartPage />} />
+            <Route path="/portfolio" element={<PortfolioPage />} />
+            <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/progress" element={<ProgressPage />} />
+            <Route path="/radio" element={<RadioPage />} />
+            <Route path="/role-access" element={<RoleAccessPage />} />
+            <Route path="/star-rating" element={<StarRatingPage />} />
+            <Route path="/starred" element={<StarredPage />} />
+            <Route path="/switch" element={<SwitchPage />} />
+            <Route path="/table-basic" element={<TableBasicPage />} />
+            <Route path="/table-data" element={<TableDataPage />} />
+            <Route path="/tabs" element={<TabsPage />} />
+            <Route path="/tags" element={<TagsPage />} />
+            <Route path="/terms-condition" element={<TermsConditionPage />} />
+            <Route path="/text-generator" element={<TextGeneratorPage />} />
+            <Route path="/text-generator-new" element={<TextGeneratorNewPage />} />
+            <Route path="/theme" element={<ThemePage />} />
+            <Route path="/tooltip" element={<TooltipPage />} />
+            <Route path="/typography" element={<TypographyPage />} />
+            <Route path="/users-grid" element={<UsersGridPage />} />
+            <Route path="/view-details" element={<ViewDetailsPage />} />
+            <Route path="/video-generator" element={<VideoGeneratorPage />} />
+            <Route path="/videos" element={<VideosPage />} />
+            <Route path="/view-profile" element={<ViewProfilePage />} />
+            <Route path="/voice-generator" element={<VoiceGeneratorPage />} />
+            <Route path="/wallet" element={<WalletPage />} />
+            <Route path="/widgets" element={<WidgetsPage />} />
+            <Route path="/wizard" element={<WizardPage />} />
+          </Route>
 
-          {/* SL */}
-          <Route path="/add-user" element={<AddUserPage />} />
-          <Route path="/alert" element={<AlertPage />} />
-          <Route path="/assign-role" element={<AssignRolePage />} />
-          <Route path="/avatar" element={<AvatarPage />} />
-          <Route path="/badges" element={<BadgesPage />} />
-          <Route path="/button" element={<ButtonPage />} />
-          <Route path="/calendar-main" element={<CalendarMainPage />} />
-          <Route path="/calendar" element={<CalendarMainPage />} />
-          <Route path="/card" element={<CardPage />} />
-          <Route path="/carousel" element={<CarouselPage />} />
-          <Route path="/chat-empty" element={<ChatEmptyPage />} />
-          <Route path="/chat-message" element={<ChatMessagePage />} />
-          <Route path="/chat-profile" element={<ChatProfilePage />} />
-          <Route path="/code-generator" element={<CodeGeneratorPage />} />
-          <Route path="/regions" element={<RegionsPage />} />
-          <Route path="/sub-regions" element={<SubRegionsPage />} />
-          <Route path="/routes" element={<RoutesPage />} />
-          <Route path="/regions/:regionName" element={<RegionsDetailsPage />} />
-          <Route path="/sub-regions/:sub-regionName" element={<SubRegionsDetailsPage />} />
-          <Route path="/routes/:regionName" element={<RoutesDetailsPage />} />
-          <Route path="/users" element={<UsersListPage />} />
-          <Route path="/users/add-user" element={<AddUsersPage />} />
-          <Route path="/users/details/:userId" element={<UsersDetailsPage />} />
-          <Route path="/users/edit-users/:userId" element={<EditUsersPage />} />
-          <Route path="/roles-list" element={<RolesListPage />} />
-          <Route path="/create-role" element={<CreateRolePage />} />
-          <Route path="/suppliers" element={<SuppliersPage />} />
-          <Route path="/suppliers/add-supplier" element={<AddSuppliersPage />} />
-          <Route path="/suppliers/details/:supplierId" element={<SuppliersDetailsPage />} />
-          <Route path="/suppliers/edit-suppliers/:id" element={<EditSuppliersPage />} />
-          <Route path="/pagination-table" element={<PaginationTablePage />} />
-          <Route path="/pending-supplies" element={<PendingSuppliesPage />} />
-          <Route path="/unpaid-supplies" element={<UnpaidSuppliesPage />} />
-          <Route path="/settled-supplies" element={<SettledSuppliesPage />} />
-          <Route path="/category" element={<CategoryPage />} />
-          <Route path="/sub-category" element={<SubCategoryPage />} />
-          <Route path="/brands" element={<BrandsPage />} />
-          <Route path="/products" element={<ProductsPage />} />
-          <Route path="/countries" element={<CountriesPage />} />
-          <Route path="/salespersons" element={<SalespersonsPage />} />
-          <Route path="/customers" element={<CustomersPage />} />
-          <Route path="/customer-type" element={<CustomerTypePage />} />
-          <Route path="/pricing-categories" element={<PricingCategoriesPage />} />
-          <Route path="/creditors-request" element={<CreditorsRequestPage />} />
-          <Route path="/pending-orders" element={<PendingOrdersPage />} />
-          <Route path="/pending-deliveries" element={<PendingDeliveriesPage />} />
-          <Route path="/settled-orders" element={<SettledOrdersPage />} />
-          <Route path="/units-of-measure" element={<UnitsOfMeasurePage />} />
-
-          <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
-          <Route path="/colors" element={<ColorsPage />} />
-          <Route path="/column-chart" element={<ColumnChartPage />} />
-          <Route path="/company" element={<CompanyPage />} />
-          <Route path="/currencies" element={<CurrenciesPage />} />
-          <Route path="/dropdown" element={<DropdownPage />} />
-          <Route path="/email" element={<EmailPage />} />
-          <Route path="/faq" element={<FaqPage />} />
-          <Route path="/form-layout" element={<FormLayoutPage />} />
-          <Route path="/form-validation" element={<FormValidationPage />} />
-          <Route path="/form" element={<FormPage />} />
-
-          <Route path="/gallery" element={<GalleryPage />} />
-          <Route path="/gallery-grid" element={<GalleryGridPage />} />
-          <Route path="/gallery-masonry" element={<GalleryMasonryPage />} />
-          <Route path="/gallery-hover" element={<GalleryHoverPage />} />
-
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog-details" element={<BlogDetailsPage />} />
-          <Route path="/add-blog" element={<AddBlogPage />} />
-
-          <Route path="/testimonials" element={<TestimonialsPage />} />
-          <Route path="/blank-page" element={<BlankPagePage />} />
-
-          <Route path="/image-generator" element={<ImageGeneratorPage />} />
-          <Route path="/image-upload" element={<ImageUploadPage />} />
-          <Route path="/invoice-add" element={<InvoiceAddPage />} />
-          <Route path="/invoice-edit" element={<InvoiceEditPage />} />
-          <Route path="/invoice-list" element={<InvoiceListPage />} />
-          <Route path="/invoice-preview" element={<InvoicePreviewPage />} />
-          <Route path="/kanban" element={<KanbanPage />} />
-          <Route path="/language" element={<LanguagePage />} />
-          <Route path="/line-chart" element={<LineChartPage />} />
-          <Route path="/list" element={<ListPage />} />
-          <Route path="/marketplace-details" element={<MarketplaceDetailsPage />} />
-          <Route path="/marketplace" element={<MarketplacePage />} />
-          <Route path="/notification-alert" element={<NotificationAlertPage />} />
-          <Route path="/notification" element={<NotificationPage />} />
-          <Route path="/pagination" element={<PaginationPage />} />
-          <Route path="/payment-gateway" element={<PaymentGatewayPage />} />
-          <Route path="/pie-chart" element={<PieChartPage />} />
-          <Route path="/portfolio" element={<PortfolioPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/progress" element={<ProgressPage />} />
-          <Route path="/radio" element={<RadioPage />} />
-          <Route path="/role-access" element={<RoleAccessPage />} />
-          <Route path="/star-rating" element={<StarRatingPage />} />
-          <Route path="/starred" element={<StarredPage />} />
-          <Route path="/switch" element={<SwitchPage />} />
-          <Route path="/table-basic" element={<TableBasicPage />} />
-          <Route path="/table-data" element={<TableDataPage />} />
-          <Route path="/tabs" element={<TabsPage />} />
-          <Route path="/tags" element={<TagsPage />} />
-          <Route path="/terms-condition" element={<TermsConditionPage />} />
-          <Route path="/text-generator" element={<TextGeneratorPage />} />
-          <Route path="/text-generator-new" element={<TextGeneratorNewPage />} />
-          <Route path="/theme" element={<ThemePage />} />
-          <Route path="/tooltip" element={<TooltipPage />} />
-          <Route path="/typography" element={<TypographyPage />} />
-          <Route path="/users-grid" element={<UsersGridPage />} />
-          <Route path="/view-details" element={<ViewDetailsPage />} />
-          <Route path="/video-generator" element={<VideoGeneratorPage />} />
-          <Route path="/videos" element={<VideosPage />} />
-          <Route path="/view-profile" element={<ViewProfilePage />} />
-          <Route path="/voice-generator" element={<VoiceGeneratorPage />} />
-          <Route path="/wallet" element={<WalletPage />} />
-          <Route path="/widgets" element={<WidgetsPage />} />
-          <Route path="/wizard" element={<WizardPage />} />
-        </Route>
-
-        {/* Catch-all route */}
-        <Route path="*" element={<ErrorPage />} />
-      </Routes>
+          {/* Catch-all route */}
+          <Route path="*" element={<ErrorPage />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

@@ -3,12 +3,15 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
 import "../styles/masterlayout.css";
+import { useAuth } from "../context/AuthContext";
 
 const MasterLayout = ({ children }) => {
   const [sidebarActive, setSidebarActive] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const dropdownRefs = useRef([]);
+  const sidebarRef = useRef(null); // Ref for the sidebar element
   const location = useLocation();
+  const { signOut } = useAuth();
 
   const sidebarControl = () => {
     setSidebarActive((prev) => !prev);
@@ -17,6 +20,33 @@ const MasterLayout = ({ children }) => {
   const mobileMenuControl = () => {
     setMobileMenu((prev) => !prev);
   };
+
+  // New: Handle clicks outside the sidebar to close it in mobile view
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Check if the sidebar is open and the click is outside the sidebar
+      if (
+        mobileMenu &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target)
+      ) {
+        // Ignore clicks on the sidebar toggle button to prevent immediate reopening
+        if (!event.target.closest(".sidebar-mobile-toggle")) {
+          setMobileMenu(false);
+        }
+      }
+    };
+
+    // Add event listener when the sidebar is open
+    if (mobileMenu) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    // Clean up the event listener when the sidebar closes or component unmounts
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [mobileMenu]); // Re-run when mobileMenu changes
 
   useEffect(() => {
     const handleDropdownClick = (index) => (event) => {
@@ -52,7 +82,7 @@ const MasterLayout = ({ children }) => {
             submenu.style.maxHeight = "0px";
           }
         });
-      }, 300); // Increased to 300ms for visibility
+      }, 300);
     };
 
     dropdownRefs.current = Array.from(document.querySelectorAll(".sidebar-menu .dropdown"));
@@ -106,7 +136,9 @@ const MasterLayout = ({ children }) => {
 
   return (
     <section className={mobileMenu ? "overlay active" : "overlay "}>
+      {/* Attach ref to the sidebar for click detection */}
       <aside
+        ref={sidebarRef}
         className={
           sidebarActive
             ? "sidebar active "
@@ -144,18 +176,14 @@ const MasterLayout = ({ children }) => {
         <div className="sidebar-menu-area">
           <ul className="sidebar-menu" id="sidebar-menu">
             <li>
-              <NavLink 
+              <NavLink
                 to="/dashboard"
                 className={(navData) => (navData.isActive ? "active-page" : "")}
               >
-                <Icon 
-                  icon="ri-home-5-line" 
-                  className="menu-icon"
-                />
+                <Icon icon="ri-home-5-line" className="menu-icon" />
                 <span>Dashboards</span>
               </NavLink>
             </li>
-
             <li className="sidebar-menu-group-title">Under Development</li>
             {/* System Users */}
             <li className="dropdown">
@@ -179,8 +207,7 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
-            {/* Customer Management  */}
+            {/* Customer Management */}
             <li className="dropdown">
               <Link to="#">
                 <Icon icon="ri:user-line" className="menu-icon" />
@@ -209,7 +236,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Orders */}
             <li className="dropdown">
               <Link to="#">
@@ -249,8 +275,7 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
-            {/* Salespersons  */}
+            {/* Salespersons */}
             <li className="dropdown">
               <Link to="#">
                 <Icon icon="ri:group-line" className="menu-icon" />
@@ -269,8 +294,7 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
-            {/* Payment  */}
+            {/* Payment */}
             <li className="dropdown">
               <Link to="#">
                 <Icon icon="ri:wallet-line" className="menu-icon" />
@@ -299,7 +323,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Regions Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -339,7 +362,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Product Catalogue */}
             <li className="dropdown">
               <Link to="#">
@@ -389,7 +411,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Supplier Management */}
             <li className="dropdown">
               <Link to="#">
@@ -439,8 +460,7 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
-            {/* Warehouse Management  */}
+            {/* Warehouse Management */}
             <li className="dropdown">
               <Link to="#">
                 <Icon icon="ri:store-3-line" className="menu-icon" />
@@ -459,8 +479,7 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
-            {/* Stock Reconciliation  */}
+            {/* Stock Reconciliation */}
             <li className="dropdown">
               <Link to="#">
                 <Icon icon="ri:equalizer-line" className="menu-icon" />
@@ -479,7 +498,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Authentication Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -519,7 +537,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Roles */}
             <li className="dropdown">
               <Link to="#">
@@ -539,7 +556,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Settings Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -662,7 +678,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             <li className="sidebar-menu-group-title">Application</li>
             <li>
               <NavLink
@@ -703,7 +718,6 @@ const MasterLayout = ({ children }) => {
                 <span>Kanban</span>
               </NavLink>
             </li>
-
             {/* Invoice Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -753,7 +767,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Ai Application Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -813,7 +826,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Crypto Currency Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -863,9 +875,7 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             <li className="sidebar-menu-group-title">UI Elements</li>
-
             {/* Components Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -1088,7 +1098,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Forms Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -1138,7 +1147,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Table Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -1168,7 +1176,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             {/* Chart Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -1208,7 +1215,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             <li>
               <NavLink
                 to="/widgets"
@@ -1218,7 +1224,6 @@ const MasterLayout = ({ children }) => {
                 <span>Widgets</span>
               </NavLink>
             </li>
-
             {/* Role & Access Dropdown */}
             <li className="dropdown">
               <Link to="#">
@@ -1248,9 +1253,7 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             <li className="sidebar-menu-group-title">Application</li>
-
             {/* Gallery */}
             <li className="dropdown">
               <Link to="#">
@@ -1303,7 +1306,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             <li>
               <NavLink
                 to="/pricing"
@@ -1316,7 +1318,6 @@ const MasterLayout = ({ children }) => {
                 <span>Pricing</span>
               </NavLink>
             </li>
-
             {/* Blog */}
             <li className="dropdown">
               <Link to="#">
@@ -1359,7 +1360,6 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-
             <li>
               <NavLink
                 to="/testimonials"
@@ -2089,13 +2089,13 @@ const MasterLayout = ({ children }) => {
                         </Link>
                       </li>
                       <li>
-                        <Link
-                          className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3"
-                          to="/sign-in"
+                        <button
+                          className="dropdown-item text-black px-0 py-8 hover-bg-transparent hover-text-danger d-flex align-items-center gap-3 w-100"
+                          onClick={signOut}
                         >
                           <Icon icon="lucide:power" className="icon text-xl" />{" "}
                           Log Out
-                        </Link>
+                        </button>
                       </li>
                     </ul>
                   </div>
@@ -2106,8 +2106,8 @@ const MasterLayout = ({ children }) => {
         </div>
         <div className="dashboard-main-body">
           {children || (
-            <div className= "card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}> 
-              <div className="card-body"> 
+            <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
+              <div className="card-body">
                 <p>No content available. Please check the URL or refresh.</p>
               </div>
             </div>
@@ -2116,10 +2116,12 @@ const MasterLayout = ({ children }) => {
         <footer className="d-footer">
           <div className="row align-items-center justify-content-between">
             <div className="col-auto">
-              <p className="mb-0" style={{ fontSize: "13px"}} >© 2025 Bizchain System. All Rights Reserved.</p>
+              <p className="mb-0" style={{ fontSize: "13px" }}>
+                © 2025 Bizchain System. All Rights Reserved.
+              </p>
             </div>
             <div className="col-auto">
-              <p className="mb-0" style={{ fontSize: "13px"}}>
+              <p className="mb-0" style={{ fontSize: "13px" }}>
                 Made by <span className="text-primary-600">tigersoft-team</span>
               </p>
             </div>

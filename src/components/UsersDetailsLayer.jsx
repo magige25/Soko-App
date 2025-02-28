@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = "https://api.bizchain.co.ke/v1/user";
 const ROL_URL = "https://api.bizchain.co.ke/v1/roles";
 
 const UsersDetailsLayer = () => {
-  const { userId } = useParams();
+  const location = useLocation();
+  const userId = location.state?.userId;
+  const navigate = useNavigate();
   const [userToView, setUserToView] = useState(null);
   const [rolePermissions, setRolePermissions] = useState({});
   const [modules, setModules] = useState([]);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (!userId) {
+      navigate("/users")
+      return;
+    }
+
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token');
@@ -66,7 +73,7 @@ const UsersDetailsLayer = () => {
 
     fetchUserData();
     fetchRolesAndModules();
-  }, [userId]); // Only userId is a dependency
+  }, [userId, navigate]);
 
   const getPermissionOptionsForModule = (moduleId) => {
     return rolePermissions[userToView?.role?.id]?.[moduleId] || [];
@@ -80,7 +87,6 @@ const UsersDetailsLayer = () => {
           {error && <div className="alert alert-danger">{error}</div>}
           {userToView ? (
             <div>
-              <p className="mb-2"><strong>ID:</strong> {userToView.id}</p>
               <p className="mb-2"><strong>First Name:</strong> {userToView.firstName || 'N/A'}</p>
               <p className="mb-2"><strong>Last Name:</strong> {userToView.lastName || 'N/A'}</p>
               <p className="mb-2"><strong>Email:</strong> {userToView.email || 'N/A'}</p>

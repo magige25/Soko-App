@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles/spinner.css";
+import "../styles/otp.css"
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
+import { useAuth } from "../context/AuthContext"; 
 
 const OtpVerificationLayer = () => {
   const [formData, setFormData] = useState({
@@ -19,6 +21,7 @@ const OtpVerificationLayer = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth(); 
 
   useEffect(() => {
     if (location.state?.email && location.state?.password) {
@@ -125,9 +128,8 @@ const OtpVerificationLayer = () => {
 
         const token = response.data.data?.accessToken;
         if (token) {
-          localStorage.setItem("token", token);
-          console.log("Token set successfully:", localStorage.getItem("token"));
-          navigate("/dashboard");
+          signIn(token);
+
         } else {
           console.error("No access token found in response!");
           toast.error("Authentication failed: No token received.");
@@ -321,23 +323,6 @@ const OtpVerificationLayer = () => {
           </p>
         </div>
       </div>
-
-      <style jsx>{`
-        .otp-box {
-          background-color: #fff;
-          color: #333;
-        }
-        .otp-box:focus {
-          border-color: #007bff;
-          box-shadow: 0 0 6px rgba(0, 123, 255, 0.25);
-          outline: none;
-        }
-        .otp-box.filled {
-          background-color: #f5faff;
-          border-color: #007bff;
-          color: #007bff;
-        }
-      `}</style>
     </section>
   );
 };

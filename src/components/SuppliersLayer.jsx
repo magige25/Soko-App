@@ -231,12 +231,20 @@ const SuppliersLayer = () => {
                             </button>
                             <ul className="dropdown-menu">
                               <li>
-                                <Link className="dropdown-item" to={`/suppliers/details/${supplier.id}`}>
+                                <Link 
+                                  className="dropdown-item" 
+                                  to="/suppliers/details"
+                                  state={{ supplierId: supplier.id }}
+                                >
                                   Details
                                 </Link>
                               </li>
                               <li>
-                                <Link className="dropdown-item" to={`/suppliers/edit-suppliers/${supplier.id}`}>
+                                <Link 
+                                  className="dropdown-item" 
+                                  to="/suppliers/edit-supplier"
+                                  state={{ supplierId: supplier.id }}
+                                >
                                   Edit
                                 </Link>
                               </li>
