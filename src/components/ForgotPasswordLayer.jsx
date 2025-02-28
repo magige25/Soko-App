@@ -54,7 +54,7 @@ const ForgotPasswordLayer = () => {
         try {
             console.log("Sending Request with Payload:", { email: formData.email });
             const response = await axios.post(
-                "https://biz-system-production.up.railway.app/v1/auth/forget-password",
+                "https://api.bizchain.co.ke/v1/auth/forget-password",
                 {
                     email: formData.email,
                 },

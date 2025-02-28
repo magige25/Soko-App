@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = "https://biz-system-production.up.railway.app/v1/user/register";
-const ROLES_URL = "https://biz-system-production.up.railway.app/v1/roles";
-const COUNTRIES_URL = "https://biz-system-production.up.railway.app/v1/countries";
+const API_URL = "https://api.bizchain.co.ke/v1/user/register";
+const ROLES_URL = "https://api.bizchain.co.ke/v1/roles";
+const COUNTRIES_URL = "https://api.bizchain.co.ke/v1/countries";
 
 const AddUsersLayer = ({ onUserAdded }) => {
   const navigate = useNavigate();

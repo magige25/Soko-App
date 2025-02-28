@@ -80,7 +80,7 @@ const ResetPasswordLayer = () => {
     try {
       console.log("Sending Request with Payload:", { password: formData.password });
       const response = await axios.post(
-        "https://biz-system-production.up.railway.app/v1/auth/reset-password/17e6cb85-7fd6-4185-867b-adbd757284e0",
+        "https://api.bizchain.co.ke/v1/auth/reset-password/17e6cb85-7fd6-4185-867b-adbd757284e0",
         {
           password: formData.password,
         },

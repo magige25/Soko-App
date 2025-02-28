@@ -65,7 +65,7 @@ const SignInLayer = () => {
 
     try {
       const response = await axios.post(
-        "https://biz-system-production.up.railway.app/v1/auth",
+        "https://api.bizchain.co.ke/v1/auth",
         formData,
         {
           headers: {

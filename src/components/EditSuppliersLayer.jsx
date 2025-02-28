@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
 
-const API_URL = "https://biz-system-production.up.railway.app/v1/suppliers";
-const DISBURSEMENT_CRITERIA_API = "https://biz-system-production.up.railway.app/v1/disbursement-criteria";
-const DISBURSEMENT_METHODS_API = "https://biz-system-production.up.railway.app/v1/disbursement-methods";
-const TRANSPORT_MODE_API = "https://biz-system-production.up.railway.app/v1/transport-mode";
-const SUPPLIER_RESIDENCE_API = "https://biz-system-production.up.railway.app/v1/supplier-residence";
+const API_URL = "https://api.bizchain.co.ke/v1/suppliers";
+const DISBURSEMENT_CRITERIA_API = "https://api.bizchain.co.ke/v1/disbursement-criteria";
+const DISBURSEMENT_METHODS_API = "https://api.bizchain.co.ke/v1/disbursement-methods";
+const TRANSPORT_MODE_API = "https://api.bizchain.co.ke/v1/transport-mode";
+const SUPPLIER_RESIDENCE_API = "https://api.bizchain.co.ke/v1/supplier-residence";
 
 const EditSuppliersLayer = () => {
   const navigate = useNavigate();

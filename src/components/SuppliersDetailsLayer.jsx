@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = "https://biz-system-production.up.railway.app/v1/suppliers";
+const API_URL = "https://api.bizchain.co.ke/v1/suppliers";
 
 const SuppliersDetailsLayer = () => {
   const { supplierId } = useParams();

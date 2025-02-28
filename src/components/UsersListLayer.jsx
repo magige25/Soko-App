@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Icon } from '@iconify/react/dist/iconify.js';
 
-const API_URL = "https://biz-system-production.up.railway.app/v1/user";
-const ROL_URL = "https://biz-system-production.up.railway.app/v1/roles";
+const API_URL = "https://api.bizchain.co.ke/v1/user";
+const ROL_URL = "https://api.bizchain.co.ke/v1/roles";
 
 const UsersListLayer = () => {
   const [users, setUsers] = useState([]);
