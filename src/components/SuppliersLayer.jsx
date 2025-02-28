@@ -231,12 +231,12 @@ const SuppliersLayer = () => {
                             </button>
                             <ul className="dropdown-menu">
                               <li>
-                                <Link className="dropdown-item" to={`/suppliers/${supplier.id}`}>
+                                <Link className="dropdown-item" to={`/suppliers/details/${supplier.id}`}>
                                   Details
                                 </Link>
                               </li>
                               <li>
-                                <Link className="dropdown-item" to={`/edit-suppliers/${supplier.id}`}>
+                                <Link className="dropdown-item" to={`/suppliers/edit-suppliers/${supplier.id}`}>
                                   Edit
                                 </Link>
                               </li>

@@ -12,7 +12,7 @@ const OtpVerificationLayer = () => {
     otp: ["", "", "", "", ""],
   });
   const [message, setMessage] = useState("We have sent an OTP to your email");
-  const [timer, setTimer] = useState(10);
+  const [timer, setTimer] = useState(180);
   const [resendDisabled, setResendDisabled] = useState(true);
   const inputRefs = useRef([]);
   const intervalRef = useRef(null);
@@ -187,7 +187,7 @@ const OtpVerificationLayer = () => {
           icon: "✅",
         });
 
-        setTimer(10);
+        setTimer(180);
         setResendDisabled(true);
         setMessage("A new OTP has been sent to your email");
 

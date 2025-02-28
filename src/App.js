@@ -119,6 +119,8 @@ import UnitsOfMeasurePage from "./pages/UnitsOfMeasurePage";
 import AddSuppliersPage from "./pages/AddSuppliersPage";
 import SuppliersDetailsPage from "./pages/SuppliersDetailsPage";
 import EditSuppliersPage from "./pages/EditSuppliersPage";
+import EditUsersPage from "./pages/EditUsersPage";
+import UsersDetailsPage from "./pages/UsersDetailsPage";
 
 function App() {
   return (
@@ -162,12 +164,14 @@ function App() {
           <Route path="/routes/:regionName" element={<RoutesDetailsPage />} />
           <Route path="/users" element={<UsersListPage />} />
           <Route path="/users/add-user" element={<AddUsersPage />} />
+          <Route path="/users/details/:userId" element={<UsersDetailsPage />} />
+          <Route path="/users/edit-users/:userId" element={<EditUsersPage />} />
           <Route path="/roles-list" element={<RolesListPage />} />
           <Route path="/create-role" element={<CreateRolePage />} />
           <Route path="/suppliers" element={<SuppliersPage />} />
           <Route path="/suppliers/add-supplier" element={<AddSuppliersPage />} />
-          <Route path="/suppliers/:supplierId" element={<SuppliersDetailsPage />} />
-          <Route path="/edit-suppliers/:id" element={<EditSuppliersPage />} />
+          <Route path="/suppliers/details/:supplierId" element={<SuppliersDetailsPage />} />
+          <Route path="/suppliers/edit-suppliers/:id" element={<EditSuppliersPage />} />
           <Route path="/pagination-table" element={<PaginationTablePage />} />
           <Route path="/pending-supplies" element={<PendingSuppliesPage />} />
           <Route path="/unpaid-supplies" element={<UnpaidSuppliesPage />} />

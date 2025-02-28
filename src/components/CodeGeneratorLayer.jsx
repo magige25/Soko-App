@@ -212,7 +212,7 @@ const CodeGeneratorLayer = () => {
                 />
               </div>
               <div className='info flex-grow-1'>
-                <h6 className='text-lg mb-16 mt-8'>WowDash</h6>
+                <h6 className='text-lg mb-16 mt-8'>BizChain</h6>
                 <pre className='language-html mb-16 text-secondary-light text-sm'>
                   {"        "}
                   <code>

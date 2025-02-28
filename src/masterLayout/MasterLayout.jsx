@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
+import "../styles/masterlayout.css";
 
 const MasterLayout = ({ children }) => {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -122,19 +123,19 @@ const MasterLayout = ({ children }) => {
           <Icon icon="radix-icons:cross-2" />
         </button>
         <div>
-          <Link to="/" className="sidebar-logo">
+          <Link to="/dashboard" className="sidebar-logo">
             <img
-              src="assets/images/logo.png"
+              src="/assets/images/logo.png"
               alt="site logo"
               className="light-logo"
             />
             <img
-              src="assets/images/logo-light.png"
+              src="/assets/images/logo-light.png"
               alt="site logo"
               className="dark-logo"
             />
             <img
-              src="assets/images/logo-icon.png"
+              src="/assets/images/logo-icon.png"
               alt="site logo"
               className="logo-icon"
             />
@@ -144,7 +145,7 @@ const MasterLayout = ({ children }) => {
           <ul className="sidebar-menu" id="sidebar-menu">
             <li>
               <NavLink 
-                to="/dashboard"  // Redirect AI (previously) to Dashboard
+                to="/dashboard"
                 className={(navData) => (navData.isActive ? "active-page" : "")}
               >
                 <Icon 
@@ -154,128 +155,6 @@ const MasterLayout = ({ children }) => {
                 <span>Dashboards</span>
               </NavLink>
             </li>
-
-            {/* <li className="dropdown">
-              <Link to="#">
-                <Icon
-                  icon="solar:home-smile-angle-outline"
-                  className="menu-icon"
-                />
-                <span>Dashboard</span>
-              </Link>
-              <ul className="sidebar-submenu">
-                <li>
-                  <NavLink
-                    to="/"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    AI
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-2"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    CRM
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-3"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    eCommerce
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-4"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Cryptocurrency
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-5"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Investment
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-6"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    LMS
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-7"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    NFT & Gaming
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-8"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Medical
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-9"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Analytics
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-10"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    POS & Inventory
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/index-11"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Finance & Banking
-                  </NavLink>
-                </li>
-              </ul>
-            </li> */}
 
             <li className="sidebar-menu-group-title">Under Development</li>
             {/* System Users */}
@@ -1609,7 +1488,7 @@ const MasterLayout = ({ children }) => {
                     data-bs-toggle="dropdown"
                   >
                     <img
-                      src="assets/images/lang-flag.png"
+                      src="/assets/images/lang-flag.png"
                       alt="Wowdash"
                       className="w-24 h-24 object-fit-cover rounded-circle"
                     />
@@ -1630,7 +1509,7 @@ const MasterLayout = ({ children }) => {
                         >
                           <span className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                             <img
-                              src="assets/images/flags/flag1.png"
+                              src="/assets/images/flags/flag1.png"
                               alt=""
                               className="w-36-px h-36-px bg-success-subtle text-success-main rounded-circle flex-shrink-0"
                             />
@@ -1653,7 +1532,7 @@ const MasterLayout = ({ children }) => {
                         >
                           <span className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                             <img
-                              src="assets/images/flags/flag2.png"
+                              src="/assets/images/flags/flag2.png"
                               alt=""
                               className="w-36-px h-36-px bg-success-subtle text-success-main rounded-circle flex-shrink-0"
                             />
@@ -1676,7 +1555,7 @@ const MasterLayout = ({ children }) => {
                         >
                           <span className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                             <img
-                              src="assets/images/flags/flag3.png"
+                              src="/assets/images/flags/flag3.png"
                               alt=""
                               className="w-36-px h-36-px bg-success-subtle text-success-main rounded-circle flex-shrink-0"
                             />
@@ -1699,7 +1578,7 @@ const MasterLayout = ({ children }) => {
                         >
                           <span className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                             <img
-                              src="assets/images/flags/flag4.png"
+                              src="/assets/images/flags/flag4.png"
                               alt=""
                               className="w-36-px h-36-px bg-success-subtle text-success-main rounded-circle flex-shrink-0"
                             />
@@ -1722,7 +1601,7 @@ const MasterLayout = ({ children }) => {
                         >
                           <span className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                             <img
-                              src="assets/images/flags/flag5.png"
+                              src="/assets/images/flags/flag5.png"
                               alt=""
                               className="w-36-px h-36-px bg-success-subtle text-success-main rounded-circle flex-shrink-0"
                             />
@@ -1745,7 +1624,7 @@ const MasterLayout = ({ children }) => {
                         >
                           <span className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                             <img
-                              src="assets/images/flags/flag6.png"
+                              src="/assets/images/flags/flag6.png"
                               alt=""
                               className="w-36-px h-36-px bg-success-subtle text-success-main rounded-circle flex-shrink-0"
                             />
@@ -1768,7 +1647,7 @@ const MasterLayout = ({ children }) => {
                         >
                           <span className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                             <img
-                              src="assets/images/flags/flag7.png"
+                              src="/assets/images/flags/flag7.png"
                               alt=""
                               className="w-36-px h-36-px bg-success-subtle text-success-main rounded-circle flex-shrink-0"
                             />
@@ -1791,7 +1670,7 @@ const MasterLayout = ({ children }) => {
                         >
                           <span className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                             <img
-                              src="assets/images/flags/flag8.png"
+                              src="/assets/images/flags/flag8.png"
                               alt=""
                               className="w-36-px h-36-px bg-success-subtle text-success-main rounded-circle flex-shrink-0"
                             />
@@ -1840,7 +1719,7 @@ const MasterLayout = ({ children }) => {
                         <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                           <span className="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
                             <img
-                              src="assets/images/notification/profile-3.png"
+                              src="/assets/images/notification/profile-3.png"
                               alt=""
                             />
                             <span className="w-8-px h-8-px bg-success-main rounded-circle position-absolute end-0 bottom-0" />
@@ -1870,7 +1749,7 @@ const MasterLayout = ({ children }) => {
                         <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                           <span className="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
                             <img
-                              src="assets/images/notification/profile-4.png"
+                              src="/assets/images/notification/profile-4.png"
                               alt=""
                             />
                             <span className="w-8-px h-8-px bg-neutral-300 rounded-circle position-absolute end-0 bottom-0" />
@@ -1900,7 +1779,7 @@ const MasterLayout = ({ children }) => {
                         <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                           <span className="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
                             <img
-                              src="assets/images/notification/profile-5.png"
+                              src="/assets/images/notification/profile-5.png"
                               alt=""
                             />
                             <span className="w-8-px h-8-px bg-success-main rounded-circle position-absolute end-0 bottom-0" />
@@ -1930,7 +1809,7 @@ const MasterLayout = ({ children }) => {
                         <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                           <span className="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
                             <img
-                              src="assets/images/notification/profile-6.png"
+                              src="/assets/images/notification/profile-6.png"
                               alt=""
                             />
                             <span className="w-8-px h-8-px bg-neutral-300 rounded-circle position-absolute end-0 bottom-0" />
@@ -1960,7 +1839,7 @@ const MasterLayout = ({ children }) => {
                         <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                           <span className="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
                             <img
-                              src="assets/images/notification/profile-7.png"
+                              src="/assets/images/notification/profile-7.png"
                               alt=""
                             />
                             <span className="w-8-px h-8-px bg-success-main rounded-circle position-absolute end-0 bottom-0" />
@@ -2049,7 +1928,7 @@ const MasterLayout = ({ children }) => {
                         <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                           <span className="w-44-px h-44-px bg-success-subtle text-success-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
                             <img
-                              src="assets/images/notification/profile-1.png"
+                              src="/assets/images/notification/profile-1.png"
                               alt=""
                             />
                           </span>
@@ -2094,7 +1973,7 @@ const MasterLayout = ({ children }) => {
                         <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
                           <span className="w-44-px h-44-px bg-success-subtle text-success-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
                             <img
-                              src="assets/images/notification/profile-2.png"
+                              src="/assets/images/notification/profile-2.png"
                               alt=""
                             />
                           </span>
@@ -2150,7 +2029,7 @@ const MasterLayout = ({ children }) => {
                     data-bs-toggle="dropdown"
                   >
                     <img
-                      src="assets/images/user.png"
+                      src="/assets/images/user.png"
                       alt="image_user"
                       className="w-40-px h-40-px object-fit-cover rounded-circle"
                     />
@@ -2237,72 +2116,16 @@ const MasterLayout = ({ children }) => {
         <footer className="d-footer">
           <div className="row align-items-center justify-content-between">
             <div className="col-auto">
-              <p className="mb-0">© 2025 Biz System. All Rights Reserved.</p>
+              <p className="mb-0" style={{ fontSize: "13px"}} >© 2025 Bizchain System. All Rights Reserved.</p>
             </div>
             <div className="col-auto">
-              <p className="mb-0">
+              <p className="mb-0" style={{ fontSize: "13px"}}>
                 Made by <span className="text-primary-600">tigersoft-team</span>
               </p>
             </div>
           </div>
         </footer>
       </main>
-
-      <style jsx>{`
-        .sidebar-menu > li {
-          padding-left: 8px;
-          transition: transform 0.2s ease;
-        }
-        .sidebar-menu > li:hover {
-          transform: translateX(5px);
-        }
-        .sidebar-menu .dropdown > a {
-          display: flex;
-          align-items: center;
-          padding: 8px 0;
-          gap: 8px;
-          font-size: 13px;
-          
-        }
-        .sidebar-menu .active-main > a {
-          background-color:rgb(13, 110, 253);
-          color:rgb(255, 255, 255);
-          font-weight: bold;
-          margin-left: -10px;
-          padding-left: 10px;
-          width: calc(100% + 10px);
-        }
-        .sidebar-submenu li {
-          transition: transform 0.2s ease;
-        }
-        .sidebar-submenu li:hover {
-          transform: translateX(5px);
-        }
-        .sidebar-submenu li a {
-          padding: 6px 0 6px 15px;
-          display: block;
-          font-size: 12px;
-          transition: background-color 0.3s ease, color 0.3s ease;
-        }
-        .sidebar-submenu li a.submenu-clicked {
-          background-color:rgb(23, 162, 184) !important;
-          color:rgb(255, 255, 255) !important;
-        }
-        .sidebar-submenu {
-          max-height: 0;
-          overflow: hidden;
-          transition: max-height 0.3s ease;
-        }
-        .sidebar-menu .open .sidebar-submenu {
-          max-height: 1000px;
-        }
-        .sidebar-menu-group-title {
-          padding: 8px 0;
-          font-size: 12px;
-          font-weight: bold;
-          color: #666;
-        }
-      `}</style>
     </section>
   );
 };
