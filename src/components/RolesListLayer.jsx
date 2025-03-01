@@ -3,58 +3,112 @@ import { Icon } from "@iconify/react";
 //import { Link } from "react-router-dom";
 import axios from "axios";
 
-const moduleMapping = {
-  "User Management": 1,
-  "Region Management": 2,
-  "Payment Management": 3,
-};
-
-const permissionMapping = {
-  view: "RD",
-  create: "CRT",
-  delete: "DLT",
-};
-
-const modulesList = Object.keys(moduleMapping);
-const permissionsList = Object.keys(permissionMapping);
-
 const RolesLayer = () => {
   const [roles, setRoles] = useState([]);
+  const [entityTypes, setEntityTypes] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
   const [newRole, setNewRole] = useState({
     name: "",
     entityType: "",
-    modulePermissions: {},
+    modulePermissions: {}
   });
+  const [createModules, setCreateModules] = useState([]); // Modules for Create modal
 
   const [editRole, setEditRole] = useState(null);
+  const [editModules, setEditModules] = useState([]); // Modules for Edit modal
+
+  // View Role state
   const [selectedRole, setSelectedRole] = useState(null);
 
-  const fetchRolesAPI = "https://biz-system-production.up.railway.app/v1/roles";
-  const createRoleAPI = "https://biz-system-production.up.railway.app/v1/roles";
-  const updateRoleAPI = (roleId) =>
-    `https://biz-system-production.up.railway.app/v1/roles/${roleId}`;
+  // API endpoints
+  const ROLES_API_URL = "https://biz-system-production.up.railway.app/v1/roles";
+  const MODULES_API_URL = "https://biz-system-production.up.railway.app/v1/module-permission"; // Base URL
 
   const addModalRef = useRef(null);
 
+  // Fetch roles
   useEffect(() => {
     const fetchRoles = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(fetchRolesAPI, {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await axios.get(ROLES_API_URL, {
+          headers: { Authorization: `Bearer ${token}` }
         });
         setRoles(response.data.data);
-        console.log("Roles state:", response.data.data);
       } catch (error) {
         console.error("Error fetching roles", error);
       }
     };
-
     fetchRoles();
   }, []);
+
+  // Fetch entity types
+  useEffect(() => {
+    const fetchEntityTypes = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get("https://biz-system-production.up.railway.app/v1/entity-types", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setEntityTypes(response.data.data);
+      } catch (error) {
+        console.error("Error fetching entity types", error);
+      }
+    };
+    fetchEntityTypes();
+  }, []);
+
+  // Fetch modules for Create modal when entityType changes
+  useEffect(() => {
+    const fetchModules = async () => {
+      if (!newRole.entityType) {
+        setCreateModules([]);
+        return;
+      }
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${MODULES_API_URL}?entityType=${newRole.entityType}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const processedModules = response.data.data.map((module) => ({
+          ...module,
+          rolePermissions: module.rolePermissions || []
+        }));
+        setCreateModules(processedModules);
+      } catch (error) {
+        console.error("Error fetching modules for create", error);
+        setCreateModules([]);
+      }
+    };
+    fetchModules();
+  }, [newRole.entityType]);
+
+  // Fetch modules for Edit modal when entityType changes
+  useEffect(() => {
+    const fetchModules = async () => {
+      if (!editRole?.entityType) {
+        setEditModules([]);
+        return;
+      }
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${MODULES_API_URL}?entityType=${editRole.entityType}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const processedModules = response.data.data.map((module) => ({
+          ...module,
+          rolePermissions: module.rolePermissions || []
+        }));
+        setEditModules(processedModules);
+      } catch (error) {
+        console.error("Error fetching modules for edit", error);
+        setEditModules([]);
+      }
+    };
+    fetchModules();
+  }, [editRole?.entityType]);
 
   const formatDate = (dateString) => {
     if (!dateString) return "";
@@ -65,10 +119,10 @@ const RolesLayer = () => {
 
   const buildModulePermissionsPayload = (modulesState) => {
     return Object.entries(modulesState)
-      .filter(([moduleId, perms]) => perms && perms.length > 0)
+      .filter(([_, perms]) => perms && perms.length > 0)
       .map(([moduleId, perms]) => ({
         moduleId: Number(moduleId),
-        permissions: perms,
+        permissions: perms
       }));
   };
 
@@ -76,17 +130,15 @@ const RolesLayer = () => {
     const payload = {
       name: newRole.name,
       entityType: newRole.entityType,
-      modulePermissions: buildModulePermissionsPayload(newRole.modulePermissions),
+      modulePermissions: buildModulePermissionsPayload(newRole.modulePermissions)
     };
-    console.log("Creating role with payload", payload);
-
     const token = localStorage.getItem("token");
     axios
-      .post(createRoleAPI, payload, {
+      .post(ROLES_API_URL, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+          "Content-Type": "application/json"
+        }
       })
       .then((res) => {
         setRoles([...roles, res.data.data]);
@@ -102,8 +154,9 @@ const RolesLayer = () => {
     setNewRole({
       name: "",
       entityType: "",
-      modulePermissions: {},
+      modulePermissions: {}
     });
+    setCreateModules([]); // Reset modules when form resets
   };
 
   useEffect(() => {
@@ -112,7 +165,6 @@ const RolesLayer = () => {
         resetCreateForm();
       }
     };
-
     const modalElement = document.getElementById("createRoleModal");
     if (modalElement && modalElement.classList.contains("show")) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -129,23 +181,23 @@ const RolesLayer = () => {
     const payload = {
       name: editRole.name,
       entityType: editRole.entityType,
-      modulePermissions: buildModulePermissionsPayload(editRole.modulePermissions),
+      modulePermissions: buildModulePermissionsPayload(editRole.modulePermissions)
     };
     const token = localStorage.getItem("token");
     axios
-      .put(updateRoleAPI(editRole.roleId), payload, {
+      .put(`${ROLES_API_URL}/${editRole.roleId}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+          "Content-Type": "application/json"
+        }
       })
-      .then((res) => {
-        const updatedRole = res.data.data;
-        const updatedRoles = roles.map((role) =>
-          role.roleId === editRole.roleId ? updatedRole : role
-        );
-        setRoles(updatedRoles);
-        setEditRole(null); // Reset edit state
+      .then(async () => {
+        const res = await axios.get(ROLES_API_URL, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setRoles(res.data.data);
+        setEditRole(null);
+        setEditModules([]); // Reset edit modules
       })
       .catch((err) => {
         console.error("Error updating role", err);
@@ -164,7 +216,7 @@ const RolesLayer = () => {
       roleId: role.roleId,
       name: role.roleName,
       entityType: role.entityType.code,
-      modulePermissions,
+      modulePermissions
     });
   };
 
@@ -174,52 +226,44 @@ const RolesLayer = () => {
   const totalPages = Math.ceil(roles.length / itemsPerPage);
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  const handleCheckboxChange = (formType, moduleName, permKey, checked) => {
-    const moduleId = moduleMapping[moduleName];
-    const code = permissionMapping[permKey];
+  const handleCheckboxChange = (formType, moduleId, permissionCode, checked) => {
     if (formType === "create") {
       const updatedModules = { ...newRole.modulePermissions };
-      if (!updatedModules[moduleId]) {
-        updatedModules[moduleId] = [];
-      }
+      if (!updatedModules[moduleId]) updatedModules[moduleId] = [];
       if (checked) {
-        if (!updatedModules[moduleId].includes(code)) {
-          updatedModules[moduleId].push(code);
+        if (!updatedModules[moduleId].includes(permissionCode)) {
+          updatedModules[moduleId].push(permissionCode);
         }
       } else {
-        updatedModules[moduleId] = updatedModules[moduleId].filter((p) => p !== code);
+        updatedModules[moduleId] = updatedModules[moduleId].filter((p) => p !== permissionCode);
       }
       setNewRole({ ...newRole, modulePermissions: updatedModules });
     } else if (formType === "edit" && editRole) {
       const updatedModules = { ...editRole.modulePermissions };
-      if (!updatedModules[moduleId]) {
-        updatedModules[moduleId] = [];
-      }
+      if (!updatedModules[moduleId]) updatedModules[moduleId] = [];
       if (checked) {
-        if (!updatedModules[moduleId].includes(code)) {
-          updatedModules[moduleId].push(code);
+        if (!updatedModules[moduleId].includes(permissionCode)) {
+          updatedModules[moduleId].push(permissionCode);
         }
       } else {
-        updatedModules[moduleId] = updatedModules[moduleId].filter((p) => p !== code);
+        updatedModules[moduleId] = updatedModules[moduleId].filter((p) => p !== permissionCode);
       }
       setEditRole({ ...editRole, modulePermissions: updatedModules });
     }
   };
 
-  const checkboxContainerStyle = {
-    marginRight: "1rem",
+  const checkboxContainerStyle = { marginRight: "1rem" };
+
+  // Filter modules to show only those with permissions
+  const filterModulesWithPermissions = (modules) => {
+    return modules.filter((module) => module.permissions && module.permissions.length > 0);
   };
 
   return (
     <div className="page-wrapper">
       <div className="row">
         <div className="d-flex justify-content-end align-items-center mb-3">
-          <button
-            className="btn btn-primary"
-            data-bs-toggle="modal"
-            data-bs-target="#createRoleModal"
-            aria-label="Add Role"
-          >
+          <button className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createRoleModal">
             + Add Role
           </button>
         </div>
@@ -244,13 +288,7 @@ const RolesLayer = () => {
                       <td>{role.entityType?.name || "N/A"}</td>
                       <td>
                         <div className="dropdown">
-                          <button
-                            className="btn btn-light dropdown-toggle btn-sm"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false"
-                            aria-label="Role actions"
-                          >
+                          <button className="btn btn-light dropdown-toggle btn-sm" data-bs-toggle="dropdown">
                             Actions
                           </button>
                           <ul className="dropdown-menu">
@@ -278,27 +316,16 @@ const RolesLayer = () => {
                               <button
                                 className="dropdown-item text-danger"
                                 onClick={() => {
-                                  if (
-                                    window.confirm(
-                                      "Are you sure you want to delete this role?"
-                                    )
-                                  ) {
+                                  if (window.confirm("Are you sure you want to delete this role?")) {
                                     const token = localStorage.getItem("token");
                                     axios
-                                      .delete(updateRoleAPI(role.roleId), {
-                                        headers: {
-                                          Authorization: `Bearer ${token}`,
-                                        },
+                                      .delete(`${ROLES_API_URL}/${role.roleId}`, {
+                                        headers: { Authorization: `Bearer ${token}` }
                                       })
                                       .then(() => {
-                                        const updatedRoles = roles.filter(
-                                          (r) => r.roleId !== role.roleId
-                                        );
-                                        setRoles(updatedRoles);
+                                        setRoles(roles.filter((r) => r.roleId !== role.roleId));
                                       })
-                                      .catch((err) =>
-                                        console.error("Error deleting role", err)
-                                      );
+                                      .catch((err) => console.error("Error deleting role", err));
                                   }
                                 }}
                               >
@@ -383,107 +410,102 @@ const RolesLayer = () => {
                       placeholder="Enter Role Name"
                       value={newRole.name}
                       onChange={(e) => setNewRole({ ...newRole, name: e.target.value })}
-                      required
-                      aria-required="true"
                     />
                   </div>
                   <div className="col-md-6">
-                    <label className="form-label">Entity Type</label>
-                    <select
-                      className="form-select"
+                  <label className="form-label">Entity Type</label>
+                  <select className="form-select"
                       value={newRole.entityType}
-                      onChange={(e) => setNewRole({ ...newRole, entityType: e.target.value })}
-                      required
-                      aria-required="true"
+                      onChange={(e) =>setNewRole({ ...newRole, entityType: e.target.value })
+                      }
                     >
                       <option value="">Select</option>
-                      <option value="S_ADM">System Admin</option>
-                      <option value="ADM">Admin</option>
-                      <option value="USR">User</option>
-                    </select>
+                      {entityTypes.map((et) => (
+                        <option key={et.code} value={et.code}>
+                          {et.name}
+                        </option>
+                      ))}
+                    </select>                    
                   </div>
                 </div>
 
-                <div className="mb-3">
-                  <h6>Modules and Permissions</h6>
-                  <table className="table table-borderless">
-                    <thead>
-                      <tr>
-                        <th style={{ width: "40%" }}>Module</th>
-                        <th>Permissions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {modulesList.map((moduleName) => (
-                        <tr key={moduleName}>
-                          <td>{moduleName}</td>
-                          <td>
-                            {permissionsList.map((permKey) => (
-                              <div
-                                className="form-check form-check-inline"
-                                key={permKey}
-                                style={checkboxContainerStyle}
-                              >
-                                <input
-                                  type="checkbox"
-                                  className="form-check-input"
-                                  id={`create-${moduleName}-${permKey}`}
-                                  checked={
-                                    newRole.modulePermissions[moduleMapping[moduleName]]?.includes(
-                                      permissionMapping[permKey]
-                                    ) || false
-                                  }
-                                  onChange={(e) =>
-                                    handleCheckboxChange(
-                                      "create",
-                                      moduleName,
-                                      permKey,
-                                      e.target.checked
-                                    )
-                                  }
-                                />
-                                <label
-                                  htmlFor={`create-${moduleName}-${permKey}`}
-                                  className="form-check-label"
-                                  style={{ marginLeft: "0.25rem" }}
-                                >
-                                  {permKey}
-                                </label>
-                              </div>
-                            ))}
-                          </td>
+                {/* Modules and Permissions for Create */}
+                {newRole.entityType && (
+                  <div className="mb-3">
+                    <h6>Modules and Permissions</h6>
+                    <table className="table table-borderless">
+                      <thead>
+                        <tr>
+                          <th style={{ width: "40%" }}>Module</th>
+                          <th>Permissions</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {filterModulesWithPermissions(createModules).map((module) => (
+                          <tr key={module.moduleId}>
+                            <td>{module.name}</td>
+                            <td>
+                              {module.permissions.map((perm) => (
+                                <div
+                                  className="form-check form-check-inline"
+                                  key={perm.code}
+                                  style={checkboxContainerStyle}
+                                >
+                                  <input
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    id={`create-${module.moduleId}-${perm.code}`}
+                                    checked={
+                                      newRole.modulePermissions[module.moduleId]?.includes(
+                                        perm.code
+                                      ) || false
+                                    }
+                                    onChange={(e) =>
+                                      handleCheckboxChange(
+                                        "create",
+                                        module.moduleId,
+                                        perm.code,
+                                        e.target.checked
+                                      )
+                                    }
+                                  />
+                                  <label
+                                    htmlFor={`create-${module.moduleId}-${perm.code}`}
+                                    className="form-check-label"
+                                    style={{ marginLeft: "0.25rem" }}
+                                  >
+                                    {perm.name}
+                                  </label>
+                                </div>
+                              ))}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                <div className="d-flex justify-content-end">
+                  <button
+                    className="btn btn-primary"
+                    onClick={handleCreateRole}
+                    data-bs-dismiss="modal"
+                  >
+                    Save
+                  </button>
                 </div>
-
-                <button
-                  className="btn btn-primary"
-                  onClick={handleCreateRole}
-                  data-bs-dismiss="modal"
-                  aria-label="Save"
-                >
-                  Save
-                </button>
               </div>
             </div>
           </div>
         </div>
 
         {/* Edit Role Modal */}
-        <div className="modal fade" id="editRoleModal" tabIndex="-1" aria-hidden="true">
+        <div className="modal fade" id="editRoleModal" tabIndex="-1">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-header">
                 <h6 className="modal-title">Edit Role</h6>
-                <button
-                  type="button"
-                  className="btn-close"
-                  data-bs-dismiss="modal"
-                  aria-label="Close"
-                  onClick={() => setEditRole(null)}
-                ></button>
+                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <div className="modal-body">
                 {editRole ? (
@@ -514,78 +536,82 @@ const RolesLayer = () => {
                           aria-required="true"
                         >
                           <option value="">Select</option>
-                          <option value="S_ADM">System Admin</option>
-                          <option value="ADM">Admin</option>
-                          <option value="USR">User</option>
+                          {entityTypes.map((et) => (
+                            <option key={et.code} value={et.code}>
+                              {et.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     </div>
-                    <div className="mb-3">
-                      <h6>Modules and Permissions</h6>
-                      <table className="table table-borderless">
-                        <thead>
-                          <tr>
-                            <th style={{ width: "40%" }}>Module</th>
-                            <th>Permissions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {modulesList.map((moduleName) => (
-                            <tr key={moduleName}>
-                              <td>{moduleName}</td>
-                              <td>
-                                {permissionsList.map((permKey) => (
-                                  <div
-                                    className="form-check form-check-inline"
-                                    key={permKey}
-                                    style={checkboxContainerStyle}
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      className="form-check-input"
-                                      id={`edit-${moduleName}-${permKey}`}
-                                      checked={
-                                        editRole.modulePermissions[
-                                          moduleMapping[moduleName]
-                                        ]?.includes(permissionMapping[permKey]) || false
-                                      }
-                                      onChange={(e) =>
-                                        handleCheckboxChange(
-                                          "edit",
-                                          moduleName,
-                                          permKey,
-                                          e.target.checked
-                                        )
-                                      }
-                                    />
-                                    <label
-                                      htmlFor={`edit-${moduleName}-${permKey}`}
-                                      className="form-check-label"
-                                      style={{ marginLeft: "0.25rem" }}
-                                    >
-                                      {permKey}
-                                    </label>
-                                  </div>
-                                ))}
-                              </td>
+                    {/* Modules and Permissions for Edit */}
+                    {editRole.entityType && (
+                      <div className="mb-3">
+                        <h6>Modules and Permissions</h6>
+                        <table className="table table-borderless">
+                          <thead>
+                            <tr>
+                              <th style={{ width: "40%" }}>Module</th>
+                              <th>Permissions</th>
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                          </thead>
+                          <tbody>
+                            {filterModulesWithPermissions(editModules).map((module) => (
+                              <tr key={module.moduleId}>
+                                <td>{module.name}</td>
+                                <td>
+                                  {module.permissions.map((perm) => (
+                                    <div
+                                      className="form-check form-check-inline"
+                                      key={perm.code}
+                                      style={checkboxContainerStyle}
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        className="form-check-input"
+                                        id={`edit-${module.moduleId}-${perm.code}`}
+                                        checked={
+                                          editRole.modulePermissions[module.moduleId]?.includes(
+                                            perm.code
+                                          ) || false
+                                        }
+                                        onChange={(e) =>
+                                          handleCheckboxChange(
+                                            "edit",
+                                            module.moduleId,
+                                            perm.code,
+                                            e.target.checked
+                                          )
+                                        }
+                                      />
+                                      <label
+                                        htmlFor={`edit-${module.moduleId}-${perm.code}`}
+                                        className="form-check-label"
+                                        style={{ marginLeft: "0.25rem" }}
+                                      >
+                                        {perm.name}
+                                      </label>
+                                    </div>
+                                  ))}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
                     <div className="d-flex justify-content-end">
                       <button
                         type="submit"
                         className="btn btn-primary"
                         data-bs-dismiss="modal"
-                        aria-label="Save Changes"
                       >
                         Save Changes
                       </button>
                     </div>
                   </form>
                 ) : (
-                  <p>No role selected for editing</p>
+                  <p>Loading...</p>
                 )}
               </div>
             </div>
@@ -608,26 +634,21 @@ const RolesLayer = () => {
               <div className="modal-body">
                 {selectedRole && (
                   <>
-                    <p>
-                      <strong>Role Name:</strong> {selectedRole.roleName}
-                    </p>
-                    <p>
-                      <strong>Entity Type:</strong>{" "}
-                      {selectedRole.entityType?.name || selectedRole.entityType}
-                    </p>
-                    <p>
-                      <strong>Modules and Permissions:</strong>
-                    </p>
+                    <p><strong>Role Name:</strong> {selectedRole.roleName}</p>
+                    <p><strong>Entity Type:</strong> {selectedRole.entityType?.name || selectedRole.entityType}</p>
+                    <p><strong>Modules and Permissions:</strong></p>
                     <ul>
-                      {selectedRole.roleModulePermissions.map((mod) => (
-                        <li key={mod.moduleId}>
-                          <strong>{mod.name}</strong>:{" "}
-                          {mod.rolePermissions
-                            .filter((p) => p.assigned)
-                            .map((p) => p.code)
-                            .join(", ")}
-                        </li>
-                      ))}
+                      {selectedRole.roleModulePermissions
+                        .filter((mod) => mod.rolePermissions && mod.rolePermissions.length > 0)
+                        .map((mod) => (
+                          <li key={mod.moduleId}>
+                            <strong>{mod.name}</strong>:{" "}
+                            {mod.rolePermissions
+                              .filter((p) => p.assigned)
+                              .map((p) => p.name)
+                              .join(", ")}
+                          </li>
+                        ))}
                     </ul>
                   </>
                 )}

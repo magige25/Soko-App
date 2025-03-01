@@ -102,8 +102,8 @@ import CreateRolePage from "./pages/CreateRolePage";
 import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
 import PendingSuppliesPage from "./pages/PendingSuppliesPage";
-import UnpaidSuppliesPage from "./pages/UnpaidSuppliesPage";
-import SettledSuppliesPage from "./pages/SettledSuppliesPage";
+import UnpaidBillsPage from "./pages/UnpaidSuppliesPage";
+import SettledBillsPage from "./pages/SettledBillsPage";
 import CategoryPage from "./pages/CategoryPage";
 import SubCategoryPage from "./pages/SubCategoryPage";
 import BrandsPage from "./pages/BrandsPage";
@@ -123,6 +123,10 @@ import SuppliersDetailsPage from "./pages/SuppliersDetailsPage";
 import EditSuppliersPage from "./pages/EditSuppliersPage";
 import EditUsersPage from "./pages/EditUsersPage";
 import UsersDetailsPage from "./pages/UsersDetailsPage";
+import SupplyResidencePage from "./pages/SupplyResidencePage";
+import DeliveriesPage from "./pages/DeliveriesPage";
+import AddDeliveryPage from "./pages/AddDeliveryPage";
+import EditDeliveryPage from "./pages/EditDeliveryPage";
 
 function App() {
   return (
@@ -177,8 +181,12 @@ function App() {
             <Route path="/suppliers/edit-supplier" element={<EditSuppliersPage />} />
             <Route path="/pagination-table" element={<PaginationTablePage />} />
             <Route path="/pending-supplies" element={<PendingSuppliesPage />} />
-            <Route path="/unpaid-supplies" element={<UnpaidSuppliesPage />} />
-            <Route path="/settled-supplies" element={<SettledSuppliesPage />} />
+            <Route path="/unpaid-bills" element={<UnpaidBillsPage />} />
+            <Route path="/settled-bills" element={<SettledBillsPage />} />
+            <Route path="/deliveries" element={<DeliveriesPage />} />
+            <Route path="/supply-residence" element={<SupplyResidencePage />} />
+            <Route path="/add-delivery" element={<AddDeliveryPage />} />
+            <Route path="/edit-delivery" element={<EditDeliveryPage />} />
             <Route path="/category" element={<CategoryPage />} />
             <Route path="/sub-category" element={<SubCategoryPage />} />
             <Route path="/brands" element={<BrandsPage />} />
