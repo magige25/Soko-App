@@ -101,8 +101,7 @@ import RolesListPage from "./pages/RolesListPage";
 import CreateRolePage from "./pages/CreateRolePage";
 import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
-import PendingSuppliesPage from "./pages/PendingSuppliesPage";
-import UnpaidBillsPage from "./pages/UnpaidSuppliesPage";
+import PendingBillsPage from "./pages/PendingSuppliesPage";
 import SettledBillsPage from "./pages/SettledBillsPage";
 import CategoryPage from "./pages/CategoryPage";
 import SubCategoryPage from "./pages/SubCategoryPage";
@@ -130,7 +129,12 @@ import EditDeliveryPage from "./pages/EditDeliveryPage";
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true, // Opt into React.startTransition
+        v7_relativeSplatPath: true, // Opt into new splat route behavior
+      }}
+    >
       <AuthProvider>
         <RouteScrollToTop />
         <Routes>
@@ -180,8 +184,7 @@ function App() {
             <Route path="/suppliers/details" element={<SuppliersDetailsPage />} />
             <Route path="/suppliers/edit-supplier" element={<EditSuppliersPage />} />
             <Route path="/pagination-table" element={<PaginationTablePage />} />
-            <Route path="/pending-supplies" element={<PendingSuppliesPage />} />
-            <Route path="/unpaid-bills" element={<UnpaidBillsPage />} />
+            <Route path="/pending-bills" element={<PendingBillsPage />} />
             <Route path="/settled-bills" element={<SettledBillsPage />} />
             <Route path="/deliveries" element={<DeliveriesPage />} />
             <Route path="/supply-residence" element={<SupplyResidencePage />} />

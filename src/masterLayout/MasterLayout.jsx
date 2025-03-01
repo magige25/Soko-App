@@ -435,28 +435,17 @@ const MasterLayout = ({ children }) => {
                       navData.isActive ? "active-page" : ""
                     }
                   >
-                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
                     Deliveries
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
-                    to='/pending-supplies'
+                    to='/pending-bills'
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
                     }
                   >
-                    Pending Supplies
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/unpaid-supplies"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Unpaid Supplies
+                    Pending Bills
                   </NavLink>
                 </li>
                 <li>
@@ -466,7 +455,6 @@ const MasterLayout = ({ children }) => {
                       navData.isActive ? "active-page" : ""
                     }
                   >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
                     Settled Bills
                   </NavLink>
                 </li>
@@ -477,7 +465,6 @@ const MasterLayout = ({ children }) => {
                       navData.isActive ? "active-page" : ""
                     }
                   >
-                    <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
                     Supply Residence
                   </NavLink>
                 </li>
@@ -2117,7 +2104,7 @@ const MasterLayout = ({ children }) => {
                           onClick={signOut}
                         >
                           <Icon icon="lucide:power" className="icon text-xl" />{" "}
-                          Log Out
+                          Sign Out
                         </button>
                       </li>
                     </ul>
