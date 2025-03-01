@@ -51,7 +51,6 @@ import PortfolioPage from "./pages/PortfolioPage";
 import PricingPage from "./pages/PricingPage";
 import ProgressPage from "./pages/ProgressPage";
 import RadioPage from "./pages/RadioPage";
-import RoleAccessPage from "./pages/RoleAccessPage";
 import SignInPage from "./pages/SignInPage";
 import StarRatingPage from "./pages/StarRatingPage";
 import StarredPage from "./pages/StarredPage";
@@ -245,7 +244,6 @@ function App() {
             <Route path="/pricing" element={<PricingPage />} />
             <Route path="/progress" element={<ProgressPage />} />
             <Route path="/radio" element={<RadioPage />} />
-            <Route path="/role-access" element={<RoleAccessPage />} />
             <Route path="/star-rating" element={<StarRatingPage />} />
             <Route path="/starred" element={<StarredPage />} />
             <Route path="/switch" element={<SwitchPage />} />

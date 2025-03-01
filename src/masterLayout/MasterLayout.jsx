@@ -578,46 +578,6 @@ const MasterLayout = ({ children }) => {
               <ul className="sidebar-submenu">
                 <li>
                   <NavLink
-                    to="/company"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Company
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/notification"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Notification
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/notification-alert"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Notification Alert
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/theme"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Theme
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
                     to="/customer-type"
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
@@ -666,26 +626,6 @@ const MasterLayout = ({ children }) => {
                     Countries
                   </NavLink>
                 </li>
-                <li>
-                  <NavLink
-                    to="/language"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Languages
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/payment-gateway"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Payment Gateway
-                  </NavLink>
-                </li>
               </ul>
             </li>
             <li className="sidebar-menu-group-title">Application</li>
@@ -714,18 +654,6 @@ const MasterLayout = ({ children }) => {
               >
                 <Icon icon="solar:calendar-outline" className="menu-icon" />
                 <span>Calendar</span>
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/kanban"
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <Icon
-                  icon="material-symbols:map-outline"
-                  className="menu-icon"
-                />
-                <span>Kanban</span>
               </NavLink>
             </li>
             {/* Invoice Dropdown */}
@@ -836,55 +764,7 @@ const MasterLayout = ({ children }) => {
                 </li>
               </ul>
             </li>
-            {/* Crypto Currency Dropdown */}
-            <li className="dropdown">
-              <Link to="#">
-                <Icon icon="ri:btc-line" className="menu-icon" />
-                <span>Crypto Currency</span>
-              </Link>
-              <ul className="sidebar-submenu">
-                <li>
-                  <NavLink
-                    to="/wallet"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Wallet
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/marketplace"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Marketplace
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/marketplace-details"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Marketplace Details
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/portfolio"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Portfolios
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
+  
             <li className="sidebar-menu-group-title">UI Elements</li>
             {/* Components Dropdown */}
             <li className="dropdown">
@@ -1227,151 +1107,6 @@ const MasterLayout = ({ children }) => {
             </li>
             <li>
               <NavLink
-                to="/widgets"
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <Icon icon="fe:vector" className="menu-icon" />
-                <span>Widgets</span>
-              </NavLink>
-            </li>
-            {/* Role & Access Dropdown */}
-            <li className="dropdown">
-              <Link to="#">
-                <Icon icon="ri:user-settings-line" className="menu-icon" />
-                <span>Role & Access</span>
-              </Link>
-              <ul className="sidebar-submenu">
-                <li>
-                  <NavLink
-                    to="/role-access"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Role & Access
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/assign-role"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Assign Role
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
-            <li className="sidebar-menu-group-title">Application</li>
-            {/* Gallery */}
-            <li className="dropdown">
-              <Link to="#">
-                <Icon
-                  icon="flowbite:users-group-outline"
-                  className="menu-icon"
-                />
-                <span>Gallery</span>
-              </Link>
-              <ul className="sidebar-submenu">
-                <li>
-                  <NavLink
-                    to="/gallery-grid"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Gallery Grid
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/gallery"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Gallery Grid Desc
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/gallery-masonry"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Gallery Grid
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/gallery-hover"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Gallery Hover Effect
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <NavLink
-                to="/pricing"
-                className={(navData) => (navData.isActive ? "active-page" : "")}
-              >
-                <Icon
-                  icon="hugeicons:money-send-square"
-                  className="menu-icon"
-                />
-                <span>Pricing</span>
-              </NavLink>
-            </li>
-            {/* Blog */}
-            <li className="dropdown">
-              <Link to="#">
-                <Icon
-                  icon="flowbite:users-group-outline"
-                  className="menu-icon"
-                />
-                <span>Blog</span>
-              </Link>
-              <ul className="sidebar-submenu">
-                <li>
-                  <NavLink
-                    to="/blog"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Blog
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/blog-details"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Blog Details
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/add-blog"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
-                  >
-                    Add Blog
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <NavLink
                 to="/testimonials"
                 className={(navData) => (navData.isActive ? "active-page" : "")}
               >
@@ -1382,6 +1117,7 @@ const MasterLayout = ({ children }) => {
                 <span>Testimonials</span>
               </NavLink>
             </li>
+
             <li>
               <NavLink
                 to="/faq"
@@ -1469,7 +1205,7 @@ const MasterLayout = ({ children }) => {
                 >
                   {sidebarActive ? (
                     <Icon
-                      icon="iconoir:arrow-right"
+                      icon="heroicons:bars-3-solid"
                       className="icon text-2xl non-active"
                     />
                   ) : (

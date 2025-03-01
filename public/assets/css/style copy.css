@@ -12748,11 +12748,24 @@ td.fc-header-center {
 
 .auth-left {
   background: linear-gradient(90deg, #ecf0ff 0%, #fafbff 100%);
-  width: 50%;
+  width: 70%;
+  height: 100vh;
+  flex-shrink: 0;
 }
 
+
+
 .auth-right {
-  width: 50%;
+  width: 30%;
+  height: 100vh;
+  flex-shrink: 0;
+  padding: 0 20px;
+}
+
+.auth-left img {
+  width: 100%;
+  height: 100vh; 
+  object-fit: cover;
 }
 
 @media (max-width: 991px) {
