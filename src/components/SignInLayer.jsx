@@ -126,7 +126,7 @@ const SignInLayer = () => {
       >
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
-            src="assets/images/auth/auth-img.png"
+            src="/assets/images/auth/auth-img.png"
             alt="Authentication"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
@@ -140,7 +140,7 @@ const SignInLayer = () => {
           <div className="text-center">
             <Link to="/" className="mb-40 max-w-290-px">
               <img
-                src="assets/images/logo.png"
+                src="/assets/images/logo.png"
                 alt="Logo"
                 style={{ width: "100%", maxWidth: "200px" }}
               />
