@@ -1,729 +1,468 @@
-import { Icon } from '@iconify/react/dist/iconify.js';
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const RoleAccessLayer = () => {
-    return (
-        <>
-            <div className="card h-100 p-0 radius-12">
-                <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
-                    <div className="d-flex align-items-center flex-wrap gap-3">
-                        <span className="text-md fw-medium text-secondary-light mb-0">
-                            Show
-                        </span>
-                        <select className="form-select form-select-sm w-auto ps-12 py-6 radius-12 h-40-px" defaultValue="Select Number">
-                            <option value="Select Number" disabled>
-                                Select Number
-                            </option>
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                            <option value="7">7</option>
-                            <option value="8">8</option>
-                            <option value="9">9</option>
-                            <option value="10">10</option>
-                        </select>
-                        <form className="navbar-search">
-                            <input
-                                type="text"
-                                className="bg-base h-40-px w-auto"
-                                name="search"
-                                placeholder="Search"
-                            />
-                            <Icon icon="ion:search-outline" className="icon" />
-                        </form>
-                        <select className="form-select form-select-sm w-auto ps-12 py-6 radius-12 h-40-px" defaultValue="Select Status">
-                            <option value="Select Status" disabled>
-                                Select Status
-                            </option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
-                    </div>
-                    <button
-                        type="button"
-                        className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-                        data-bs-toggle="modal"
-                        data-bs-target="#exampleModal"
-                    >
-                        <Icon
-                            icon="ic:baseline-plus"
-                            className="icon text-xl line-height-1"
-                        />
-                        Add New Role
-                    </button>
-                </div>
-                <div className="card-body p-24">
-                    <div className="table-responsive scroll-sm">
-                        <table className="table bordered-table sm-table mb-0">
-                            <thead>
-                                <tr>
-                                    <th scope="col">
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border input-form-dark"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                    id="selectAll"
-                                                />
-                                            </div>
-                                            S.L
-                                        </div>
-                                    </th>
-                                    <th scope="col">Create Date</th>
-                                    <th scope="col">Role </th>
-                                    <th scope="col">Description</th>
-                                    <th scope="col" className="text-center">
-                                        Status
-                                    </th>
-                                    <th scope="col" className="text-center">
-                                        Action
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            01
-                                        </div>
-                                    </td>
-                                    <td>25 Jan 2024</td>
-                                    <td>Test</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-success-focus text-success-600 border border-success-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Active
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            02
-                                        </div>
-                                    </td>
-                                    <td>25 Jan 2024</td>
-                                    <td>Waiter</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-danger-focus text-danger-600 border border-danger-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Inactive
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            03
-                                        </div>
-                                    </td>
-                                    <td>10 Feb 2024</td>
-                                    <td>Manager</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-success-focus text-success-600 border border-success-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Active
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            04
-                                        </div>
-                                    </td>
-                                    <td>10 Feb 2024</td>
-                                    <td>Project Manager</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-success-focus text-success-600 border border-success-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Active
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            05
-                                        </div>
-                                    </td>
-                                    <td>15 March 2024</td>
-                                    <td>Game Developer</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-danger-focus text-danger-600 border border-danger-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Inactive
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            06
-                                        </div>
-                                    </td>
-                                    <td>15 March 2024</td>
-                                    <td>Head</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-success-focus text-success-600 border border-success-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Active
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            07
-                                        </div>
-                                    </td>
-                                    <td>27 April 2024</td>
-                                    <td>Management</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-success-focus text-success-600 border border-success-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Active
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            08
-                                        </div>
-                                    </td>
-                                    <td>27 April 2024</td>
-                                    <td>Waiter</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-danger-focus text-danger-600 border border-danger-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Inactive
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            09
-                                        </div>
-                                    </td>
-                                    <td>30 April 2024</td>
-                                    <td>Waiter</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-success-focus text-success-600 border border-success-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Active
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div className="d-flex align-items-center gap-10">
-                                            <div className="form-check style-check d-flex align-items-center">
-                                                <input
-                                                    className="form-check-input radius-4 border border-neutral-400"
-                                                    type="checkbox"
-                                                    name="checkbox"
-                                                />
-                                            </div>
-                                            10
-                                        </div>
-                                    </td>
-                                    <td>30 April 2024</td>
-                                    <td>Waiter</td>
-                                    <td>
-                                        <p className="max-w-500-px">
-                                            Lorem Ipsum is simply dummy text of the printing and
-                                            typesetting
-                                        </p>
-                                    </td>
-                                    <td className="text-center">
-                                        <span className="bg-success-focus text-success-600 border border-success-main px-24 py-4 radius-4 fw-medium text-sm">
-                                            Active
-                                        </span>
-                                    </td>
-                                    <td className="text-center">
-                                        <div className="d-flex align-items-center gap-10 justify-content-center">
-                                            <button
-                                                type="button"
-                                                className="bg-success-focus text-success-600 bg-hover-success-200 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon icon="lucide:edit" className="menu-icon" />
-                                            </button>
-                                            <button
-                                                type="button"
-                                                className="remove-item-btn bg-danger-focus bg-hover-danger-200 text-danger-600 fw-medium w-40-px h-40-px d-flex justify-content-center align-items-center rounded-circle"
-                                            >
-                                                <Icon
-                                                    icon="fluent:delete-24-regular"
-                                                    className="menu-icon"
-                                                />
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                    <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mt-24">
-                        <span>Showing 1 to 10 of 12 entries</span>
-                        <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center">
-                            <li className="page-item">
-                                <Link
-                                    className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md"
-                                    to="#"
-                                >
-                                    <Icon icon="ep:d-arrow-left" className="" />
-                                </Link>
-                            </li>
-                            <li className="page-item">
-                                <Link
-                                    className="page-link text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md bg-primary-600 text-white"
-                                    to="#"
-                                >
-                                    1
-                                </Link>
-                            </li>
-                            <li className="page-item">
-                                <Link
-                                    className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
-                                    to="#"
-                                >
-                                    2
-                                </Link>
-                            </li>
-                            <li className="page-item">
-                                <Link
-                                    className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md"
-                                    to="#"
-                                >
-                                    3
-                                </Link>
-                            </li>
-                            <li className="page-item">
-                                <Link
-                                    className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md"
-                                    to="#"
-                                >
-                                    4
-                                </Link>
-                            </li>
-                            <li className="page-item">
-                                <Link
-                                    className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md"
-                                    to="#"
-                                >
-                                    5
-                                </Link>
-                            </li>
-                            <li className="page-item">
-                                <Link
-                                    className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px text-md"
-                                    to="#"
-                                >
-                                    {" "}
-                                    <Icon icon="ep:d-arrow-right" className="" />{" "}
-                                </Link>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+const API_URL = "https://biz-system-production.up.railway.app/v1/suppliers";
+const DISBURSEMENT_CRITERIA_API = "https://biz-system-production.up.railway.app/v1/disbursement-criteria";
+const DISBURSEMENT_METHODS_API = "https://biz-system-production.up.railway.app/v1/disbursement-methods";
+const TRANSPORT_MODE_API = "https://biz-system-production.up.railway.app/v1/transport-mode";
+const SUPPLIER_RESIDENCE_API = "https://biz-system-production.up.railway.app/v1/supplier-residence";
+
+const AddSuppliersLayer = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phoneNumber: "",
+    productionQuantity: "",
+    numberCattle: "",
+    residence: "",
+    paymentMethod: "",
+    transportMode: "",
+    disbursementCriteria: "",
+    disbursementLitresTarget: "",
+    expansionSpace: true,
+    expansionCapacity: "5",
+    contactPersonName: "",
+    contactPersonPhoneNumber: "",
+    paymentCycle: "WKLY",
+    disbursementPhoneNumber: "",
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [disbursementCriteria, setDisbursementCriteria] = useState([]);
+  const [disbursementMethods, setDisbursementMethods] = useState([]);
+  const [transportModes, setTransportModes] = useState([]);
+  const [residences, setResidences] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setErrors({ submit: "No authentication token found. Please log in." });
+        return;
+      }
+
+      try {
+        const [criteriaRes, methodsRes, modesRes, residencesRes] = await Promise.all([
+          axios.get(DISBURSEMENT_CRITERIA_API, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(DISBURSEMENT_METHODS_API, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(TRANSPORT_MODE_API, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(SUPPLIER_RESIDENCE_API, { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+
+        if (criteriaRes.data.status.code === 0) setDisbursementCriteria(criteriaRes.data.data);
+        if (methodsRes.data.status.code === 0) setDisbursementMethods(methodsRes.data.data);
+        if (modesRes.data.status.code === 0) setTransportModes(modesRes.data.data);
+        if (residencesRes.data.status.code === 0) setResidences(residencesRes.data.data);
+      } catch (err) {
+        console.error("Error fetching data:", err.response?.data || err.message);
+        setErrors({ submit: "Failed to load dropdown data. Please try again." });
+      }
+    };
+    fetchData();
+  }, []);
+
+  const validateField = (field, value) => {
+    if (field === "expansionSpace") return "";
+    if (typeof value === "string" && !value.trim() && 
+        field !== "expansionCapacity" && field !== "paymentCycle" && 
+        !(field === "disbursementPhoneNumber" && disbursementMethods.find(m => m.name === formData.paymentMethod)?.code !== "MPS") &&
+        !(field === "disbursementLitresTarget" && disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name !== "Litres")) {
+      return `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} is required`;
+    }
+    if ((field === "phoneNumber" || field === "contactPersonPhoneNumber" || field === "disbursementPhoneNumber") && 
+        value && typeof value === "string" && !/^\+?\d{9,}$/.test(value)) {
+      return "Please enter a valid phone number";
+    }
+    if ((field === "productionQuantity" || field === "numberCattle" || field === "disbursementLitresTarget" || 
+         field === "expansionCapacity") && value && isNaN(value)) {
+      return `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} must be a number`;
+    }
+    return "";
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    const error = validateField(field, value);
+    setErrors((prev) => ({
+      ...prev,
+      [field]: error,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const newErrors = {};
+    Object.keys(formData).forEach((field) => {
+      if (field !== "expansionSpace" && field !== "expansionCapacity" && field !== "paymentCycle" &&
+          !(field === "disbursementPhoneNumber" && disbursementMethods.find(m => m.name === formData.paymentMethod)?.code !== "MPS") &&
+          !(field === "disbursementLitresTarget" && disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name !== "Litres")) {
+        const error = validateField(field, formData[field]);
+        if (error) newErrors[field] = error;
+      }
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setErrors({});
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      let phoneNumber = formData.phoneNumber;
+      if (phoneNumber.startsWith("+254")) phoneNumber = phoneNumber.replace("+254", "0");
+      else if (!phoneNumber.startsWith("0")) phoneNumber = `0${phoneNumber}`;
+      
+      let contactPhoneNumber = formData.contactPersonPhoneNumber;
+      if (contactPhoneNumber.startsWith("+254")) contactPhoneNumber = contactPhoneNumber.replace("+254", "0");
+      else if (!contactPhoneNumber.startsWith("0")) contactPhoneNumber = `0${contactPhoneNumber}`;
+      
+      let disbursementPhoneNumber = formData.disbursementPhoneNumber;
+      if (disbursementPhoneNumber && disbursementPhoneNumber.startsWith("+254")) 
+        disbursementPhoneNumber = disbursementPhoneNumber.replace("+254", "0");
+      else if (disbursementPhoneNumber && !disbursementPhoneNumber.startsWith("0")) 
+        disbursementPhoneNumber = `0${disbursementPhoneNumber}`;
+
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        phoneNumber: phoneNumber,
+        productionQuantity: parseFloat(formData.productionQuantity) || 0,
+        numberCattle: parseInt(formData.numberCattle, 10) || 0,
+        supplierResidence: residences.find((r) => r.name === formData.residence)?.id || 1,
+        disbursementMethod: disbursementMethods.find((m) => m.name === formData.paymentMethod)?.code || "MPS",
+        transportMode: transportModes.find((m) => m.name === formData.transportMode)?.code || "PBLC",
+        expansionSpace: formData.expansionSpace,
+        expansionCapacity: formData.expansionSpace ? parseInt(formData.expansionCapacity, 10) || 5 : 0,
+        contactPersonName: formData.contactPersonName,
+        contactPersonPhoneNumber: contactPhoneNumber,
+        disbursementCriteria: disbursementCriteria.find((c) => c.name === formData.disbursementCriteria)?.code || "TM",
+        ...(disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name === "Litres" && { 
+          disbursementLitresTarget: parseFloat(formData.disbursementLitresTarget) || 0 
+        }),
+        paymentCycle: formData.paymentCycle,
+        ...(disbursementMethods.find(m => m.name === formData.paymentMethod)?.code === "MPS" && { 
+          disbursementPhoneNumber: disbursementPhoneNumber 
+        }),
+      };
+
+      console.log("Submitting payload:", payload);
+
+      await axios.post(API_URL, payload, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      // Navigate to /suppliers regardless of the response
+      navigate("/suppliers");
+
+    } catch (error) {
+      console.error("Error adding supplier:", error.response?.data || error.message);
+      setErrors({ 
+        submit: error.response?.data?.message || 
+                error.message || 
+                "Failed to add supplier. Please check your connection and try again." 
+      });
+      // Navigate even if there's an error
+      navigate("/suppliers");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="card h-100 p-0 radius-12">
+      <div className="card-body">
+        {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
+
+        <form onSubmit={handleSubmit}>
+          <div className="row gx-3">
+            {/* First Column */}
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                First Name <span className="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                className={`form-control radius-8 ${errors.firstName ? "is-invalid" : ""}`}
+                placeholder="Enter First Name"
+                value={formData.firstName}
+                onChange={(e) => handleInputChange("firstName", e.target.value)}
+              />
+              {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
             </div>
-            {/* Modal Start */}
-            <div
-                className="modal fade"
-                id="exampleModal"
-                tabIndex={-1}
-                aria-labelledby="exampleModalLabel"
-                aria-hidden="true"
+
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Phone Number <span className="text-danger">*</span>
+              </label>
+              <input
+                type="tel"
+                className={`form-control radius-8 ${errors.phoneNumber ? "is-invalid" : ""}`}
+                placeholder="Enter Phone Number"
+                value={formData.phoneNumber}
+                onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+              />
+              {errors.phoneNumber && <div className="invalid-feedback">{errors.phoneNumber}</div>}
+            </div>
+
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Production Quantity (Litres) <span className="text-danger">*</span>
+              </label>
+              <input
+                type="number"
+                className={`form-control radius-8 ${errors.productionQuantity ? "is-invalid" : ""}`}
+                placeholder="Enter Production Quantity"
+                value={formData.productionQuantity}
+                onChange={(e) => handleInputChange("productionQuantity", e.target.value)}
+              />
+              {errors.productionQuantity && <div className="invalid-feedback">{errors.productionQuantity}</div>}
+            </div>
+
+            {/* Second Column */}
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Last Name <span className="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                className={`form-control radius-8 ${errors.lastName ? "is-invalid" : ""}`}
+                placeholder="Enter Last Name"
+                value={formData.lastName}
+                onChange={(e) => handleInputChange("lastName", e.target.value)}
+              />
+              {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
+            </div>
+
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Number of Cattle <span className="text-danger">*</span>
+              </label>
+              <input
+                type="number"
+                className={`form-control radius-8 ${errors.numberCattle ? "is-invalid" : ""}`}
+                placeholder="Enter Number of Cattle"
+                value={formData.numberCattle}
+                onChange={(e) => handleInputChange("numberCattle", e.target.value)}
+              />
+              {errors.numberCattle && <div className="invalid-feedback">{errors.numberCattle}</div>}
+            </div>
+
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Residence <span className="text-danger">*</span>
+              </label>
+              <select
+                className={`form-control radius-8 form-select ${errors.residence ? "is-invalid" : ""}`}
+                value={formData.residence}
+                onChange={(e) => handleInputChange("residence", e.target.value)}
+              >
+                <option value="">Select Residence</option>
+                {residences.map((residence) => (
+                  <option key={residence.id} value={residence.name}>
+                    {residence.name}
+                  </option>
+                ))}
+              </select>
+              {errors.residence && <div className="invalid-feedback">{errors.residence}</div>}
+            </div>
+
+            {/* Third Column */}
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Payment Method <span className="text-danger">*</span>
+              </label>
+              <select
+                className={`form-control radius-8 form-select ${errors.paymentMethod ? "is-invalid" : ""}`}
+                value={formData.paymentMethod}
+                onChange={(e) => handleInputChange("paymentMethod", e.target.value)}
+              >
+                <option value="">Select Payment Method</option>
+                {disbursementMethods.map((method) => (
+                  <option key={method.code} value={method.name}>
+                    {method.name}
+                  </option>
+                ))}
+              </select>
+              {errors.paymentMethod && <div className="invalid-feedback">{errors.paymentMethod}</div>}
+            </div>
+
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Transport Mode <span className="text-danger">*</span>
+              </label>
+              <select
+                className={`form-control radius-8 form-select ${errors.transportMode ? "is-invalid" : ""}`}
+                value={formData.transportMode}
+                onChange={(e) => handleInputChange("transportMode", e.target.value)}
+              >
+                <option value="">Select Transport Mode</option>
+                {transportModes.map((mode) => (
+                  <option key={mode.code} value={mode.name}>
+                    {mode.name}
+                  </option>
+                ))}
+              </select>
+              {errors.transportMode && <div className="invalid-feedback">{errors.transportMode}</div>}
+            </div>
+
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Disbursement Criteria <span className="text-danger">*</span>
+              </label>
+              <select
+                className={`form-control radius-8 form-select ${errors.disbursementCriteria ? "is-invalid" : ""}`}
+                value={formData.disbursementCriteria}
+                onChange={(e) => handleInputChange("disbursementCriteria", e.target.value)}
+              >
+                <option value="">Select Disbursement Criteria</option>
+                {disbursementCriteria.map((criteria) => (
+                  <option key={criteria.code} value={criteria.name}>
+                    {criteria.name}
+                  </option>
+                ))}
+              </select>
+              {errors.disbursementCriteria && <div className="invalid-feedback">{errors.disbursementCriteria}</div>}
+            </div>
+
+            {/* Additional Fields */}
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Contact Person Name <span className="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                className={`form-control radius-8 ${errors.contactPersonName ? "is-invalid" : ""}`}
+                placeholder="Enter Contact Person Name"
+                value={formData.contactPersonName}
+                onChange={(e) => handleInputChange("contactPersonName", e.target.value)}
+              />
+              {errors.contactPersonName && <div className="invalid-feedback">{errors.contactPersonName}</div>}
+            </div>
+
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Contact Person Phone <span className="text-danger">*</span>
+              </label>
+              <input
+                type="tel"
+                className={`form-control radius-8 ${errors.contactPersonPhoneNumber ? "is-invalid" : ""}`}
+                placeholder="Enter Contact Phone"
+                value={formData.contactPersonPhoneNumber}
+                onChange={(e) => handleInputChange("contactPersonPhoneNumber", e.target.value)}
+              />
+              {errors.contactPersonPhoneNumber && <div className="invalid-feedback">{errors.contactPersonPhoneNumber}</div>}
+            </div>
+
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Has Expansion Space
+              </label>
+              <div 
+                className="form-control radius-8 d-flex align-items-center"
+                style={{ 
+                  border: 'none', 
+                  background: 'transparent', 
+                  height: '38px',
+                  padding: '0' 
+                }}
+              >
+                <input
+                  type="checkbox"
+                  className="form-check-input me-2"
+                  id="expansionSpace"
+                  checked={formData.expansionSpace}
+                  onChange={(e) => handleInputChange("expansionSpace", e.target.checked)}
+                  style={{ width: "30px", height: "30px" }}
+                />
+                <label 
+                  className="form-check-label text-primary-light" 
+                  htmlFor="expansionSpace"
+                  style={{ cursor: 'pointer' }}
+                >
+                  
+                </label>
+              </div>
+            </div>
+
+            {/* Conditional Fields */}
+            {disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name === "Litres" && (
+              <div className="col-md-4 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Disbursement Litres Target <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="number"
+                  className={`form-control radius-8 ${errors.disbursementLitresTarget ? "is-invalid" : ""}`}
+                  placeholder="Enter Litres Target"
+                  value={formData.disbursementLitresTarget}
+                  onChange={(e) => handleInputChange("disbursementLitresTarget", e.target.value)}
+                />
+                {errors.disbursementLitresTarget && <div className="invalid-feedback">{errors.disbursementLitresTarget}</div>}
+              </div>
+            )}
+
+            {disbursementMethods.find(m => m.name === formData.paymentMethod)?.code === "MPS" && (
+              <div className="col-md-4 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Disbursement Phone <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="tel"
+                  className={`form-control radius-8 ${errors.disbursementPhoneNumber ? "is-invalid" : ""}`}
+                  placeholder="Enter Disbursement Phone"
+                  value={formData.disbursementPhoneNumber}
+                  onChange={(e) => handleInputChange("disbursementPhoneNumber", e.target.value)}
+                />
+                {errors.disbursementPhoneNumber && <div className="invalid-feedback">{errors.disbursementPhoneNumber}</div>}
+              </div>
+            )}
+
+            {formData.expansionSpace && (
+              <div className="col-md-4 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Expansion Capacity
+                </label>
+                <input
+                  type="number"
+                  className={`form-control radius-8 ${errors.expansionCapacity ? "is-invalid" : ""}`}
+                  placeholder="Enter Expansion Capacity"
+                  value={formData.expansionCapacity}
+                  onChange={(e) => handleInputChange("expansionCapacity", e.target.value)}
+                />
+                {errors.expansionCapacity && <div className="invalid-feedback">{errors.expansionCapacity}</div>}
+              </div>
+            )}
+          </div>
+
+          <div className="text-muted small mt-4 mb-3">
+            Fields marked with <span className="text-danger">*</span> are required.
+          </div>
+
+          <div className="mt-4 d-flex justify-content-end gap-2">
+            <button 
+              type="submit" 
+              className="btn btn-primary px-12" 
+              disabled={isLoading}
             >
-                <div className="modal-dialog modal-lg modal-dialog modal-dialog-centered">
-                    <div className="modal-content radius-16 bg-base">
-                        <div className="modal-header py-16 px-24 border border-top-0 border-start-0 border-end-0">
-                            <h1 className="modal-title fs-5" id="exampleModalLabel">
-                                Add New Role
-                            </h1>
-                            <button
-                                type="button"
-                                className="btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"
-                            />
-                        </div>
-                        <div className="modal-body p-24">
-                            <form action="#">
-                                <div className="row">
-                                    <div className="col-12 mb-20">
-                                        <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                                            Role Name
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control radius-8"
-                                            placeholder="Enter Role  Name"
-                                        />
-                                    </div>
-                                    <div className="col-12 mb-20">
-                                        <label
-                                            htmlFor="desc"
-                                            className="form-label fw-semibold text-primary-light text-sm mb-8"
-                                        >
-                                            Description
-                                        </label>
-                                        <textarea
-                                            className="form-control"
-                                            id="desc"
-                                            rows={4}
-                                            cols={50}
-                                            placeholder="Write some text"
-                                            defaultValue={""}
-                                        />
-                                    </div>
-                                    <div className="col-12 mb-20">
-                                        <label className="form-label fw-semibold text-primary-light text-sm mb-8">
-                                            Status{" "}
-                                        </label>
-                                        <div className="d-flex align-items-center flex-wrap gap-28">
-                                            <div className="form-check checked-success d-flex align-items-center gap-2">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    name="label"
-                                                    id="Personal"
-                                                />
-                                                <label
-                                                    className="form-check-label line-height-1 fw-medium text-secondary-light text-sm d-flex align-items-center gap-1"
-                                                    htmlFor="Personal"
-                                                >
-                                                    <span className="w-8-px h-8-px bg-success-600 rounded-circle" />
-                                                    Active
-                                                </label>
-                                            </div>
-                                            <div className="form-check checked-danger d-flex align-items-center gap-2">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="radio"
-                                                    name="label"
-                                                    id="Holiday"
-                                                />
-                                                <label
-                                                    className="form-check-label line-height-1 fw-medium text-secondary-light text-sm d-flex align-items-center gap-1"
-                                                    htmlFor="Holiday"
-                                                >
-                                                    <span className="w-8-px h-8-px bg-danger-600 rounded-circle" />
-                                                    Inactive
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="d-flex align-items-center justify-content-center gap-3 mt-24">
-                                        <button
-                                            type="reset"
-                                            className="border border-danger-600 bg-hover-danger-200 text-danger-600 text-md px-40 py-11 radius-8"
-                                        >
-                                            Cancel
-                                        </button>
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary border border-primary-600 text-md px-48 py-12 radius-8"
-                                        >
-                                            Save
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {/* Modal End */}
-        </>
-
-    );
+              {isLoading ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
 };
 
-export default RoleAccessLayer;
+export default AddSuppliersLayer;

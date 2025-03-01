@@ -1,9 +1,9 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import SettledSuppliesLayer from "../components/SettledSuppliesLayer";
+import SettledBillsLayer from "../components/SettledBillsLayer";
 
-const SettledSuppliesPage= () => {
+const SettledBillsPage= () => {
   return (
     <>
 
@@ -11,14 +11,14 @@ const SettledSuppliesPage= () => {
         <MasterLayout>
 
           {/* Breadcrumb */}
-          <Breadcrumb title="Settled Supplies" />
+          <Breadcrumb title="Settled Bills" />
 
-            {/* SettledSuppliesLayer */}
-          <SettledSuppliesLayer/>
+            {/* SettledBillsLayer */}
+          <SettledBillsLayer/>
 
         </MasterLayout>
     </>
   );
 };
 
-export default SettledSuppliesPage; 
+export default SettledBillsPage; 

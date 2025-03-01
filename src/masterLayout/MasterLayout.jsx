@@ -452,6 +452,17 @@ const MasterLayout = ({ children }) => {
                 </li>
                 <li>
                   <NavLink
+                    to='/deliveries'
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
+                  >
+                    <i className='ri-circle-fill circle-icon text-primary-600 w-auto' />{" "}
+                    Deliveries
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
                     to='/pending-supplies'
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
@@ -474,13 +485,13 @@ const MasterLayout = ({ children }) => {
                 </li>
                 <li>
                   <NavLink
-                    to='/settled-supplies'
+                    to='/settled-bills'
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
                     }
                   >
                     <i className='ri-circle-fill circle-icon text-warning-main w-auto' />{" "}
-                    Settled Supplies
+                    Settled Bills
                   </NavLink>
                 </li>
                 <li>

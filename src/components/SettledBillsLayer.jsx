@@ -1,45 +1,67 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
-//import { Link } from "react-router-dom";
 
-const SettledSuppliesLayer = () => {
-  const [settledSupplies, setSettledSupplies] = useState([
-    { name: "Kantaram Company", country: "KENYA", orderNo: "ORD123", numberOfItems: "22", amount: 1025, dateSettled: "2024 Jan 20", status: "Settled" },
-    { name: "Morwabe Ventures", country: "KENYA", orderNo: "ORD123", numberOfItems: "11", amount: 455, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Kireki Enterprises", country: "KENYA", orderNo: "ORD123", numberOfItems: "15", amount: 675, dateSettled: "2024 Jan 25", status: "Settled" },
-    { name: "Nuru Limited", country: "KENYA", orderNo: "ORD123", numberOfItems: "45", amount: 965, dateSettled: "2024 Jan 2", status: "Settled" },
-    { name: "Monte Company", country: "KENYA", orderNo: "ORD123", numberOfItems: "21", amount: 1500, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Mayuo Ventures", country: "KENYA", orderNo: "ORD123", numberOfItems: "90", amount: 755, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Xi Xieny", country: "KENYA", orderNo: "ORD124", numberOfItems: "291", amount: 454, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Luo Xieny", country: "KENYA", orderNo: "ORD124", numberOfItems: "291", amount: 454, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Ka Xieny", country: "KENYA", orderNo: "ORD124", numberOfItems: "291", amount: 454, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Dong Xieny", country: "KENYA", orderNo: "ORD124", numberOfItems: "291", amount: 454, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Muo Xieny", country: "KENYA", orderNo: "ORD124", numberOfItems: "291", amount: 454, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Li Xieny", country: "KENYA", orderNo: "ORD124", numberOfItems: "291", amount: 454, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Guo Xieny", country: "KENYA", orderNo: "ORD124", numberOfItems: "291", amount: 454, dateSettled: "2024 Jan 5", status: "Settled" },
-    { name: "Lu Ka", country: "KENYA", orderNo: "ORD124", numberOfItems: "291", amount: 454, dateSettled: "2024 Jan 5", status: "Settled" },
-  ]);
+const API_URL = "";
 
+const SettledBillsLayer = () => {
+  const [settledBills, setSettledBills] = useState([]);
   const [searchItem, setSearchItem] = useState("");
-  const filteredItems = settledSupplies.filter((supply) =>
-    supply.name.toLowerCase().includes(searchItem.toLowerCase())
-  );
-
-  const [settledSuppliesToDelete, setSettledSuppliesToDelete] = useState(null);
+  const [settledBillsToDelete, setSettledBillsToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10; // Changed to constant since it’s not updated
-  const [selectedSupply, setSelectedSupply] = useState(null); // Fixed typo
+  const [selectedBill, setSelectedBill] = useState(null);
+  const itemsPerPage = 10;
 
-  const handleDeleteClick = (supply) => {
-    setSettledSuppliesToDelete(supply);
+  // Fetching settled bills
+  useEffect(() => {
+    fetchSettledBills();
+  }, []);
+
+  const fetchSettledBills = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(API_URL, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Response Data:", response.data.data);
+      setSettledBills(response.data.data);
+    } catch (error) {
+      console.error("Error fetching Settled Bills:", error);
+    }
   };
 
-  const handleDeleteConfirm = () => {
-    const updatedSettledSupplies = settledSupplies.filter(
-      (r) => r.name !== settledSuppliesToDelete.name
-    );
-    setSettledSupplies(updatedSettledSupplies);
-    setSettledSuppliesToDelete(null);
+  const filteredItems = settledBills.filter((bill) =>
+    Object.values(bill).some((value) =>
+      String(value).toLowerCase().includes(searchItem.toLowerCase())
+    )
+  );
+
+  const formatCurrency = (amount) =>
+    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
+
+  const handleDeleteClick = (bill) => {
+    setSettledBillsToDelete(bill);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/${settledBillsToDelete.id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(`Successfully deleted bill with ID: ${settledBillsToDelete.id}`);
+      const updatedSettledBills = settledBills.filter(
+        (r) => r.id !== settledBillsToDelete.id
+      );
+      setSettledBills(updatedSettledBills);
+      setSettledBillsToDelete(null);
+    } catch (error) {
+      console.error("Error deleting Settled Bill:", error);
+    }
   };
 
   // Pagination logic using filteredItems
@@ -55,7 +77,7 @@ const SettledSuppliesLayer = () => {
   return (
     <div className="page-wrapper">
       <div className="row">
-        {/* Settled Supplies table */}
+        {/* Settled Bills table */}
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
             <div>
@@ -77,30 +99,30 @@ const SettledSuppliesLayer = () => {
               <table className="table table-borderless text-start small-text" style={{ width: "100%" }}>
                 <thead className="table-light text-start small-text">
                   <tr>
-                    <th className="text-start">#</th>
-                    <th className="text-start">Name</th>
-                    <th className="text-start">Country</th>
-                    <th className="text-start">Order No.</th>
-                    <th className="text-start">No. Of Items</th>
-                    <th className="text-start">Amount</th>
-                    <th className="text-start">Date Settled</th>
-                    <th className="text-start">Status</th>
-                    <th className="text-start">Action</th>
+                    <th scope="col" className="text-start">#</th>
+                    <th scope="col" className="text-start">Name</th>
+                    <th scope="col" className="text-start">Country</th>
+                    <th scope="col" className="text-start">Order No.</th>
+                    <th scope="col" className="text-start">No. Of Items</th>
+                    <th scope="col" className="text-start">Amount</th>
+                    <th scope="col" className="text-start">Date Settled</th>
+                    <th scope="col" className="text-start">Status</th>
+                    <th scope="col" className="text-start">Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {currentItems.map((supply, index) => (
-                    <tr key={index}>
+                  {currentItems.map((bill, index) => (
+                    <tr key={bill.id}>
                       <th scope="row" className="text-start small-text">
                         {indexOfFirstItem + index + 1}
                       </th>
-                      <td className="text-start small-text">{supply.name}</td>
-                      <td className="text-start small-text">{supply.country}</td>
-                      <td className="text-start small-text">{supply.orderNo}</td>
-                      <td className="text-start small-text">{supply.numberOfItems}</td>
-                      <td className="text-start small-text">{supply.amount}</td>
-                      <td className="text-start small-text">{supply.dateSettled}</td>
-                      <td className="text-start small-text">{supply.status}</td>
+                      <td className="text-start small-text">{bill.name}</td>
+                      <td className="text-start small-text">{bill.country}</td>
+                      <td className="text-start small-text">{bill.orderNo}</td>
+                      <td className="text-start small-text">{bill.numberOfItems}</td>
+                      <td className="text-start small-text">{formatCurrency(bill.amount)}</td>
+                      <td className="text-start small-text">{bill.dateSettled}</td>
+                      <td className="text-start small-text">{bill.status}</td>
                       <td className="text-start small-text">
                         <div className="dropdown">
                           <button
@@ -117,7 +139,7 @@ const SettledSuppliesLayer = () => {
                                 className="dropdown-item"
                                 data-bs-toggle="modal"
                                 data-bs-target="#viewModal"
-                                onClick={() => setSelectedSupply(supply)}
+                                onClick={() => setSelectedBill(bill)}
                               >
                                 View
                               </button>
@@ -125,7 +147,7 @@ const SettledSuppliesLayer = () => {
                             <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(supply)}
+                                onClick={() => handleDeleteClick(bill)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
@@ -144,8 +166,8 @@ const SettledSuppliesLayer = () => {
             <div className="d-flex justify-content-between align-items-start mt-3">
               <div className="text-muted">
                 <span>
-                  Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredItems.length)} of{" "}
-                  {filteredItems.length} entries
+                  Showing {filteredItems.length > 0 ? indexOfFirstItem + 1 : 0} to{" "}
+                  {Math.min(indexOfLastItem, filteredItems.length)} of {filteredItems.length} entries
                 </span>
               </div>
               <nav aria-label="Page navigation">
@@ -189,34 +211,34 @@ const SettledSuppliesLayer = () => {
           </div>
         </div>
 
-        {/* View Settled Order Modal */}
+        {/* View Settled Bill Modal */}
         <div className="modal fade" id="viewModal" tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Settled Supplies
+                  Settled Bills
                   <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </h6>
-                {selectedSupply && (
+                {selectedBill && (
                   <>
                     <div className="mb-3">
-                      <strong>Name:</strong> {selectedSupply.name}
+                      <strong>Name:</strong> {selectedBill.name}
                     </div>
                     <div className="mb-3">
-                      <strong>Country:</strong> {selectedSupply.country}
+                      <strong>Country:</strong> {selectedBill.country}
                     </div>
                     <div className="mb-3">
-                      <strong>No. of Items:</strong> {selectedSupply.numberOfItems}
+                      <strong>No. of Items:</strong> {selectedBill.numberOfItems}
                     </div>
                     <div className="mb-3">
-                      <strong>Amount:</strong> ${selectedSupply.amount}
+                      <strong>Amount:</strong> {formatCurrency(selectedBill.amount)}
                     </div>
                     <div className="mb-3">
-                      <strong>Date Settled:</strong> {selectedSupply.dateSettled}
+                      <strong>Date Settled:</strong> {selectedBill.dateSettled}
                     </div>
                     <div className="mb-3">
-                      <strong>Status:</strong> {selectedSupply.status}
+                      <strong>Status:</strong> {selectedBill.status}
                     </div>
                   </>
                 )}
@@ -231,11 +253,11 @@ const SettledSuppliesLayer = () => {
             <div className="modal-content">
               <div className="modal-body pt-3 ps-18 pe-18">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h6 className="modal-title fs-6">Delete Settled Supplies</h6>
+                  <h6 className="modal-title fs-6">Delete Settled Bill</h6>
                   <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <p className="pb-3 mb-0">
-                  Are you sure you want to delete the <strong>{settledSuppliesToDelete?.name}</strong> Settled Supply
+                  Are you sure you want to delete the <strong>{settledBillsToDelete?.name}</strong> Settled Bill
                   permanently? This action cannot be undone.
                 </p>
               </div>
@@ -260,4 +282,4 @@ const SettledSuppliesLayer = () => {
   );
 };
 
-export default SettledSuppliesLayer;
+export default SettledBillsLayer;

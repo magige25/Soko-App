@@ -394,7 +394,7 @@ const SupplyResidenceLayer = () => {
                     <div className="mb-3"><strong>Name:</strong> {selectedResidence.name}</div>
                     <div className="mb-3"><strong>Tarmacked:</strong> {selectedResidence.tarmacked ? "Yes" : "No"}</div>
                     <div className="mb-3"><strong>Storage Facility:</strong> {selectedResidence.storageFacility ? "Yes" : "No"}</div>
-                    <div className="mb-3"><strong>Date Created:</strong> {selectedResidence.dateCreated || "N/A"}</div>
+                    <div className="mb-3"><strong>Date Created:</strong> {formatDate(selectedResidence.dateCreated) || "N/A"}</div>
                     <div className="mb-3"><strong>Suppliers:</strong> {selectedResidence.suppliers}</div>
                     <div className="mb-3"><strong>Created By:</strong> {selectedResidence.createdBy?.name || "Unknown"}</div>
                   </>

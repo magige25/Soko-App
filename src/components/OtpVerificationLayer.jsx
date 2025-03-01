@@ -86,7 +86,7 @@ const OtpVerificationLayer = () => {
         otp: otpCode,
       });
       const response = await axios.post(
-        "https://biz-system-production.up.railway.app/v1/auth/validate-otp",
+        "https://api.bizchain.co.ke/v1/auth/validate-otp",
         {
           email: formData.email,
           password: formData.password,
@@ -151,7 +151,7 @@ const OtpVerificationLayer = () => {
         password: formData.password,
       });
       const response = await axios.post(
-        "https://biz-system-production.up.railway.app/v1/auth/otp",
+        "https://api.bizchain.co.ke/v1/auth/otp",
         {
           email: formData.email,
           authMethod: formData.authMethod,

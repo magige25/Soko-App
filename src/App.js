@@ -111,13 +111,16 @@ import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
 import PendingSuppliesPage from "./pages/PendingSuppliesPage";
 import UnpaidSuppliesPage from "./pages/UnpaidSuppliesPage";
-import SettledSuppliesPage from "./pages/SettledSuppliesPage";
+import SettledBillsPage from "./pages/SettledBillsPage";
 import CategoryPage from "./pages/CategoryPage";
 import SubCategoryPage from "./pages/SubCategoryPage";
 import BrandsPage from "./pages/BrandsPage";
 import ProductsPage from "./pages/ProductsPage";
 import CountriesPage from "./pages/CountriesPage";
 import SupplyResidencePage from "./pages/SupplyResidencePage";
+import DeliveriesPage from "./pages/DeliveriesPage";
+import AddDeliveryPage from "./pages/AddDeliveryPage";
+import EditDeliveryPage from "./pages/EditDeliveryPage";
 
 function App() {
   return (
@@ -176,13 +179,16 @@ function App() {
           <Route path="/pagination-table" element={<PaginationTablePage />} />
           <Route path="/pending-supplies" element={<PendingSuppliesPage />} />
           <Route path="/unpaid-supplies" element={<UnpaidSuppliesPage />} />
-          <Route path="/settled-supplies" element={<SettledSuppliesPage />} />
+          <Route path="/settled-bills" element={<SettledBillsPage />} />
           <Route path="/category" element={<CategoryPage />} />
           <Route path="/sub-category" element={<SubCategoryPage />} />
           <Route path="/brands" element={<BrandsPage />} />
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/countries" element={<CountriesPage />} />
+          <Route path="/deliveries" element={<DeliveriesPage />} />
           <Route path="/supply-residence" element={<SupplyResidencePage />} />
+          <Route path="/add-delivery" element={<AddDeliveryPage />} />
+          <Route path="/edit-delivery" element={<EditDeliveryPage />} />
 
           <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
           <Route path="/colors" element={<ColorsPage />} />
