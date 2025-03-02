@@ -15575,16 +15575,31 @@ td.fc-header-center {
     font-size: 1.375rem;
   }
 }
-.sidebar-menu li.dropdown.open > a,
+/* .sidebar-menu li.dropdown.open > a,
 .sidebar-menu li.dropdown.dropdown-open > a {
   background-color: var(--brand);
   color: #fff;
 }
 
-.sidebar-menu li.dropdown.open > a:hover,
-.sidebar-menu li.dropdown.dropdown-open > a:hover {
+.sidebar-menu li.dropdown.active > a {
+  background-color: var(--brand);
+  color: #fff;
+} */
+
+.sidebar-menu li.dropdown.submenu-active > a {
+  background-color: var(--brand);
   color: #fff;
 }
+
+.sidebar-menu li.dropdown.submenu-active > a:hover {
+  color: #fff;
+}
+
+
+/* .sidebar-menu li.dropdown.open > a:hover,
+.sidebar-menu li.dropdown.dropdown-open > a:hover {
+  color: #fff;
+} */
 
 .sidebar-menu li.dropdown.open > a::after,
 .sidebar-menu li.dropdown.dropdown-open > a::after {
@@ -15607,7 +15622,7 @@ td.fc-header-center {
 }
 
 .sidebar-menu li a {
-  padding: 0.625rem 0.75rem;
+  padding: 0.4rem 0.75rem;
   font-weight: 500;
   display: flex;
   align-items: center;
@@ -15617,7 +15632,7 @@ td.fc-header-center {
   -moz-border-radius: 8px;
   -ms-border-radius: 8px;
   -o-border-radius: 8px;
-  font-size: 0.875rem;
+  font-size: 0.75rem;
 }
 
 @media (min-width: 1650px) {
@@ -15640,6 +15655,15 @@ td.fc-header-center {
     margin-inline-end: 0.75rem;
   }
 }
+
+.sidebar-menu > li {
+  padding-left: 8px;
+  transition: transform 0.2s ease;
+}
+.sidebar-menu > li:hover {
+  transform: translateX(5px);
+}
+
 .sidebar-menu li a i {
   line-height: 1.2;
   width: 24px;
@@ -15652,17 +15676,26 @@ td.fc-header-center {
 }
 
 .sidebar-menu .sidebar-submenu {
-  padding-block-start: 0.75rem;
+  padding-block-start: 0.4rem;
   display: none;
-  padding-inline-start: 1.5rem;
+  padding-inline-start: 2.5rem;
   transition: none;
 }
 
+.sidebar-submenu li {
+  transition: transform 0.2s ease;
+}
+.sidebar-submenu li:hover {
+  transform: translateX(5px);
+}
+
+
 @media (min-width: 1650px) {
   .sidebar-menu .sidebar-submenu {
-    padding-inline-start: 2.75rem;
+    padding-inline-start: 3.5rem;
   }
 }
+
 .sidebar-menu .sidebar-submenu li.active-page a {
   background-color: var(--button-secondary);
   color: var(--text-primary-light);
@@ -15675,8 +15708,8 @@ td.fc-header-center {
 .sidebar-menu .sidebar-menu-group-title {
   color: var(--neutral-500);
   font-weight: 600;
-  margin-block: 0.5rem;
-  font-size: 0.875rem;
+  margin-block: 0.4rem;
+  font-size: 0.75rem;
 }
 
 @media (min-width: 1650px) {
@@ -15684,6 +15717,8 @@ td.fc-header-center {
     font-size: 1rem;
   }
 }
+
+
 /* === sidebar css end === */
 /* === breadcrumb css start === */
 /* === breadcrumb css end === */

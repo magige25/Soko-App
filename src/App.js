@@ -125,6 +125,9 @@ import SupplyResidencePage from "./pages/SupplyResidencePage";
 import DeliveriesPage from "./pages/DeliveriesPage";
 import AddDeliveryPage from "./pages/AddDeliveryPage";
 import EditDeliveryPage from "./pages/EditDeliveryPage";
+import StorageFacilityPage from "./pages/StorageFacilityPage";
+import AddStorageFacilityPage from "./pages/AddStorageFacilityPage";
+import EditStorageFacilityPage from "./pages/EditStorageFacilityPage";
 
 function App() {
   return (
@@ -176,6 +179,9 @@ function App() {
             <Route path="/users/add-user" element={<AddUsersPage />} />
             <Route path="/users/details" element={<UsersDetailsPage />} />
             <Route path="/users/edit-user" element={<EditUsersPage />} />
+            <Route path="/storage-facility" element={<StorageFacilityPage />} />
+            <Route path="/storage/add-facility" element={<AddStorageFacilityPage />} />
+            <Route path="/storage/edit-facility" element={<EditStorageFacilityPage />} />
             <Route path="/roles-list" element={<RolesListPage />} />
             <Route path="/create-role" element={<CreateRolePage />} />
             <Route path="/suppliers" element={<SuppliersPage />} />

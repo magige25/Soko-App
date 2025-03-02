@@ -95,26 +95,6 @@ const MasterLayout = ({ children }) => {
       });
     });
 
-    const highlightActiveMainMenu = () => {
-      dropdownRefs.current.forEach((dropdown) => {
-        const submenuLinks = dropdown.querySelectorAll(".sidebar-submenu li a");
-        let isActive = false;
-        submenuLinks.forEach((link) => {
-          const path = link.getAttribute("to") || link.getAttribute("href");
-          if (path === location.pathname) {
-            isActive = true;
-          }
-        });
-        if (isActive) {
-          dropdown.classList.add("active-main");
-        } else {
-          dropdown.classList.remove("active-main");
-        }
-      });
-    };
-
-    highlightActiveMainMenu();
-
     return () => {
       dropdownRefs.current.forEach((dropdown, index) => {
         const trigger = dropdown.querySelector("a");
@@ -129,9 +109,41 @@ const MasterLayout = ({ children }) => {
     };
   }, [location.pathname]);
 
+  // Function to check if a submenu item is active
+  const isSubmenuActive = (paths) => {
+    return paths.some((path) => location.pathname === path);
+  };
+
+  // Define submenu paths for each dropdown
+  const submenuPaths = {
+    systemUsers: ["/users"],
+    customerManagement: ["/customers", "/creditors-request"],
+    orderManagement: ["/pending-orders", "/pending-deliveries", "/settled-orders"],
+    salespersonOperation: ["/salespersons"],
+    paymentManagement: ["/payments", "/creditors-payment"],
+    regions: ["/regions", "/sub-regions", "/routes"],
+    productCatalogue: ["/category", "/sub-category", "/brands", "/products"],
+    supplierManagement: ["/suppliers", "/deliveries", "/pending-bills", "/settled-bills", "/supply-residence"],
+    warehouseManagement: ["/warehouses"],
+    stockManagement: ["/stock", "/reconciled"],
+    storageFacility: ["/storage-facility"],
+    authentication: ["/sign-in", "/forgot-password", "/reset-password"],
+    roles: ["/roles-list"],
+    settings: ["/customer-type", "/pricing-categories", "/currencies", "/units-of-measure", "/countries"],
+    invoice: ["/invoice-list", "/invoice-preview", "/invoice-add", "/invoice-edit"],
+    aiApplication: ["/text-generator", "/code-generator", "/image-generator", "/voice-generator", "/video-generator"],
+    components: [
+      "/typography", "/colors", "/button", "/dropdown", "/alert", "/card", "/carousel", "/avatar",
+      "/progress", "/tabs", "/pagination", "/badges", "/tooltip", "/videos", "/star-rating", "/tags",
+      "/list", "/calendar", "/radio", "/switch", "/image-upload"
+    ],
+    forms: ["/form", "/form-layout", "/form-validation", "/wizard"],
+    table: ["/table-basic", "/table-data"],
+    chart: ["/line-chart", "/column-chart", "/pie-chart"],
+  };
+
   return (
     <section className={mobileMenu ? "overlay active" : "overlay "}>
-      {/* Attach ref to the sidebar for click detection */}
       <aside
         ref={sidebarRef}
         className={
@@ -181,21 +193,16 @@ const MasterLayout = ({ children }) => {
             </li>
             <li className="sidebar-menu-group-title">Under Development</li>
             {/* System Users */}
-            <li className="dropdown">
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.systemUsers) ? "submenu-active" : ""}`}>
               <Link to="#">
-                <Icon
-                  icon="flowbite:users-group-outline"
-                  className="menu-icon"
-                />
+                <Icon icon="ri-team-line" className="menu-icon" />
                 <span>System Users</span>
               </Link>
               <ul className="sidebar-submenu">
                 <li>
                   <NavLink
                     to="/users"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Users
                   </NavLink>
@@ -203,7 +210,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
             {/* Customer Management */}
-            <li className="dropdown">
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.customerManagement) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:user-line" className="menu-icon" />
                 <span>Customer Management</span>
@@ -212,9 +219,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/customers"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Customers
                   </NavLink>
@@ -222,9 +227,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/creditors-request"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Creditors Request
                   </NavLink>
@@ -232,7 +235,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
             {/* Orders */}
-            <li className="dropdown">
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.orderManagement) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:shopping-cart-line" className="menu-icon" />
                 <span>Order Management</span>
@@ -241,9 +244,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/pending-orders"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Pending Orders
                   </NavLink>
@@ -251,9 +252,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/pending-deliveries"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Pending Deliveries
                   </NavLink>
@@ -261,9 +260,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/settled-orders"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Settled Orders
                   </NavLink>
@@ -271,7 +268,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
             {/* Salespersons */}
-            <li className="dropdown">
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.salespersonOperation) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:group-line" className="menu-icon" />
                 <span>Salesperson Operation</span>
@@ -280,9 +277,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/salespersons"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Salespersons
                   </NavLink>
@@ -290,7 +285,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
             {/* Payment */}
-            <li className="dropdown">
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.paymentManagement) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:wallet-line" className="menu-icon" />
                 <span>Payment Management</span>
@@ -299,9 +294,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/payments"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Payments
                   </NavLink>
@@ -309,17 +302,15 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/creditors-payment"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Creditors Payment
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Regions Dropdown */}
-            <li className="dropdown">
+            {/* Regions */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.regions) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:map-pin-line" className="menu-icon" />
                 <span>Regions</span>
@@ -328,9 +319,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/regions"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Regions
                   </NavLink>
@@ -338,9 +327,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/sub-regions"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Sub Regions
                   </NavLink>
@@ -348,9 +335,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/routes"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Routes
                   </NavLink>
@@ -358,7 +343,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
             {/* Product Catalogue */}
-            <li className="dropdown">
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.productCatalogue) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:archive-2-line" className="menu-icon" />
                 <span>Product Catalogue</span>
@@ -367,9 +352,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/category"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Category
                   </NavLink>
@@ -377,9 +360,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/sub-category"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Sub Category
                   </NavLink>
@@ -387,9 +368,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/brands"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Brands
                   </NavLink>
@@ -397,9 +376,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/products"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Products
                   </NavLink>
@@ -407,7 +384,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
             {/* Supplier Management */}
-            <li className="dropdown">
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.supplierManagement) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:clipboard-line" className="menu-icon" />
                 <span>Supplier Management</span>
@@ -416,49 +393,39 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/suppliers"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Suppliers
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
-                    to='/deliveries'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    to="/deliveries"
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Deliveries
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
-                    to='/pending-bills'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    to="/pending-bills"
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Pending Bills
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
-                    to='/settled-bills'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    to="/settled-bills"
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Settled Bills
                   </NavLink>
                 </li>
                 <li>
                   <NavLink
-                    to='/supply-residence'
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    to="/supply-residence"
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Supply Residence
                   </NavLink>
@@ -466,7 +433,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
             {/* Warehouse Management */}
-            <li className="dropdown">
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.warehouseManagement) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:store-3-line" className="menu-icon" />
                 <span>Warehouse Management</span>
@@ -475,36 +442,57 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/warehouses"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Warehouses
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Stock Reconciliation */}
-            <li className="dropdown">
+            {/* Stock Management */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.stockManagement) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:equalizer-line" className="menu-icon" />
-                <span>Stock Reconciliation</span>
+                <span>Stock Management</span>
               </Link>
               <ul className="sidebar-submenu">
                 <li>
                   <NavLink
+                    to="/stock"
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
+                  >
+                    Stock
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
                     to="/reconciled"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Reconciled Stock
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Authentication Dropdown */}
-            <li className="dropdown">
+            {/* Storage Facility */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.storageFacility) ? "submenu-active" : ""}`}>
+              <Link to="#">
+                <Icon icon="ri-store-line" className="menu-icon" />
+                <span>Storage Facility</span>
+              </Link>
+              <ul className="sidebar-submenu">
+                <li>
+                  <NavLink
+                    to="/storage-facility"
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
+                  >
+                    Storage Facility
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+            {/* Authentication */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.authentication) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:shield-user-line" className="menu-icon" />
                 <span>Authentication</span>
@@ -513,9 +501,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/sign-in"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Sign In
                   </NavLink>
@@ -523,9 +509,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/forgot-password"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Forgot Password
                   </NavLink>
@@ -533,9 +517,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/reset-password"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Reset Password
                   </NavLink>
@@ -543,7 +525,7 @@ const MasterLayout = ({ children }) => {
               </ul>
             </li>
             {/* Roles */}
-            <li className="dropdown">
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.roles) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:user-settings-line" className="menu-icon" />
                 <span>Roles</span>
@@ -552,31 +534,24 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/roles-list"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Roles
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Settings Dropdown */}
-            <li className="dropdown">
+            {/* Settings */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.settings) ? "submenu-active" : ""}`}>
               <Link to="#">
-                <Icon
-                  icon="icon-park-outline:setting-two"
-                  className="menu-icon"
-                />
+                <Icon icon="icon-park-outline:setting-two" className="menu-icon" />
                 <span>Settings</span>
               </Link>
               <ul className="sidebar-submenu">
                 <li>
                   <NavLink
                     to="/customer-type"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Customer Type
                   </NavLink>
@@ -584,9 +559,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/pricing-categories"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Pricing Categories
                   </NavLink>
@@ -594,9 +567,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/currencies"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Currencies
                   </NavLink>
@@ -604,9 +575,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/units-of-measure"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Units of Measure
                   </NavLink>
@@ -614,9 +583,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/countries"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Countries
                   </NavLink>
@@ -651,8 +618,8 @@ const MasterLayout = ({ children }) => {
                 <span>Calendar</span>
               </NavLink>
             </li>
-            {/* Invoice Dropdown */}
-            <li className="dropdown">
+            {/* Invoice */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.invoice) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="hugeicons:invoice-03" className="menu-icon" />
                 <span>Invoice</span>
@@ -661,9 +628,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/invoice-list"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     List
                   </NavLink>
@@ -671,9 +636,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/invoice-preview"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Preview
                   </NavLink>
@@ -681,9 +644,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/invoice-add"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Add new
                   </NavLink>
@@ -691,17 +652,15 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/invoice-edit"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Edit
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Ai Application Dropdown */}
-            <li className="dropdown">
+            {/* Ai Application */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.aiApplication) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:robot-2-line" className="menu-icon" />
                 <span>Ai Application</span>
@@ -710,9 +669,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/text-generator"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Text Generator
                   </NavLink>
@@ -720,9 +677,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/code-generator"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Code Generator
                   </NavLink>
@@ -730,9 +685,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/image-generator"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Image Generator
                   </NavLink>
@@ -740,9 +693,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/voice-generator"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Voice Generator
                   </NavLink>
@@ -750,33 +701,25 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/video-generator"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Video Generator
                   </NavLink>
                 </li>
               </ul>
             </li>
-  
             <li className="sidebar-menu-group-title">UI Elements</li>
-            {/* Components Dropdown */}
-            <li className="dropdown">
+            {/* Components */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.components) ? "submenu-active" : ""}`}>
               <Link to="#">
-                <Icon
-                  icon="solar:document-text-outline"
-                  className="menu-icon"
-                />
+                <Icon icon="solar:document-text-outline" className="menu-icon" />
                 <span>Components</span>
               </Link>
               <ul className="sidebar-submenu">
                 <li>
                   <NavLink
                     to="/typography"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Typography
                   </NavLink>
@@ -784,9 +727,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/colors"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Colors
                   </NavLink>
@@ -794,9 +735,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/button"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Button
                   </NavLink>
@@ -804,9 +743,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/dropdown"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Dropdown
                   </NavLink>
@@ -814,9 +751,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/alert"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Alerts
                   </NavLink>
@@ -824,9 +759,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/card"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Card
                   </NavLink>
@@ -834,9 +767,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/carousel"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Carousel
                   </NavLink>
@@ -844,9 +775,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/avatar"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Avatars
                   </NavLink>
@@ -854,9 +783,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/progress"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Progress bar
                   </NavLink>
@@ -864,9 +791,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/tabs"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Tab & Accordion
                   </NavLink>
@@ -874,9 +799,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/pagination"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Pagination
                   </NavLink>
@@ -884,9 +807,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/badges"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Badges
                   </NavLink>
@@ -894,9 +815,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/tooltip"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Tooltip & Popover
                   </NavLink>
@@ -904,9 +823,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/videos"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Videos
                   </NavLink>
@@ -914,9 +831,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/star-rating"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Star Ratings
                   </NavLink>
@@ -924,9 +839,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/tags"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Tags
                   </NavLink>
@@ -934,9 +847,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/list"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     List
                   </NavLink>
@@ -944,9 +855,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/calendar"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Calendar
                   </NavLink>
@@ -954,9 +863,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/radio"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Radio
                   </NavLink>
@@ -964,9 +871,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/switch"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Switch
                   </NavLink>
@@ -974,17 +879,15 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/image-upload"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Upload
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Forms Dropdown */}
-            <li className="dropdown">
+            {/* Forms */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.forms) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="heroicons:document" className="menu-icon" />
                 <span>Forms</span>
@@ -993,9 +896,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/form"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Input Forms
                   </NavLink>
@@ -1003,9 +904,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/form-layout"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Input Layout
                   </NavLink>
@@ -1013,9 +912,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/form-validation"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Form Validation
                   </NavLink>
@@ -1023,17 +920,15 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/wizard"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Form Wizard
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Table Dropdown */}
-            <li className="dropdown">
+            {/* Table */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.table) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="mingcute:storage-line" className="menu-icon" />
                 <span>Table</span>
@@ -1042,9 +937,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/table-basic"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Basic Table
                   </NavLink>
@@ -1052,17 +945,15 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/table-data"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Data Table
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Chart Dropdown */}
-            <li className="dropdown">
+            {/* Chart */}
+            <li className={`dropdown ${isSubmenuActive(submenuPaths.chart) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="solar:pie-chart-outline" className="menu-icon" />
                 <span>Chart</span>
@@ -1071,9 +962,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/line-chart"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Line Chart
                   </NavLink>
@@ -1081,9 +970,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/column-chart"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Column Chart
                   </NavLink>
@@ -1091,9 +978,7 @@ const MasterLayout = ({ children }) => {
                 <li>
                   <NavLink
                     to="/pie-chart"
-                    className={(navData) =>
-                      navData.isActive ? "active-page" : ""
-                    }
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Pie Chart
                   </NavLink>
@@ -1105,23 +990,16 @@ const MasterLayout = ({ children }) => {
                 to="/testimonials"
                 className={(navData) => (navData.isActive ? "active-page" : "")}
               >
-                <Icon
-                  icon="mage:message-question-mark-round"
-                  className="menu-icon"
-                />
+                <Icon icon="mage:message-question-mark-round" className="menu-icon" />
                 <span>Testimonials</span>
               </NavLink>
             </li>
-
             <li>
               <NavLink
                 to="/faq"
                 className={(navData) => (navData.isActive ? "active-page" : "")}
               >
-                <Icon
-                  icon="mage:message-question-mark-round"
-                  className="menu-icon"
-                />
+                <Icon icon="mage:message-question-mark-round" className="menu-icon" />
                 <span>FAQs.</span>
               </NavLink>
             </li>
@@ -1175,10 +1053,7 @@ const MasterLayout = ({ children }) => {
                 to="/blank-page"
                 className={(navData) => (navData.isActive ? "active-page" : "")}
               >
-                <Icon
-                  icon="ri:checkbox-multiple-blank-line"
-                  className="menu-icon"
-                />
+                <Icon icon="ri:checkbox-multiple-blank-line" className="menu-icon" />
                 <span>Blank Page</span>
               </NavLink>
             </li>
