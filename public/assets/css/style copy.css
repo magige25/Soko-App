@@ -12788,6 +12788,7 @@ td.fc-header-center {
 
 .center-border-horizontal {
   position: relative;
+  height: 56px;
   z-index: 1;
 }
 

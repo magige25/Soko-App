@@ -1,10 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import "../styles/spinner.css";
-import "../styles/otp.css"
+import "../styles/otp.css";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext"; 
+import { useAuth } from "../context/AuthContext";
 
 const OtpVerificationLayer = () => {
   const [formData, setFormData] = useState({
@@ -21,7 +21,7 @@ const OtpVerificationLayer = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
-  const { signIn } = useAuth(); 
+  const { signIn } = useAuth();
 
   useEffect(() => {
     if (location.state?.email && location.state?.password) {
@@ -71,7 +71,7 @@ const OtpVerificationLayer = () => {
       e.preventDefault();
       inputRefs.current[index - 1].focus();
       const newOtp = [...formData.otp];
-      newOtp[index - 1] = ""; // Optionally clear the previous field
+      newOtp[index - 1] = "";
       setFormData((prevData) => ({
         ...prevData,
         otp: newOtp,
@@ -129,7 +129,6 @@ const OtpVerificationLayer = () => {
         const token = response.data.data?.accessToken;
         if (token) {
           signIn(token);
-
         } else {
           console.error("No access token found in response!");
           toast.error("Authentication failed: No token received.");
@@ -225,28 +224,18 @@ const OtpVerificationLayer = () => {
   };
 
   return (
-    <section
-      className="auth bg-base d-flex flex-nowrap"
-      style={{ height: "100vh", minWidth: "100vw", overflowX: "auto" }}
-    >
+    <section className="auth bg-base d-flex flex-wrap">
       <Toaster />
-      <div
-        className="auth-right d-block"
-        style={{ width: "70%", height: "100vh", flexShrink: 0 }}
-      >
+      <div className="auth-left d-lg-block d-none">
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
             src="assets/images/auth/auth-img.png"
             alt="Authentication"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
       </div>
-      <div
-        className="auth-form d-flex flex-column justify-content-center align-items-center"
-        style={{ width: "30%", height: "100vh", padding: "0 20px", flexShrink: 0 }}
-      >
-        <div className="w-100" style={{ maxWidth: "400px" }}>
+      <div className="auth-right py-32 px-24 d-flex flex-column justify-content-center">
+        <div className="max-w-464-px mx-auto w-100">
           <div className="text-center">
             <Link to="/" className="mb-40 max-w-290-px">
               <img
@@ -266,10 +255,7 @@ const OtpVerificationLayer = () => {
 
           <form onSubmit={handleSubmit}>
             <div className="form-container" style={{ width: "280px", margin: "0 auto" }}>
-              <div
-                className="otp-inputs d-flex gap-2 mb-24"
-                style={{ width: "100%" }}
-              >
+              <div className="otp-inputs d-flex gap-2 mb-24" style={{ width: "100%" }}>
                 {formData.otp.map((digit, index) => (
                   <input
                     key={index}
@@ -318,7 +304,7 @@ const OtpVerificationLayer = () => {
               disabled={resendDisabled || loading}
               style={{ fontSize: "16px" }}
             >
-             Resend
+              Resend
             </button>
           </p>
         </div>

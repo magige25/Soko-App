@@ -9,7 +9,7 @@ const MasterLayout = ({ children }) => {
   const [sidebarActive, setSidebarActive] = useState(false);
   const [mobileMenu, setMobileMenu] = useState(false);
   const dropdownRefs = useRef([]);
-  const sidebarRef = useRef(null); // Ref for the sidebar element
+  const sidebarRef = useRef(null);
   const location = useLocation();
   const { signOut } = useAuth();
 
@@ -21,32 +21,27 @@ const MasterLayout = ({ children }) => {
     setMobileMenu((prev) => !prev);
   };
 
-  // New: Handle clicks outside the sidebar to close it in mobile view
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Check if the sidebar is open and the click is outside the sidebar
       if (
         mobileMenu &&
         sidebarRef.current &&
         !sidebarRef.current.contains(event.target)
       ) {
-        // Ignore clicks on the sidebar toggle button to prevent immediate reopening
         if (!event.target.closest(".sidebar-mobile-toggle")) {
           setMobileMenu(false);
         }
       }
     };
 
-    // Add event listener when the sidebar is open
     if (mobileMenu) {
       document.addEventListener("mousedown", handleClickOutside);
     }
 
-    // Clean up the event listener when the sidebar closes or component unmounts
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [mobileMenu]); // Re-run when mobileMenu changes
+  }, [mobileMenu]);
 
   useEffect(() => {
     const handleDropdownClick = (index) => (event) => {

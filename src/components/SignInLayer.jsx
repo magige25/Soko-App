@@ -120,8 +120,7 @@ const SignInLayer = () => {
     >
       <Toaster />
       <div
-        className="auth-left d-lg-block d-none"
-      >
+        className="auth-left d-lg-block d-none">
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
             src="/assets/images/auth/auth-img.png"

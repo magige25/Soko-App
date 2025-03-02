@@ -122,28 +122,18 @@ const ResetPasswordLayer = () => {
   };
 
   return (
-    <section
-      className="auth bg-base d-flex flex-nowrap"
-      style={{ height: "100vh", minWidth: "100vw", overflowX: "auto" }}
-    >
+    <section className="auth bg-base d-flex flex-wrap">
       <Toaster />
-      <div
-        className="auth-right d-block"
-        style={{ width: "70%", height: "100vh", flexShrink: 0 }}
-      >
+      <div className="auth-left d-lg-block d-none">
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
             src="assets/images/auth/auth-img.png"
             alt="Reset Password"
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
       </div>
-      <div
-        className="auth-form d-flex flex-column justify-content-center align-items-center"
-        style={{ width: "30%", height: "100vh", padding: "0 20px", flexShrink: 0 }}
-      >
-        <div className="w-100" style={{ maxWidth: "400px" }}>
+      <div className="auth-right py-32 px-24 d-flex flex-column justify-content-center">
+        <div className="max-w-464-px mx-auto w-100">
           <div className="text-center">
             <Link to="/" className="mb-40 max-w-290-px">
               <img
