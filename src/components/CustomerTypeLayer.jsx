@@ -92,59 +92,65 @@ const CustomerTypeLayer = () => {
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: 'visible' }}>
-              <table className="table table-borderless text-start small-text" style={{ width: '100%' }}>
-                <thead className="table-light text-start small-text">
+              <table className="table table-borderless table-hover text-start small-text" style={{ width: '100%' }}>
+                <thead className="table-light text-start small-text" style={{ fontSize: "15px" }}>
                   <tr>
-                    <th className="text-start">#</th>
-                    <th className="text-start">Name</th>
-                    <th className="text-start">Status</th>
-                    <th className="text-start">Action</th>
+                    <th className="text-center py-3 px-6">#</th>
+                    <th className="text-start py-3 px-4">Name</th>
+                    <th className="text-start py-3 px-4">Status</th>
+                    <th className="text-start py-3 px-4">Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {currentItems.map((customerType, index) => (
                     <tr key={index}>
-                      <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
+                      <th scope="row" className="text-center small-text">{indexOfFirstItem + index + 1}</th>
                       <td className="text-start small-text">{customerType.name}</td>
                       <td className="text-start small-text">{customerType.status}</td>
                       <td className="text-start small-text">
-                        <div className="dropdown">
-                          <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
-                            Actions
-                          </button>
-                          <ul className="dropdown-menu">
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                data-bs-toggle="modal"
-                                data-bs-target="#viewModal"
-                                onClick={() => handleViewClick(customerType)}
-                              >
-                                View
-                              </button>
-                            </li>
-                            <li>
-                              <Link
-                                className="dropdown-item"
-                                to="#"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editModal"
-                                onClick={() => handleEditClick(customerType)}
-                              >
-                                Edit
-                              </Link>
-                            </li>
-                            <li>
-                              <button
-                                className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(customerType)}
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
-                              >
-                                Delete
-                              </button>
-                            </li>
-                          </ul>
+                        <div className="action-dropdown">
+                          <div className="dropdown">
+                            <button
+                              className="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                              type="button"
+                              data-bs-toggle="dropdown"
+                            >
+                              Actions
+                            </button>
+                            <ul className="dropdown-menu">
+                              <li>
+                                <button
+                                  className="dropdown-item"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#viewModal"
+                                  onClick={() => handleViewClick(customerType)}
+                                >
+                                  View
+                                </button>
+                              </li>
+                              <li>
+                                <Link
+                                  className="dropdown-item"
+                                  to="#"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#editModal"
+                                  onClick={() => handleEditClick(customerType)}
+                                >
+                                  Edit
+                                </Link>
+                              </li>
+                              <li>
+                                <button
+                                  className="dropdown-item text-danger"
+                                  onClick={() => handleDeleteClick(customerType)}
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#deleteModal"
+                                >
+                                  Delete
+                                </button>
+                              </li>
+                            </ul>
+                          </div>
                         </div>
                       </td>
                     </tr>

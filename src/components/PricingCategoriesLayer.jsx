@@ -1,20 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
+import axios from "axios";
+
+const API_URL = "https://api.bizchain.co.ke/v1/pricing-categories"
 
 const PricingCategoriesLayer = () => {
-  const [pricingCategories, setPricingCategories] = useState([
-    { name: "Standard", status: "Active" },
-    { name: "Premium", status: "Active" },
-    { name: "Discount", status: "Inactive" },
-  ]);
-
+  const [pricingCategories, setPricingCategories] = useState([]);
+  const [query, setQuery] = useState('');
   const [editPricingCategory, setEditPricingCategory] = useState({ name: '', status: '' });
   const [newPricingCategory, setNewPricingCategory] = useState({ name: '', status: '' });
   const [pricingCategoryToDelete, setPricingCategoryToDelete] = useState(null);
   const [pricingCategoryToView, setPricingCategoryToView] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [totalItems, setTotalitems] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchPricingCategories = useCallback(async (page=1, searchQuery = '') => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.hetItem("token");
+      const response = await axios.get(API_URL, {
+        headers: {
+          "Authorization" : `Bearer ${token}`
+        },
+        params: {
+        page: page - 1, 
+        size: itemsPerPage,
+        searchValue: searchQuery
+        }
+      });
+
+      console.log("Full API Response:", response.data);
+      const responseData = response.data;
+      if (responseData.status.code === 0) {
+        const data = responseData || [];
+        console.log("Categories Data:", data);
+        setPricingCategories(data);
+        setTotalitems(responseData.totalElements || 0);
+      } else {
+        throw new Error(responseData.status.message);
+      }
+    } catch (error) {
+      console.error("Error fetching pricingCategories:", error);
+      setError("Failed to fetch categories. Please try again.");
+      setPricingCategories([]);
+      setTotalitems(0);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [itemsPerPage]);
+
+  useEffect(() => {
+    fetchPricingCategories(currentPage, query);
+  }, [currentPage, query, fetchPricingCategories]);
 
   const handleEditClick = (pricingCategory) => {
     setEditPricingCategory(pricingCategory);
@@ -54,15 +96,15 @@ const PricingCategoriesLayer = () => {
     setPricingCategoryToView(pricingCategory);
   };
 
-  // Pagination logic
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = pricingCategories.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(pricingCategories.length / itemsPerPage);
+  const handleSearchInputChange = (e) => {
+    setQuery(e.target.value);
+    setCurrentPage(1);
+  };
 
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-  };
+  }
 
   return (
     <div className="page-wrapper">
@@ -85,112 +127,161 @@ const PricingCategoriesLayer = () => {
         {/* Pricing Categories table */}
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
           <div className="card-body">
+            {error && <div className="alert alert-danger">{error}</div>} 
             <div>
-              <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}>
-                <input type="text" name="search" placeholder="Search" />
-                <Icon icon="ion:search-outline" className="icon" style={{ width: '16px', height: '16px' }} />
+              <form
+                className="navbar-search mb-3"
+                style={{ display: "flex", alignItems: "center", gap: "10px" }}
+              >
+                <input
+                  type="text"
+                  name="search"
+                  placeholder="Search Name"
+                  value={query}
+                  onChange={handleSearchInputChange}
+                  className="form-control"
+                  style={{ maxWidth: "300px" }}
+                />
+                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: 'visible' }}>
-              <table className="table table-borderless text-start small-text" style={{ width: '100%' }}>
-                <thead className="table-light text-start small-text">
+              <table className="table table-borderless table-hover text-start small-text" style={{ width: '100%' }}>
+                <thead className="table-light text-start small-text" style={{ width: "50px" }}>
                   <tr>
-                    <th className="text-start">#</th>
-                    <th className="text-start">Name</th>
-                    <th className="text-start">Status</th>
-                    <th className="text-start">Action</th>
+                    <th className="text-center py-3 px-6">#</th>
+                    <th className="text-start py-3 px-4">Name</th>
+                    <th className="text-start py-3 px-4">Status</th>
+                    <th className="text-start py-3 px-4">Action</th>
                   </tr>
                 </thead>
-                <tbody>
-                  {currentItems.map((pricingCategory, index) => (
-                    <tr key={index}>
-                      <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
-                      <td className="text-start small-text">{pricingCategory.name}</td>
-                      <td className="text-start small-text">{pricingCategory.status}</td>
-                      <td className="text-start small-text">
-                        <div className="dropdown">
-                          <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
-                            Actions
-                          </button>
-                          <ul className="dropdown-menu">
-                            <li>
-                              <button
-                                className="dropdown-item"
-                                data-bs-toggle="modal"
-                                data-bs-target="#viewModal"
-                                onClick={() => handleViewClick(pricingCategory)}
-                              >
-                                View
-                              </button>
-                            </li>
-                            <li>
-                              <Link
-                                className="dropdown-item"
-                                to="#"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editModal"
-                                onClick={() => handleEditClick(pricingCategory)}
-                              >
-                                Edit
-                              </Link>
-                            </li>
-                            <li>
-                              <button
-                                className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(pricingCategory)}
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
-                              >
-                                Delete
-                              </button>
-                            </li>
-                          </ul>
+                <tbody style={{ fontSize: "14px"}}>
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan="8" className="text-center py-3">
+                        <div>
+                          <span className="visually-hidden">Loading...</span>
                         </div>
                       </td>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  ) : pricingCategories.length > 0 ? (
+                    pricingCategories.map((pricingCategory, index) => (
+                      <tr key={pricingCategory.id} style={{transition: "background-color 0.2s"}}>
+                        <td className="text-center small-text py-3 px-6">
+                          {(currentPage -1) * itemsPerPage + index + 1}
+                        </td>
+                        <td className="text-start small-text py-3 px-4">{pricingCategory.name}</td>
+                        <td className="text-start small-text py-3 px-4">{pricingCategory.status}</td>
+                        <td className="text-start small-text py-3 px-4">
+                          <div className="dropdown">
+                            <button 
+                              className="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                              type="button" 
+                              data-bs-toggle="dropdown"
+                            >
+                              Actions
+                            </button>
+                            <ul className="dropdown-menu">
+                              <li>
+                                <button
+                                  className="dropdown-item"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#viewModal"
+                                  onClick={() => handleViewClick(pricingCategory)}
+                                >
+                                  View
+                                </button>
+                              </li>
+                              <li>
+                                <Link
+                                  className="dropdown-item"
+                                  to="#"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#editModal"
+                                  onClick={() => handleEditClick(pricingCategory)}
+                                >
+                                  Edit
+                                </Link>
+                              </li>
+                              <li>
+                                <button
+                                  className="dropdown-item text-danger"
+                                  onClick={() => handleDeleteClick(pricingCategory)}
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#deleteModal"
+                                >
+                                  Delete
+                                </button>
+                              </li>
+                            </ul>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="3" className="text-center py-3">
+                        No pricing categories found
+                      </td>
+                    </tr>
+                  )}  
+                  </tbody>
+                </table>
+              </div>
 
             {/* Pagination */}
-            <div className="d-flex justify-content-between align-items-start mt-3">
-              <div className="text-muted">
-                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, pricingCategories.length)} of {pricingCategories.length} entries</span>
-              </div>
-              <nav aria-label="Page navigation">
-                <ul className="pagination mb-0">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      <Icon icon="ep:d-arrow-left" />
-                    </button>
-                  </li>
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+            {!isLoading && (
+              <div className="d-flex justify-content-between align-items-center mt-3">
+                <div className="text-muted" style={{ fontSize: "13px" }}>
+                  <span>
+                    Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+                    {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+                  </span>
+                </div>
+                <nav aria-label="Page navigation">
+                  <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                       <button
-                        className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
-                        onClick={() => handlePageChange(i + 1)}
+                        className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                        onClick={() => handlePageChange(currentPage - 1)}
+                        disabled={currentPage === 1}
                       >
-                        {i + 1}
+                        <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
                       </button>
                     </li>
-                  ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      <Icon icon="ep:d-arrow-right" />
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                        <button
+                          className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle d-flex align-items-center justify-content-center`}
+                          style={{
+                            width: "30px",
+                            height: "30px",
+                            padding: "0",
+                            transition: "all 0.2s",
+                            fontSize: "10px",
+                            color: currentPage === i + 1 ? "#fff" : "",
+                          }}
+                          onClick={() => handlePageChange(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
+                      </li>
+                    ))}
+                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                      <button
+                        className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                        onClick={() => handlePageChange(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
+            )}
           </div>
         </div>
 

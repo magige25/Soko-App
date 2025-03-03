@@ -100,7 +100,7 @@ import RolesListPage from "./pages/RolesListPage";
 import CreateRolePage from "./pages/CreateRolePage";
 import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
-import PendingBillsPage from "./pages/PendingSuppliesPage";
+import PendingBillsPage from "./pages/PendingBillsPage";
 import SettledBillsPage from "./pages/SettledBillsPage";
 import CategoryPage from "./pages/CategoryPage";
 import SubCategoryPage from "./pages/SubCategoryPage";

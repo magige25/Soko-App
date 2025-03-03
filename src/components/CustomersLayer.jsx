@@ -138,8 +138,13 @@ const CustomersLayer = () => {
                       <td className="text-start small-text">{customer.salesperson}</td>
                       <td className="text-start small-text">{formatDate(customer.dateCreated)}</td>
                       <td className="text-start small-text">
+                        <div className="action-dropdown">
                         <div className="dropdown">
-                          <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
+                          <button 
+                            className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                          >
                             Actions
                           </button>
                           <ul className="dropdown-menu">
@@ -175,6 +180,7 @@ const CustomersLayer = () => {
                               </button>
                             </li>
                           </ul>
+                        </div>
                         </div>
                       </td>
                     </tr>

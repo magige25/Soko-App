@@ -1,44 +1,67 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Icon } from '@iconify/react/dist/iconify.js';
 
 const API_URL = "https://api.bizchain.co.ke/v1/user";
 
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 const UsersListLayer = () => {
   const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
   const [query, setQuery] = useState('');
   const [userToDelete, setUserToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const debouncedQuery = useDebounce(query, 300);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async (page = 1, searchQuery = '') => {
     setIsLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(`${API_URL}/system`, {
         headers: { Authorization: `Bearer ${token}` },
+        params: {
+          page: page,
+          limit: itemsPerPage,
+          searchValue: searchQuery
+        }
       });
+      
       const data = response.data.data || [];
-      setUsers(data);
-      setFilteredUsers(data);
+      const total = response.data.totalElements || 0;
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = Math.min(page * itemsPerPage, total);
+      const paginatedData = data.slice(startIndex, endIndex);
+      
+      setUsers(paginatedData);
+      setTotalItems(total);
     } catch (error) {
       console.error('Error fetching users:', error);
       setError("Failed to fetch users. Please try again.");
       setUsers([]);
-      setFilteredUsers([]);
+      setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [itemsPerPage]);
+
+  useEffect(() => {
+    fetchUsers(currentPage, debouncedQuery);
+  }, [currentPage, debouncedQuery, fetchUsers]);
 
   const handleDeleteClick = (user) => {
     setUserToDelete(user);
@@ -52,10 +75,8 @@ const UsersListLayer = () => {
       await axios.delete(`${API_URL}/system/${userToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const updatedUsers = users.filter((user) => user.id !== userToDelete.id);
-      setUsers(updatedUsers);
-      setFilteredUsers(updatedUsers);
       setUserToDelete(null);
+      fetchUsers(currentPage, debouncedQuery);
     } catch (error) {
       console.error('Error deleting user:', error);
       setError(error.response?.data?.message || "Failed to delete user.");
@@ -64,36 +85,19 @@ const UsersListLayer = () => {
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    filterUsers(query);
-  };
-
   const handleSearchInputChange = (e) => {
     const searchQuery = e.target.value;
     setQuery(searchQuery);
-    filterUsers(searchQuery);
-  };
-
-  const filterUsers = (searchQuery) => {
-    const lowerQuery = searchQuery.toLowerCase();
-    const filtered = users.filter(
-      (user) =>
-        user.firstName?.toLowerCase().includes(lowerQuery) ||
-        user.lastName?.toLowerCase().includes(lowerQuery) ||
-        user.email?.toLowerCase().includes(lowerQuery) ||
-        user.phoneNo?.toLowerCase().includes(lowerQuery) ||
-        user.role?.name?.toLowerCase().includes(lowerQuery)
-    );
-    setFilteredUsers(filtered);
     setCurrentPage(1);
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
+  console.log('Rendering with action-dropdown class');
+  console.log('CSS imported')
 
   return (
     <div className="page-wrapper">
@@ -116,19 +120,18 @@ const UsersListLayer = () => {
             <div>
               <form
                 className="navbar-search mb-3"
-                onSubmit={handleSearch}
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
               >
                 <input
                   type="text"
                   name="search"
-                  placeholder="Search by name, email, or phone"
+                  placeholder="Search Name"
                   value={query}
                   onChange={handleSearchInputChange}
                   className="form-control"
                   style={{ maxWidth: "300px" }}
                 />
-                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
+                <Icon icon="ion:search-outline" className="icon" style={{ width: "16px", height: "16px" }} />
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: "visible" }}>
@@ -154,11 +157,11 @@ const UsersListLayer = () => {
                         </div>
                       </td>
                     </tr>
-                  ) : currentItems.length > 0 ? (
-                    currentItems.map((user) => (
+                  ) : users.length > 0 ? (
+                    users.map((user, index) => (
                       <tr key={user.id} style={{ transition: "background-color 0.2s" }}>
                         <td className="text-center small-text py-3 px-6">
-                          {indexOfFirstItem + currentItems.indexOf(user) + 1}
+                          {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
                         <td className="text-start small-text py-3 px-4">{user.firstName}</td>
                         <td className="text-start small-text py-3 px-4">{user.lastName}</td>
@@ -166,50 +169,51 @@ const UsersListLayer = () => {
                         <td className="text-start small-text py-3 px-4">{user.phoneNo}</td>
                         <td className="text-start small-text py-3 px-4">{user.role?.name || ''}</td>
                         <td className="text-start small-text py-3 px-4">
-                          <span className={`bg-${user.status === 'Active' ? 'success-focus' : 'neutral-200'} text-${user.status === 'Active' ? 'success-600' : 'neutral-600'} px-24 py-4 radius-8 fw-medium text-sm`}>
-                            {user.status}
+                          <span className={`bg-${user.blocked ? 'neutral-200' : 'success-focus'} text-${user.blocked ? 'neutral-600' : 'success-600'} px-24 py-4 radius-8 fw-medium text-sm`}>
+                            {user.blocked ? 'Blocked' : 'Active'}
                           </span>
                         </td>
                         <td className="text-start small-text py-3 px-4">
-                          <div className="dropdown">
-                            <button
-                              className="btn btn-outline-secondary btn-sm dropdown-toggle"
-                              type="button"
-                              data-bs-toggle="dropdown"
-                              style={{ padding: "4px 8px" }}
-                            >
-                              Actions
-                            </button>
-                            <ul className="dropdown-menu">
-                              <li>
-                                <Link
-                                  className="dropdown-item"
-                                  to="/users/details"
-                                  state={{ userId: user.id }}
-                                >
-                                  Details
-                                </Link>
-                              </li>
-                              <li>
-                                <Link
-                                  className="dropdown-item"
-                                  to="/users/edit-user"
-                                  state={{ userId: user.id }}
-                                >
-                                  Edit
-                                </Link>
-                              </li>
-                              <li>
-                                <button
-                                  className="dropdown-item text-danger"
-                                  onClick={() => handleDeleteClick(user)}
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#deleteUserModal"
-                                >
-                                  Delete
-                                </button>
-                              </li>
-                            </ul>
+                          <div className="action-dropdown">
+                            <div className="dropdown">
+                              <button
+                                className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                                type="button"
+                                data-bs-toggle="dropdown"
+                              >
+                                Actions
+                              </button>
+                              <ul className="dropdown-menu">
+                                <li>
+                                  <Link
+                                    className="dropdown-item"
+                                    to="/users/details"
+                                    state={{ userId: user.id }}
+                                  >
+                                    Details
+                                  </Link>
+                                </li>
+                                <li>
+                                  <Link
+                                    className="dropdown-item"
+                                    to="/users/edit-user"
+                                    state={{ userId: user.id }}
+                                  >
+                                    Edit
+                                  </Link>
+                                </li>
+                                <li>
+                                  <button
+                                    className="dropdown-item text-danger"
+                                    onClick={() => handleDeleteClick(user)}
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteUserModal"
+                                  >
+                                    Delete
+                                  </button>
+                                </li>
+                              </ul>
+                            </div>
                           </div>
                         </td>
                       </tr>
@@ -227,19 +231,22 @@ const UsersListLayer = () => {
 
             {!isLoading && (
               <div className="d-flex justify-content-between align-items-center mt-3">
-                <div className="text-muted">
-                  <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredUsers.length)} of {filteredUsers.length} entries</span>
+                <div className="text-muted" style={{ fontSize: "13px"}}>
+                  <span>
+                    Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+                    {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+                  </span>
                 </div>
                 <nav aria-label="Page navigation">
-                  <ul className="pagination mb-0" style={{ gap: "8px" }}>
+                  <ul className="pagination mb-0" style={{ gap: "6px" }}>
                     <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                       <button
                         className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                        style={{ width: "36px", height: "36px", padding: "0", transition: "all 0.2s" }}
+                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
                       >
-                        <Icon icon="ep:d-arrow-left" style={{ fontSize: "18px" }} />
+                        <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
                       </button>
                     </li>
                     {Array.from({ length: totalPages }, (_, i) => (
@@ -247,10 +254,11 @@ const UsersListLayer = () => {
                         <button
                           className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle d-flex align-items-center justify-content-center`}
                           style={{
-                            width: "36px",
-                            height: "36px",
+                            width: "30px",
+                            height: "30px",
                             padding: "0",
                             transition: "all 0.2s",
+                            fontSize: "10px",  
                             color: currentPage === i + 1 ? "#fff" : "",
                           }}
                           onClick={() => handlePageChange(i + 1)}
@@ -262,11 +270,11 @@ const UsersListLayer = () => {
                     <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                       <button
                         className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                        style={{ width: "36px", height: "36px", padding: "0", transition: "all 0.2s" }}
+                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                       >
-                        <Icon icon="ep:d-arrow-right" style={{ fontSize: "18px" }} />
+                        <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
                       </button>
                     </li>
                   </ul>

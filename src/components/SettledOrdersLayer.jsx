@@ -105,7 +105,10 @@ const SettledOrdersLayer = () => {
                       <td className="text-start small-text">{settledOrder.status}</td>
                       <td className="text-start small-text">
                         <div className="dropdown">
-                          <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
+                          <button 
+                            className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                            type="button" 
+                            data-bs-toggle="dropdown">
                             Actions
                           </button>
                           <ul className="dropdown-menu">

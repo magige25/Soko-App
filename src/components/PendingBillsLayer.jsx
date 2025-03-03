@@ -150,8 +150,12 @@ const PendingSuppliesLayer = () => {
                       <td className="text-start small-text">{formatDate(pendingSupply.dateOrdered)}</td>
                       <td className="text-start small-text">{pendingSupply.status}</td>
                       <td className="text-start small-text">
+                        <div className="action-dropdown">
                         <div className="dropdown">
-                          <button className="btn btn-light dropdown-toggle btn-sm" type="button" data-bs-toggle="dropdown">
+                          <button className="btn btn-outline-secondary btn-sm-dropdown-toggle btn-sm" 
+                            type="button" 
+                            data-bs-toggle="dropdown"
+                          >
                             Actions
                           </button>
                           <ul className="dropdown-menu">
@@ -186,6 +190,7 @@ const PendingSuppliesLayer = () => {
                               </button>
                             </li>
                           </ul>
+                        </div>
                         </div>
                       </td>
                     </tr>

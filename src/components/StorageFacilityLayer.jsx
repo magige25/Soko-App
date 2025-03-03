@@ -1,44 +1,57 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Icon } from '@iconify/react/dist/iconify.js';
 
-const API_URL = "https://api.bizchain.co.ke/v1/storage";
+const API_URL = "https://api.bizchain.co.ke/v1/storage-facilities";
 
 const StorageFacilityLayer = () => {
   const [facilities, setFacilities] = useState([]);
-  const [filteredFacilities, setFilteredFacilities] = useState([]);
   const [query, setQuery] = useState('');
   const [facilityToDelete, setFacilityToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchFacilities();
-  }, []);
-
-  const fetchFacilities = async () => {
+  const fetchFacilities = useCallback(async (page = 1, searchQuery = '') => {
     setIsLoading(true);
     setError(null);
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(`${API_URL}/facilities`, {
-        headers: { Authorization: `Bearer ${token}` },
+      const response = await axios.get(API_URL, {
+        headers: { "Authorization" : `Bearer ${token}` },
+        params: {
+          page: page - 1,
+          size: itemsPerPage,
+          searchValue: searchQuery
+        }
       });
-      const data = response.data.data || [];
-      setFacilities(data);
-      setFilteredFacilities(data);
+
+      console.log('Full API Response:', response.data);
+      const responseData = response.data;
+      if (responseData.status.code === 0) {
+        const data = responseData.data || [];
+        console.log('Facilities Data:', data);
+        setFacilities(data);
+        setTotalItems(responseData.totalElements || 0);
+      } else {
+        throw new Error(responseData.status.message);
+      }
     } catch (error) {
       console.error('Error fetching facilities:', error);
       setError("Failed to fetch facilities. Please try again.");
       setFacilities([]);
-      setFilteredFacilities([]);
+      setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [itemsPerPage]);
+
+  useEffect(() => {
+    fetchFacilities(currentPage, query);
+  }, [currentPage, query, fetchFacilities]);
 
   const handleDeleteClick = (facility) => {
     setFacilityToDelete(facility);
@@ -49,48 +62,28 @@ const StorageFacilityLayer = () => {
     setError(null);
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/facilities/${facilityToDelete.id}`, {
+      await axios.delete(`${API_URL}/${facilityToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const updatedFacilities = facilities.filter((facility) => facility.id !== facilityToDelete.id);
-      setFacilities(updatedFacilities);
-      setFilteredFacilities(updatedFacilities);
       setFacilityToDelete(null);
+      fetchFacilities(currentPage, query);
     } catch (error) {
       console.error('Error deleting facility:', error);
-      setError(error.response?.data?.message || "Failed to delete facility.");
+      setError(error.response?.data?.status?.message || "Failed to delete facility.");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    filterFacilities(query);
-  };
-
   const handleSearchInputChange = (e) => {
-    const searchQuery = e.target.value;
-    setQuery(searchQuery);
-    filterFacilities(searchQuery);
-  };
-
-  const filterFacilities = (searchQuery) => {
-    const lowerQuery = searchQuery.toLowerCase();
-    const filtered = facilities.filter(
-      (facility) =>
-        facility.name?.toLowerCase().includes(lowerQuery) ||
-        facility.location?.toLowerCase().includes(lowerQuery)
-    );
-    setFilteredFacilities(filtered);
+    setQuery(e.target.value);
     setCurrentPage(1);
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredFacilities.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredFacilities.length / itemsPerPage);
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="page-wrapper">
@@ -113,7 +106,6 @@ const StorageFacilityLayer = () => {
             <div>
               <form
                 className="navbar-search mb-3"
-                onSubmit={handleSearch}
                 style={{ display: "flex", alignItems: "center", gap: "10px" }}
               >
                 <input
@@ -151,16 +143,16 @@ const StorageFacilityLayer = () => {
                         </div>
                       </td>
                     </tr>
-                  ) : currentItems.length > 0 ? (
-                    currentItems.map((facility) => (
+                  ) : facilities.length > 0 ? (
+                    facilities.map((facility, index) => (
                       <tr key={facility.id} style={{ transition: "background-color 0.2s" }}>
                         <td className="text-center small-text py-3 px-6">
-                          {indexOfFirstItem + currentItems.indexOf(facility) + 1}
+                          {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
                         <td className="text-start small-text py-3 px-4">{facility.name}</td>
-                        <td className="text-start small-text py-3 px-4">{facility.location}</td>
-                        <td className="text-start small-text py-3 px-4">{facility.capacity?.toLocaleString()}</td>
-                        <td className="text-start small-text py-3 px-4">{facility.currentVolume?.toLocaleString()}</td>
+                        <td className="text-start small-text py-3 px-4">{facility.location || '-'}</td>
+                        <td className="text-start small-text py-3 px-4">{facility.capacity.toLocaleString()}</td>
+                        <td className="text-start small-text py-3 px-4">{facility.stockVolume?.toLocaleString() || '-'}</td>
                         <td className="text-start small-text py-3 px-4">
                           {facility.dateLastRefilled ? new Date(facility.dateLastRefilled).toLocaleDateString() : '-'}
                         </td>
@@ -173,7 +165,6 @@ const StorageFacilityLayer = () => {
                               className="btn btn-outline-secondary btn-sm dropdown-toggle"
                               type="button"
                               data-bs-toggle="dropdown"
-                              style={{ padding: "4px 8px" }}
                             >
                               Actions
                             </button>
@@ -224,19 +215,22 @@ const StorageFacilityLayer = () => {
 
             {!isLoading && (
               <div className="d-flex justify-content-between align-items-center mt-3">
-                <div className="text-muted">
-                  <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredFacilities.length)} of {filteredFacilities.length} entries</span>
+                <div className="text-muted" style={{ fontSize: "13px" }}>
+                  <span>
+                    Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+                    {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+                  </span>
                 </div>
                 <nav aria-label="Page navigation">
-                  <ul className="pagination mb-0" style={{ gap: "8px" }}>
+                  <ul className="pagination mb-0" style={{ gap: "6px" }}>
                     <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                       <button
                         className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                        style={{ width: "36px", height: "36px", padding: "0", transition: "all 0.2s" }}
+                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
                         onClick={() => handlePageChange(currentPage - 1)}
                         disabled={currentPage === 1}
                       >
-                        <Icon icon="ep:d-arrow-left" style={{ fontSize: "18px" }} />
+                        <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
                       </button>
                     </li>
                     {Array.from({ length: totalPages }, (_, i) => (
@@ -244,10 +238,11 @@ const StorageFacilityLayer = () => {
                         <button
                           className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle d-flex align-items-center justify-content-center`}
                           style={{
-                            width: "36px",
-                            height: "36px",
+                            width: "30px",
+                            height: "30px",
                             padding: "0",
                             transition: "all 0.2s",
+                            fontSize: "10px",
                             color: currentPage === i + 1 ? "#fff" : "",
                           }}
                           onClick={() => handlePageChange(i + 1)}
@@ -259,11 +254,11 @@ const StorageFacilityLayer = () => {
                     <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                       <button
                         className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                        style={{ width: "36px", height: "36px", padding: "0", transition: "all 0.2s" }}
+                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
                         onClick={() => handlePageChange(currentPage + 1)}
                         disabled={currentPage === totalPages}
                       >
-                        <Icon icon="ep:d-arrow-right" style={{ fontSize: "18px" }} />
+                        <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
                       </button>
                     </li>
                   </ul>

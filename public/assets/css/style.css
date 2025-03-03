@@ -15770,3 +15770,119 @@ td.fc-header-center {
 }
 
 /* === footer css end === */
+
+/* General text styling for consistency */
+.page-wrapper,
+.card-body,
+.alert,
+.text-muted,
+p,
+h6 {
+  font-size: 13px !important;
+}
+
+.form-label {
+  font-size: 13px !important;
+}
+
+.form-control,
+.form-select {
+  font-size: 13px !important;
+}
+
+.form-control::placeholder {
+  font-size: 13px !important;
+}
+
+.form-select option[disabled] {
+  font-size: 13px !important;
+}
+
+.invalid-feedback {
+  font-size: 13px !important;
+}
+
+.table th,
+.table td {
+  font-size: 13px !important;
+}
+
+/* Buttons (general, excluding action dropdown specific styling) */
+.btn {
+  font-size: 13px !important;
+}
+
+.alert-danger {
+  font-size: 13px !important;
+}
+
+.form-check-label {
+  font-size: 13px !important;
+}
+
+.text-success,
+.text-muted {
+  font-size: 13px !important;
+}
+
+/* Action dropdown specific styling */
+.action-dropdown .dropdown {
+  display: inline-block !important;
+}
+
+.action-dropdown .btn.btn-outline-secondary.btn-sm.dropdown-toggle {
+  padding: 4px 8px !important;
+  font-size: 13px !important;
+}
+
+.action-dropdown .dropdown-menu {
+  font-size: 13px !important; 
+}
+
+.action-dropdown .dropdown-item {
+  font-size: 13px !important;
+}
+
+.action-dropdown .dropdown-item.text-danger {
+  color: #dc3545 !important;
+}
+
+.action-dropdown .dropdown-item:hover {
+  background-color: #f8f9fa !important;
+}
+
+.action-dropdown .dropdown-item.text-danger:hover {
+  color: #fff !important;
+  background-color: #dc3545 !important;
+}
+
+/* dropdown*/
+.dropdown .dropdown {
+  display: inline-block !important;
+}
+
+.dropdown .btn.btn-outline-secondary.btn-sm.dropdown-toggle {
+  padding: 4px 8px !important;
+  font-size: 13px !important;
+}
+
+.dropdown .dropdown-menu {
+  font-size: 13px !important; 
+}
+
+.ropdown .dropdown-item {
+  font-size: 13px !important;
+}
+
+.dropdown .dropdown-item.text-danger {
+  color: #dc3545 !important;
+}
+
+.dropdown .dropdown-item:hover {
+  background-color: #f8f9fa !important;
+}
+
+.dropdown .dropdown-item.text-danger:hover {
+  color: #fff !important;
+  background-color: #dc3545 !important;
+}

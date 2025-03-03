@@ -110,7 +110,20 @@ const AddUsersLayer = ({ onUserAdded }) => {
 
   const validateField = (field, value) => {
     if (!value.trim() && field !== 'userPermissions') {
-      return `${field === 'roleId' ? 'Role' : field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+      switch (field) {
+        case 'firstName':
+          return 'First Name is required';
+        case 'lastName':
+          return 'Last Name is required';
+        case 'phoneNumber':
+          return 'Phone Number is required';
+        case 'email':
+          return 'Email is required';
+        case 'roleId':
+          return 'Role is required';
+        default:
+          return `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
+      }
     }
     if (field === 'email' && value && !/\S+@\S+\.\S+/.test(value)) {
       return 'Please enter a valid email address';
@@ -229,7 +242,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
           <div className="row gx-3">
             {['firstName', 'lastName'].map((field) => (
               <div className="col-md-6 mb-3" key={field}>
-                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                <label className="form-label fw-semibold text-primary-light mb-2">
                   {field === 'firstName' ? 'First' : 'Last'} Name <span className="text-danger">*</span>
                 </label>
                 <input
@@ -250,7 +263,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
               { label: 'Email', type: 'email', id: 'email', placeholder: 'Enter Email Address', required: true },
             ].map(({ label, type, id, placeholder }) => (
               <div className="col-md-6 mb-3" key={id}>
-                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                <label className="form-label fw-semibold text-primary-light mb-2">
                   {label} <span className="text-danger">*</span>
                 </label>
                 <input
@@ -266,8 +279,8 @@ const AddUsersLayer = ({ onUserAdded }) => {
             ))}
           </div>
 
-          <div className="col-md-4 mb-3" style={{ fontSize: "12px"}}>
-            <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+          <div className="col-md-6 mb-3">
+            <label className="form-label fw-semibold text-primary-light mb-2">
               Role <span className="text-danger">*</span>
             </label>
             <select
@@ -287,7 +300,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
 
           {formData.roleId && (
             <div className="mb-3">
-              <div className="table-responsive px-0 py-4 fw-medium text-sm">
+              <div className="table-responsive px-0 py-4 fw-medium">
                 <table className="table table-borderless mb-2 mt-12">
                   <thead>
                     <tr>
@@ -329,7 +342,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
             </div>
           )}
 
-          <div className="text-muted small mt-3">
+          <div className="text-muted mt-3">
             Fields marked with <span className="text-danger">*</span> are required.
           </div>
 

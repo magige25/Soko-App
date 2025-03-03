@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const API_URL = "https://api.bizchain.co.ke/v1/storage/facilities";
+const API_URL = "https://api.bizchain.co.ke/v1/storage-facilities";
 
 const AddFacilityLayer = ({ onFacilityAdded }) => {
   const navigate = useNavigate();
@@ -18,8 +18,10 @@ const AddFacilityLayer = ({ onFacilityAdded }) => {
     if (!value.trim()) {
       return `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
     }
-    if (field === 'capacity' && value && (!/^\d+$/.test(value) || parseInt(value) <= 0)) {
-      return 'Capacity must be a positive number';
+    if (field === 'capacity' && value) {
+      if (isNaN(value) || parseFloat(value) <= 0) {
+        return 'Capacity must be a positive number';
+      }
     }
     return '';
   };
@@ -50,37 +52,46 @@ const AddFacilityLayer = ({ onFacilityAdded }) => {
     try {
       setIsLoading(true);
       setErrors({});
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       if (!token) {
-        setErrors({ submit: "No authentication token found. Please log in." });
-        setIsLoading(false);
-        return;
+        throw new Error('No authentication token found. Please log in.');
       }
 
-      const response = await axios.post(API_URL, {
+      const payload = {
         name: formData.name,
         location: formData.location,
-        capacity: parseInt(formData.capacity),
-      }, {
+        capacity: parseFloat(formData.capacity),
+      };
+
+      console.log('Submitting payload:', payload);
+
+      const response = await axios.post(API_URL, payload, {
         headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
-      if (onFacilityAdded && response.data.data) {
+      if (response.data.status?.code === 0 && onFacilityAdded && response.data.data) {
         const newFacility = {
+          id: response.data.data.id,
           name: formData.name,
           location: formData.location,
-          capacity: parseInt(formData.capacity),
+          capacity: parseFloat(formData.capacity),
         };
         onFacilityAdded(newFacility);
       }
 
-      navigate('/storage');
+      navigate('/storage-facility');
+
     } catch (error) {
-      console.error("Error adding facility:", error.response?.data || error.message);
-      setErrors({ submit: error.response?.data?.message || "Failed to add facility. Please try again." });
+      console.error('Error adding facility:', error.response?.data || error.message);
+      setErrors({
+        submit: error.response?.data?.message || 
+                error.message || 
+                'Failed to add facility. Please check your connection and try again.',
+      });
+      navigate('/storage');
     } finally {
       setIsLoading(false);
     }
@@ -90,8 +101,10 @@ const AddFacilityLayer = ({ onFacilityAdded }) => {
     <div className="card h-100 p-0 radius-12">
       <div className="card-body">
         {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
+
         <form onSubmit={handleSubmit}>
           <div className="row gx-3">
+            {/* First Column */}
             <div className="col-md-6 mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">
                 Name <span className="text-danger">*</span>
@@ -106,6 +119,7 @@ const AddFacilityLayer = ({ onFacilityAdded }) => {
               {errors.name && <div className="invalid-feedback">{errors.name}</div>}
             </div>
 
+            {/* Second Column */}
             <div className="col-md-6 mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">
                 Location <span className="text-danger">*</span>
@@ -119,9 +133,8 @@ const AddFacilityLayer = ({ onFacilityAdded }) => {
               />
               {errors.location && <div className="invalid-feedback">{errors.location}</div>}
             </div>
-          </div>
 
-          <div className="row gx-3">
+            {/* Third Column */}
             <div className="col-md-6 mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">
                 Capacity (Litres) <span className="text-danger">*</span>
@@ -138,17 +151,17 @@ const AddFacilityLayer = ({ onFacilityAdded }) => {
             </div>
           </div>
 
-          <div className="text-muted small mt-3">
+          <div className="text-muted small mt-4 mb-3">
             Fields marked with <span className="text-danger">*</span> are required.
           </div>
 
-          <div className="d-flex justify-content-end gap-2">
+          <div className="mt-4 d-flex justify-content-end gap-2">
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn btn-primary px-12"
               disabled={isLoading}
             >
-              {isLoading ? "Saving..." : "Save"}
+              {isLoading ? 'Saving...' : 'Save'}
             </button>
           </div>
         </form>

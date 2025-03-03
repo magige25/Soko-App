@@ -201,7 +201,7 @@ const SupplyResidenceLayer = () => {
             {error && <p className="text-danger">{error}</p>}
             {!loading && !error && (
               <>
-                <div className="table-responsive">
+                <div className="table-responsive" style={{ overflow: "visible" }}>
                   <table className="table table-borderless text-start small-text">
                     <thead className="table-light">
                       <tr>
@@ -227,7 +227,9 @@ const SupplyResidenceLayer = () => {
                           <td>{residence.createdBy?.name || "Unknown"}</td>
                           <td>
                             <div className="dropdown">
-                              <button className="btn btn-light dropdown-toggle btn-sm" data-bs-toggle="dropdown">
+                              <button className="btn btn-outline-secondary btn-sm dropdown-toggle btn-sm" 
+                              type="button"
+                              data-bs-toggle="dropdown">
                                 Actions
                               </button>
                               <ul className="dropdown-menu">

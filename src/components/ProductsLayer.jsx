@@ -181,7 +181,11 @@ const ProductsLayer = () => {
                           <td>{product.sellingPrice}</td>
                           <td>
                             <div className="dropdown">
-                              <button className="btn btn-light dropdown-toggle btn-sm" data-bs-toggle="dropdown">
+                              <button 
+                                className="btn btn-outline-secondary btn-sm dropdown-toggle" 
+                                type="button"
+                                data-bs-toggle="dropdown"
+                              >
                                 Actions
                               </button>
                               <ul className="dropdown-menu">

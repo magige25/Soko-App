@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+
 const API_URL = "https://api.bizchain.co.ke/v1/user";
 const ROL_URL = "https://api.bizchain.co.ke/v1/roles";
 
@@ -16,7 +17,7 @@ const UsersDetailsLayer = () => {
 
   useEffect(() => {
     if (!userId) {
-      navigate("/users")
+      navigate("/users");
       return;
     }
 
@@ -87,13 +88,27 @@ const UsersDetailsLayer = () => {
           {error && <div className="alert alert-danger">{error}</div>}
           {userToView ? (
             <div>
-              <p className="mb-2"><strong>First Name:</strong> {userToView.firstName || 'N/A'}</p>
-              <p className="mb-2"><strong>Last Name:</strong> {userToView.lastName || 'N/A'}</p>
-              <p className="mb-2"><strong>Email:</strong> {userToView.email || 'N/A'}</p>
-              <p className="mb-2"><strong>Phone Number:</strong> {userToView.phoneNo || 'N/A'}</p>
-              <p className="mb-2"><strong>Role:</strong> {userToView.role?.name || 'N/A'}</p>
-              <p className="mb-2"><strong>Status:</strong> {userToView.status || 'N/A'}</p>
-              <p className="mb-2"><strong>Country Code:</strong> {userToView.countryCode || 'N/A'}</p>
+              <p className="mb-2">
+                <strong>First Name:</strong> {userToView.firstName || 'N/A'}
+              </p>
+              <p className="mb-2">
+                <strong>Last Name:</strong> {userToView.lastName || 'N/A'}
+              </p>
+              <p className="mb-2">
+                <strong>Email:</strong> {userToView.email || 'N/A'}
+              </p>
+              <p className="mb-2">
+                <strong>Phone Number:</strong> {userToView.phoneNo || 'N/A'}
+              </p>
+              <p className="mb-2">
+                <strong>Role:</strong> {userToView.role?.name || 'N/A'}
+              </p>
+              <p className="mb-2">
+                <strong>Status:</strong> {userToView.status || 'N/A'}
+              </p>
+              <p className="mb-2">
+                <strong>Country Code:</strong> {userToView.countryCode || 'N/A'}
+              </p>
 
               <div className="mt-4">
                 <h6 className="mb-3">Module Permissions</h6>
@@ -116,7 +131,9 @@ const UsersDetailsLayer = () => {
 
                         return (
                           <tr key={module.moduleId}>
-                            <td>{module.moduleName || modules.find(m => m.moduleId === module.moduleId)?.name || 'Unknown Module'}</td>
+                            <td>
+                              {module.moduleName || modules.find(m => m.moduleId === module.moduleId)?.name || 'Unknown Module'}
+                            </td>
                             <td>
                               {permissionsList.length > 0 ? (
                                 permissionsList.map((perm, index) => (
@@ -139,7 +156,9 @@ const UsersDetailsLayer = () => {
               </div>
 
               <div className="d-flex justify-content-end gap-2 mt-3">
-                <Link to="/users" className="btn btn-primary">Back</Link>
+                <Link to="/users" className="btn btn-primary">
+                  Back
+                </Link>
               </div>
             </div>
           ) : (
