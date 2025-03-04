@@ -21,12 +21,13 @@ const StorageFacilityLayer = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(API_URL, {
-        headers: { "Authorization" : `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
         params: {
           page: page - 1,
           size: itemsPerPage,
-          searchValue: searchQuery
-        }
+          searchValue: searchQuery,
+          _t: new Date().getTime(),
+        },
       });
 
       console.log('Full API Response:', response.data);
@@ -85,13 +86,30 @@ const StorageFacilityLayer = () => {
     setCurrentPage(pageNumber);
   };
 
+  const formatDate = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.toLocaleString("en-GB", { month: "short" });
+    const year = date.getFullYear();
+    const suffix =
+      day % 10 === 1 && day !== 11
+        ? "st"
+        : day % 10 === 2 && day !== 12
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+        ? "rd"
+        : "th";
+    return `${day}${suffix} ${month} ${year}`;
+  };
+
   return (
     <div className="page-wrapper">
       <div className="row">
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <Link
-              to="/storage/add-facility"
+              to="/storage-facility/add-facility"
               className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
             >
               <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
@@ -122,22 +140,11 @@ const StorageFacilityLayer = () => {
             </div>
             <div className="table-responsive" style={{ overflow: "visible" }}>
               <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
-                <thead className="table-light text-start small-text" style={{ fontSize: "15px" }}>
-                  <tr>
-                    <th className="text-center py-3 px-6" style={{ width: "50px" }}>#</th>
-                    <th className="text-start py-3 px-4">Name</th>
-                    <th className="text-start py-3 px-4">Location</th>
-                    <th className="text-start py-3 px-4">Capacity (L)</th>
-                    <th className="text-start py-3 px-4">Current Volume (L)</th>
-                    <th className="text-start py-3 px-4">Last Refilled</th>
-                    <th className="text-start py-3 px-4">Last Drawn</th>
-                    <th className="text-start py-3 px-4">Action</th>
-                  </tr>
-                </thead>
+                <thead className="table-light text-start small-text" style={{ fontSize: "15px" }}><tr><th className="text-center py-3 px-6" style={{ width: "50px" }}>#</th><th className="text-start py-3 px-4">Name</th><th className="text-start py-3 px-4">Location</th><th className="text-start py-3 px-4">Capacity (L)</th><th className="text-start py-3 px-4">Stock Volume (L)</th><th className="text-start py-3 px-4">Overflow (L)</th><th className="text-start py-3 px-4">Last Refilled</th><th className="text-start py-3 px-4">Last Drawn</th><th className="text-start py-3 px-4">Action</th></tr></thead>
                 <tbody style={{ fontSize: "14px" }}>
                   {isLoading ? (
                     <tr>
-                      <td colSpan="8" className="text-center py-3">
+                      <td colSpan="9" className="text-center py-3">
                         <div>
                           <span className="visually-hidden">Loading...</span>
                         </div>
@@ -154,10 +161,17 @@ const StorageFacilityLayer = () => {
                         <td className="text-start small-text py-3 px-4">{facility.capacity.toLocaleString()}</td>
                         <td className="text-start small-text py-3 px-4">{facility.stockVolume?.toLocaleString() || '-'}</td>
                         <td className="text-start small-text py-3 px-4">
-                          {facility.dateLastRefilled ? new Date(facility.dateLastRefilled).toLocaleDateString() : '-'}
+                          {facility.overflow !== undefined && facility.overflow !== null
+                            ? facility.overflow === 0
+                              ? '0'
+                              : facility.overflow.toLocaleString()
+                            : '-'}
                         </td>
                         <td className="text-start small-text py-3 px-4">
-                          {facility.dateLastDrawn ? new Date(facility.dateLastDrawn).toLocaleDateString() : '-'}
+                          {formatDate(facility.dateLastRefilled) || '-'}
+                        </td>
+                        <td className="text-start small-text py-3 px-4">
+                          {formatDate(facility.dateLastDrawn) || '-'}
                         </td>
                         <td className="text-start small-text py-3 px-4">
                           <div className="dropdown">
@@ -172,7 +186,7 @@ const StorageFacilityLayer = () => {
                               <li>
                                 <Link
                                   className="dropdown-item"
-                                  to="/storage/details"
+                                  to="/storage-facility/facility-details"
                                   state={{ facilityId: facility.id }}
                                 >
                                   Details
@@ -181,7 +195,7 @@ const StorageFacilityLayer = () => {
                               <li>
                                 <Link
                                   className="dropdown-item"
-                                  to="/storage/edit-facility"
+                                  to="/storage-facility/edit-facility"
                                   state={{ facilityId: facility.id }}
                                 >
                                   Edit
@@ -204,7 +218,7 @@ const StorageFacilityLayer = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="8" className="text-center py-3">
+                      <td colSpan="9" className="text-center py-3">
                         No facilities found
                       </td>
                     </tr>

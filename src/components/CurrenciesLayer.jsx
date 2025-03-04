@@ -1,5 +1,5 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
@@ -17,14 +17,15 @@ const CurrenciesLayer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const addButtonRef = useRef(null);
 
   useEffect(() => {
     fetchCurrencies();
 
     const addModal = document.getElementById("addCurrencyModal");
     const editModal = document.getElementById("editCurrencyModal");
-    const resetAddForm = () => !isLoading && setNewCurrency({ code: "", name: "", sign: "" });
-    const resetEditForm = () => !isLoading && setEditCurrency({ code: "", name: "", sign: "" });
+    const resetAddForm = () => setNewCurrency({ code: "", name: "", sign: "" });
+    const resetEditForm = () => setEditCurrency({ code: "", name: "", sign: "" });
 
     addModal?.addEventListener("hidden.bs.modal", resetAddForm);
     editModal?.addEventListener("hidden.bs.modal", resetEditForm);
@@ -33,7 +34,7 @@ const CurrenciesLayer = () => {
       addModal?.removeEventListener("hidden.bs.modal", resetAddForm);
       editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
     };
-  }, [isLoading]);
+  }, []);
 
   const fetchCurrencies = async () => {
     try {
@@ -79,6 +80,17 @@ const CurrenciesLayer = () => {
       });
       console.log("API Response (Add Currency):", response.data);
       await fetchCurrencies();
+
+      setNewCurrency({ code: "", name: "", sign: "" });
+
+      if (addButtonRef.current) {
+        addButtonRef.current.focus();
+      }
+
+      const closeButton = document.querySelector("#addCurrencyModal .btn-close");
+      if (closeButton) {
+        closeButton.click();
+      }
     } catch (error) {
       console.error("Error adding currency:", error);
       setError(error.response?.data?.message || "Failed to add currency.");
@@ -105,6 +117,7 @@ const CurrenciesLayer = () => {
       const response = await axios.put(`${API_URL}/${editCurrency.code}`, editCurrency, {
         headers: { "Authorization": `Bearer ${token}` },
       });
+
       console.log("API Response (Edit Currency):", response.data);
       await fetchCurrencies();
     } catch (error) {
@@ -174,6 +187,7 @@ const CurrenciesLayer = () => {
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <button
+              ref={addButtonRef} 
               type="button"
               className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
               data-bs-toggle="modal"
@@ -250,7 +264,7 @@ const CurrenciesLayer = () => {
                                   data-bs-target="#viewCurrencyModal"
                                   onClick={() => handleViewClick(currency)}
                                 >
-                                  View
+                                  Details
                                 </Link>
                               </li>
                               <li>
@@ -369,12 +383,7 @@ const CurrenciesLayer = () => {
                     Fields marked with <span className="text-danger">*</span> are required.
                   </div>
                   <div className="d-flex justify-content-end gap-2">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={isLoading}
-                      data-bs-dismiss={!isLoading && !error ? "modal" : undefined}
-                    >
+                    <button type="submit" className="btn btn-primary" disabled={isLoading}>
                       {isLoading ? "Saving..." : "Save"}
                     </button>
                   </div>
@@ -429,27 +438,27 @@ const CurrenciesLayer = () => {
           </div>
         </div>
 
-        {/* View Currency Modal */}
+        {/* Details Currency Modal */}
         <div className="modal fade" id="viewCurrencyModal" tabIndex={-1} aria-hidden="true">
           <div className="modal-dialog modal-md modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Currency Details
+                  Details
                   <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </h6>
                 {currencyToView && (
                   <div className="mt-3">
-                    <p className="mb-2">
+                    <p className="mb-3">
                       <strong>Code:</strong> {currencyToView.code}
                     </p>
-                    <p className="mb-2">
+                    <p className="mb-3">
                       <strong>Name:</strong> {currencyToView.name}
                     </p>
-                    <p className="mb-2">
+                    <p className="mb-3">
                       <strong>Sign:</strong> {currencyToView.sign}
                     </p>
-                    <p className="mb-2">
+                    <p className="mb-3">
                       <strong>Date Created:</strong> {currencyToView.dateCreated ? formatDate(currencyToView.dateCreated) : "N/A"}
                     </p>
                   </div>

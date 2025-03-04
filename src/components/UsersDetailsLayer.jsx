@@ -84,33 +84,33 @@ const UsersDetailsLayer = () => {
     <div className="page-wrapper">
       <div className="card shadow-sm mt-3" style={{ width: "100%" }}>
         <div className="card-body">
-          <h6 className="mb-4">User Details</h6>
+          <h6 className="mb-4">Details</h6>
           {error && <div className="alert alert-danger">{error}</div>}
           {userToView ? (
             <div>
-              <p className="mb-2">
+              <p className="mb-3">
                 <strong>First Name:</strong> {userToView.firstName || 'N/A'}
               </p>
-              <p className="mb-2">
+              <p className="mb-3">
                 <strong>Last Name:</strong> {userToView.lastName || 'N/A'}
               </p>
-              <p className="mb-2">
+              <p className="mb-3">
                 <strong>Email:</strong> {userToView.email || 'N/A'}
               </p>
-              <p className="mb-2">
+              <p className="mb-3">
                 <strong>Phone Number:</strong> {userToView.phoneNo || 'N/A'}
               </p>
-              <p className="mb-2">
+              <p className="mb-3">
                 <strong>Role:</strong> {userToView.role?.name || 'N/A'}
               </p>
-              <p className="mb-2">
+              <p className="mb-3">
                 <strong>Status:</strong> {userToView.status || 'N/A'}
               </p>
-              <p className="mb-2">
+              <p className="mb-3">
                 <strong>Country Code:</strong> {userToView.countryCode || 'N/A'}
               </p>
 
-              <div className="mt-4">
+              <div className="mt-5">
                 <h6 className="mb-3">Module Permissions</h6>
                 {userToView.userModelModulePermissions && userToView.userModelModulePermissions.length > 0 ? (
                   <table className="table table-bordered">

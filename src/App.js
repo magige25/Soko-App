@@ -128,6 +128,7 @@ import EditDeliveryPage from "./pages/EditDeliveryPage";
 import StorageFacilityPage from "./pages/StorageFacilityPage";
 import AddStorageFacilityPage from "./pages/AddStorageFacilityPage";
 import EditStorageFacilityPage from "./pages/EditStorageFacilityPage";
+import StorageFacilityDetailsPage from "./pages/StorageFacilityDetailsPage";
 
 function App() {
   return (
@@ -180,8 +181,9 @@ function App() {
             <Route path="/users/details" element={<UsersDetailsPage />} />
             <Route path="/users/edit-user" element={<EditUsersPage />} />
             <Route path="/storage-facility" element={<StorageFacilityPage />} />
-            <Route path="/storage/add-facility" element={<AddStorageFacilityPage />} />
-            <Route path="/storage/edit-facility" element={<EditStorageFacilityPage />} />
+            <Route path="/storage-facility/add-facility" element={<AddStorageFacilityPage />} />
+            <Route path="/storage-facility/edit-facility" element={<EditStorageFacilityPage />} />
+            <Route path="/storage-facility/facility-details" element={<StorageFacilityDetailsPage />} />
             <Route path="/roles-list" element={<RolesListPage />} />
             <Route path="/create-role" element={<CreateRolePage />} />
             <Route path="/suppliers" element={<SuppliersPage />} />

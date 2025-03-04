@@ -15,7 +15,7 @@ const EditUsersLayer = () => {
     lastName: '',
     email: '',
     phoneNumber: '',
-    roleId: '',
+    roleId: '', // Keep as string for consistency
     countryCode: '',
     userPermissions: [],
   });
@@ -44,12 +44,12 @@ const EditUsersLayer = () => {
         }));
 
         setFormData({
-          id: userData.id || '',
+          id: userData.id ? String(userData.id) : '', // Ensure id is a string
           firstName: userData.firstName || '',
           lastName: userData.lastName || '',
           email: userData.email || '',
           phoneNumber: userData.phoneNo || '',
-          roleId: userData.role?.id || '',
+          roleId: userData.role?.id ? String(userData.role.id) : '', // Ensure roleId is a string
           countryCode: userData.countryCode || 'KE',
           userPermissions,
         });
@@ -67,7 +67,7 @@ const EditUsersLayer = () => {
         });
         const rolesData = Array.isArray(response.data) ? response.data : response.data.data || [];
         const roleList = rolesData.map(role => ({
-          roleId: role.roleId,
+          roleId: String(role.roleId), // Ensure roleId is a string
           roleName: role.roleName,
         }));
         setRoles(roleList);
@@ -75,7 +75,7 @@ const EditUsersLayer = () => {
         const allModules = [];
         const permissionsMap = {};
         rolesData.forEach((role) => {
-          permissionsMap[role.roleId] = {};
+          permissionsMap[String(role.roleId)] = {}; // Use string keys for consistency
           role.roleModulePermissions.forEach((module) => {
             if (!allModules.some((m) => m.moduleId === module.moduleId)) {
               allModules.push({
@@ -83,7 +83,7 @@ const EditUsersLayer = () => {
                 name: module.name,
               });
             }
-            permissionsMap[role.roleId][module.moduleId] = module.rolePermissions.map((p) => ({
+            permissionsMap[String(role.roleId)][module.moduleId] = module.rolePermissions.map((p) => ({
               code: p.code,
               name: p.name || p.code,
               assigned: p.assigned,
@@ -107,7 +107,15 @@ const EditUsersLayer = () => {
   }, [userId, navigate]);
 
   const validateField = (field, value) => {
-    if (!value.trim()) {
+    if (field === 'roleId') {
+      if (!value) {
+        return 'Role is required';
+      }
+      return '';
+    }
+
+    const stringValue = String(value || '').trim();
+    if (!stringValue) {
       switch (field) {
         case 'firstName':
           return 'First Name is required';
@@ -117,16 +125,14 @@ const EditUsersLayer = () => {
           return 'Phone Number is required';
         case 'email':
           return 'Email is required';
-        case 'roleId':
-          return 'Role is required';
         default:
           return `${field.charAt(0).toUpperCase() + field.slice(1)} is required`;
       }
     }
-    if (field === 'email' && value && !/\S+@\S+\.\S+/.test(value)) {
+    if (field === 'email' && stringValue && !/\S+@\S+\.\S+/.test(stringValue)) {
       return 'Please enter a valid email address';
     }
-    if (field === 'phoneNumber' && value && !/^\+?\d{9,}$/.test(value)) {
+    if (field === 'phoneNumber' && stringValue && !/^\+?\d{9,}$/.test(stringValue)) {
       return 'Please enter a valid phone number';
     }
     return '';
@@ -223,7 +229,7 @@ const EditUsersLayer = () => {
         lastName: formData.lastName,
         email: formData.email,
         phoneNumber: formData.phoneNumber,
-        roleId: parseInt(formData.roleId),
+        roleId: parseInt(formData.roleId), // Parse to number for API
         countryCode: formData.countryCode,
         userPermissions: formData.userPermissions,
       };

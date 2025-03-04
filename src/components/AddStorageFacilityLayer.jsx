@@ -91,7 +91,7 @@ const AddFacilityLayer = ({ onFacilityAdded }) => {
                 error.message || 
                 'Failed to add facility. Please check your connection and try again.',
       });
-      navigate('/storage');
+      navigate('/storage-facility');
     } finally {
       setIsLoading(false);
     }

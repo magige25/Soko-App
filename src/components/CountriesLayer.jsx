@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
-import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 
-const API_URL = "https://biz-system-production.up.railway.app/v1/countries";
-const CURRENCY_API_URL = "https://biz-system-production.up.railway.app/v1/currencies";
+const API_URL = "https://api.bizchain.co.ke/v1/countries";
+const CURRENCY_API_URL = "https://api.bizchain.co.ke/v1/currencies";
 
 const CountriesLayer = () => {
   const [countries, setCountries] = useState([]);
@@ -14,61 +13,47 @@ const CountriesLayer = () => {
   const [editCountry, setEditCountry] = useState({ code: "", name: "", currencyCode: "" });
   const [newCountry, setNewCountry] = useState({ code: "", name: "", currencyCode: "" });
   const [countryToDelete, setCountryToDelete] = useState(null);
+  const [countryToView, setCountryToView] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [currencies, setCurrencies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  const addModalRef = useRef(null);
-  const editModalRef = useRef(null);
+  const addButtonRef = useRef(null);
 
   useEffect(() => {
-    console.log('Component mounted, fetching countries and currencies...');
     fetchCountries();
     fetchCurrencies();
 
-    const editModal = document.getElementById("editCountryModal");
-    const resetEditForm = () => {
-      if (!isLoading) {
-        console.log('Resetting edit form');
-        setEditCountry({ code: "", name: "", currencyCode: "" });
-      }
-    };
-
     const addModal = document.getElementById("addCountryModal");
-    const resetAddForm = () => {
-      if (!isLoading) {
-        console.log('Resetting add form');
-        setNewCountry({ code: "", name: "", currencyCode: "" });
-      }
-    };
+    const editModal = document.getElementById("editCountryModal");
+    const resetAddForm = () => setNewCountry({ code: "", name: "", currencyCode: "" });
+    const resetEditForm = () => setEditCountry({ code: "", name: "", currencyCode: "" });
 
-    editModal?.addEventListener("hidden.bs.modal", resetEditForm);
     addModal?.addEventListener("hidden.bs.modal", resetAddForm);
+    editModal?.addEventListener("hidden.bs.modal", resetEditForm);
 
     return () => {
-      editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
       addModal?.removeEventListener("hidden.bs.modal", resetAddForm);
+      editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
     };
-  }, [isLoading]);
+  }, []);
 
   const fetchCountries = async () => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem("token");
-      console.log('Fetching countries with token:', token);
+      if (!token) throw new Error("No authentication token found");
       const response = await axios.get(API_URL, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { "Authorization": `Bearer ${token}` },
       });
-      console.log('Fetch Countries Response:', response.data.data);
       const data = response.data.data || [];
       setCountries(data);
       setFilteredCountries(data);
       setError(null);
     } catch (error) {
       console.error("Error fetching countries:", error);
-      setError("Failed to fetch countries. Please try again.");
+      setError(error.message || "Failed to fetch countries. Please try again.");
       setCountries([]);
       setFilteredCountries([]);
     } finally {
@@ -79,121 +64,121 @@ const CountriesLayer = () => {
   const fetchCurrencies = async () => {
     try {
       const token = localStorage.getItem("token");
-      console.log('Fetching currencies with token:', token);
+      if (!token) throw new Error("No authentication token found");
       const response = await axios.get(CURRENCY_API_URL, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Fetched currencies:", response.data.data);
       setCurrencies(response.data.data || []);
     } catch (error) {
       console.error("Error fetching currencies:", error);
-      setError("Failed to fetch currencies.");
+      setError(error.message || "Failed to fetch currencies.");
       setCurrencies([]);
     }
   };
 
-  const handleEditClick = (country) => {
-    console.log('Edit clicked for country:', country);
-    setEditCountry(country);
-  };
-
-  const handleEditSubmit = async (e) => {
+  const handleAddCountry = async (e) => {
     e.preventDefault();
-    console.log('Submitting edit form:', editCountry);
+    if (!newCountry.code.trim() || !newCountry.name.trim() || !newCountry.currencyCode.trim()) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
       const token = localStorage.getItem("token");
-      const response = await axios.put(`${API_URL}/${editCountry.code}`, editCountry, {
+      if (!token) throw new Error("No authentication token found");
+
+      await axios.post(API_URL, newCountry, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          "Authorization": `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-      console.log('Update Response:', response.data);
-      if (response.status === 200) {
-        const updatedCountries = countries.map((r) =>
-          r.code === editCountry.code ? { ...r, ...editCountry } : r
-        );
-        setCountries(updatedCountries);
-        setFilteredCountries(updatedCountries);
-        alert("Country updated successfully!");
+      await fetchCountries();
+      
+      setNewCountry({ code: "", name: "", currencyCode: "" });
+
+      if (addButtonRef.current) {
+        addButtonRef.current.focus();
+      }
+
+      const closeButton = document.querySelector("#addCountryModal .btn-close");
+      if (closeButton) {
+        closeButton.click();
       }
     } catch (error) {
+      console.error("Error adding country:", error);
+      // Enhanced error logging with server response if available
+      const errorMessage = error.response?.data?.message || error.message || "Failed to add country. Server error occurred.";
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleEditClick = (country) => {
+    setEditCountry({ ...country, currencyCode: country.currency?.code || "" });
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+    if (!editCountry.code.trim() || !editCountry.name.trim() || !editCountry.currencyCode.trim()) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No authentication token found");
+
+      await axios.put(`${API_URL}/${editCountry.code}`, editCountry, {
+        headers: {
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+      await fetchCountries();
+    } catch (error) {
       console.error("Error updating country:", error);
-      setError("Failed to update country.");
-      alert("Failed to update country.");
+      const errorMessage = error.response?.data?.message || error.message || "Failed to update country.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDeleteClick = (country) => {
-    console.log('Delete clicked for country:', country);
     setCountryToDelete(country);
   };
 
   const handleDeleteConfirm = async () => {
     if (!countryToDelete) return;
-    console.log('Confirming delete for country:', countryToDelete);
     try {
       setIsLoading(true);
       setError(null);
       const token = localStorage.getItem("token");
-      const response = await axios.delete(`${API_URL}/${countryToDelete.code}`, {
+      if (!token) throw new Error("No authentication token found");
+
+      await axios.delete(`${API_URL}/${countryToDelete.code}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (response.status === 200) {
-        const updatedCountries = countries.filter((r) => r.code !== countryToDelete.code);
-        setCountries(updatedCountries);
-        setFilteredCountries(updatedCountries);
-        setCountryToDelete(null);
-        alert("Country deleted successfully!");
-      }
+      setCountries(countries.filter((c) => c.code !== countryToDelete.code));
+      setFilteredCountries(filteredCountries.filter((c) => c.code !== countryToDelete.code));
+      setCountryToDelete(null);
     } catch (error) {
       console.error("Error deleting country:", error);
-      setError("Failed to delete country.");
-      alert("Failed to delete country.");
+      const errorMessage = error.response?.data?.message || error.message || "Failed to delete country.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleAddCountry = async (e) => {
-    e.preventDefault();
-    if (!newCountry.code || !newCountry.name || !newCountry.currencyCode) {
-      setError("Please fill in all fields before saving.");
-      alert("Please fill in all fields before saving.");
-      return;
-    }
-    const newCountryData = {
-      code: newCountry.code,
-      name: newCountry.name,
-      currencyCode: newCountry.currencyCode,
-    };
-    console.log('Submitting add form:', newCountryData);
-    try {
-      setIsLoading(true);
-      setError(null);
-      const token = localStorage.getItem("token");
-      const response = await axios.post(API_URL, newCountryData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      console.log('Add Response:', response.data);
-      if (response.status === 201) {
-        await fetchCountries(); // Refresh the list
-        alert("Country added successfully!");
-      }
-    } catch (error) {
-      console.error("Error adding country:", error.response ? error.response.data : error.message);
-      setError(`Failed to add country: ${error.response ? error.response.data.message : error.message}`);
-      alert(`Failed to add country: ${error.response ? error.response.data.message : error.message}`);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleViewClick = (country) => {
+    setCountryToView(country);
   };
 
   const handleSearch = (e) => {
@@ -243,6 +228,7 @@ const CountriesLayer = () => {
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <button
+              ref={addButtonRef}
               type="button"
               className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
               data-bs-toggle="modal"
@@ -309,6 +295,17 @@ const CountriesLayer = () => {
                               Actions
                             </button>
                             <ul className="dropdown-menu">
+                              <li>
+                                <Link
+                                  className="dropdown-item"
+                                  to="#"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#viewCountryModal"
+                                  onClick={() => handleViewClick(country)}
+                                >
+                                  Details
+                                </Link>
+                              </li>
                               <li>
                                 <Link
                                   className="dropdown-item"
@@ -394,188 +391,188 @@ const CountriesLayer = () => {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Add Country Modal */}
-      <div className="modal fade" id="addCountryModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content" ref={addModalRef}>
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Add Country
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
-              <form onSubmit={handleAddCountry}>
-                <div className="row mb-3">
-                  <div className="col-md-6 mb-3">
+        {/* Add Country Modal */}
+        <div className="modal fade" id="addCountryModal" tabIndex={-1} aria-hidden="true">
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-body">
+                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                  Add Country
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </h6>
+                {error && <div className="alert alert-danger">{error}</div>}
+                <form onSubmit={handleAddCountry}>
+                  {["code", "name"].map((field) => (
+                    <div className="mb-3" key={field}>
+                      <label className="form-label">
+                        {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={`Enter Country ${field.charAt(0).toUpperCase() + field.slice(1)}`}
+                        value={newCountry[field]}
+                        onChange={(e) => setNewCountry({ ...newCountry, [field]: e.target.value })}
+                        required
+                      />
+                    </div>
+                  ))}
+                  <div className="mb-3">
                     <label className="form-label">
-                      Code <span className="text-danger">*</span>
+                      Currency <span className="text-danger">*</span>
                     </label>
-                    <input
-                      type="text"
+                    <select
                       className="form-control"
-                      placeholder="Enter Country Code"
-                      value={newCountry.code}
-                      onChange={(e) => setNewCountry({ ...newCountry, code: e.target.value })}
+                      value={newCountry.currencyCode}
+                      onChange={(e) => setNewCountry({ ...newCountry, currencyCode: e.target.value })}
                       required
-                    />
-                  </div>
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">
-                      Name <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Country Name"
-                      value={newCountry.name}
-                      onChange={(e) => setNewCountry({ ...newCountry, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Currency <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    className="form-control"
-                    value={newCountry.currencyCode}
-                    onChange={(e) => setNewCountry({ ...newCountry, currencyCode: e.target.value })}
-                    required
-                  >
-                    <option value="">Select Currency</option>
-                    {currencies.length > 0 ? (
-                      currencies.map((currency) => (
+                    >
+                      <option value="">Select Currency</option>
+                      {currencies.map((currency) => (
                         <option key={currency.code} value={currency.code}>
                           {currency.name}
                         </option>
-                      ))
-                    ) : (
-                      <option disabled>Loading...</option>
-                    )}
-                  </select>
-                </div>
-                <div className="text-muted small mt-3">
-                  Fields marked with <span className="text-danger">*</span> are required.
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={isLoading}
-                    data-bs-dismiss={!isLoading && !error ? "modal" : undefined}
-                  >
-                    {isLoading ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit Country Modal */}
-      <div className="modal fade" id="editCountryModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-lg modal-dialog-centered">
-          <div className="modal-content" ref={editModalRef}>
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Edit Country
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
-              <form onSubmit={handleEditSubmit}>
-                <div className="row mb-3">
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">
-                      Code <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Country Code"
-                      value={editCountry.code}
-                      onChange={(e) => setEditCountry({ ...editCountry, code: e.target.value })}
-                      required
-                    />
+                      ))}
+                    </select>
                   </div>
-                  <div className="col-md-6 mb-3">
-                    <label className="form-label">
-                      Name <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      className="form-control"
-                      placeholder="Enter Country Name"
-                      value={editCountry.name}
-                      onChange={(e) => setEditCountry({ ...editCountry, name: e.target.value })}
-                      required
-                    />
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
                   </div>
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Currency <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    className="form-control"
-                    value={editCountry.currencyCode}
-                    onChange={(e) => setEditCountry({ ...editCountry, currencyCode: e.target.value })}
-                    required
-                  >
-                    <option value="">Select Currency</option>
-                    {currencies.map((currency) => (
-                      <option key={currency.code} value={currency.code}>
-                        {currency.code} - {currency.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="text-muted small mt-3">
-                  Fields marked with <span className="text-danger">*</span> are required.
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button
-                    type="submit"
-                    className="btn btn-primary"
-                    disabled={isLoading}
-                    data-bs-dismiss={!isLoading && !error ? "modal" : undefined}
-                  >
-                    {isLoading ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Delete Confirmation Modal */}
-      <div className="modal fade" id="deleteCountryModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body pt-3 ps-18 pe-18">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="modal-title fs-6">Delete Country</h6>
-                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                  <div className="d-flex justify-content-end gap-2">
+                    <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                      {isLoading ? "Saving..." : "Save"}
+                    </button>
+                  </div>
+                </form>
               </div>
-              <p className="pb-3 mb-0">
-                Are you sure you want to delete the <strong>{countryToDelete?.name}</strong> country permanently? This action cannot be undone.
-              </p>
             </div>
-            <div className="d-flex justify-content-end gap-2 px-12 pb-3">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-dismiss="modal"
-                onClick={handleDeleteConfirm}
-                disabled={isLoading}
-              >
-                {isLoading ? "Deleting..." : "Delete"}
-              </button>
+          </div>
+        </div>
+
+        {/* Edit Country Modal */}
+        <div className="modal fade" id="editCountryModal" tabIndex={-1} aria-hidden="true">
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-body">
+                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                  Edit Country
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </h6>
+                {error && <div className="alert alert-danger">{error}</div>}
+                <form onSubmit={handleEditSubmit}>
+                  {["code", "name"].map((field) => (
+                    <div className="mb-3" key={field}>
+                      <label className="form-label">
+                        {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder={`Enter Country ${field.charAt(0).toUpperCase() + field.slice(1)}`}
+                        value={editCountry[field]}
+                        onChange={(e) => setEditCountry({ ...editCountry, [field]: e.target.value })}
+                        required
+                      />
+                    </div>
+                  ))}
+                  <div className="mb-3">
+                    <label className="form-label">
+                      Currency <span className="text-danger">*</span>
+                    </label>
+                    <select
+                      className="form-control"
+                      value={editCountry.currencyCode}
+                      onChange={(e) => setEditCountry({ ...editCountry, currencyCode: e.target.value })}
+                      required
+                    >
+                      <option value="">Select Currency</option>
+                      {currencies.map((currency) => (
+                        <option key={currency.code} value={currency.code}>
+                          {currency.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="text-muted small mt-3">
+                    Fields marked with <span className="text-danger">*</span> are required.
+                  </div>
+                  <div className="d-flex justify-content-end gap-2">
+                    <button
+                      type="submit"
+                      className="btn btn-primary"
+                      disabled={isLoading}
+                      data-bs-dismiss={!isLoading && !error ? "modal" : undefined}
+                    >
+                      {isLoading ? "Saving..." : "Save"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* View Country Modal */}
+        <div className="modal fade" id="viewCountryModal" tabIndex={-1} aria-hidden="true">
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-body">
+                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                  Details
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </h6>
+                {countryToView && (
+                  <div className="mt-3">
+                    <p className="mb-3">
+                      <strong>Code:</strong> {countryToView.code}
+                    </p>
+                    <p className="mb-3">
+                      <strong>Name:</strong> {countryToView.name}
+                    </p>
+                    <p className="mb-3">
+                      <strong>Currency:</strong> {countryToView.currency?.name || 'N/A'}
+                    </p>
+                    <p className="mb-3">
+                      <strong>Date Created:</strong> {countryToView.dateCreated ? formatDate(countryToView.dateCreated) : "N/A"}
+                    </p>
+                  </div>
+                )}
+                <div className="d-flex justify-content-end gap-2 mt-3">
+                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Delete Confirmation Modal */}
+        <div className="modal fade" id="deleteCountryModal" tabIndex={-1} aria-hidden="true">
+          <div className="modal-dialog modal-md modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-body pt-3 ps-18 pe-18">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h6 className="modal-title fs-6">Delete Country</h6>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <p className="pb-3 mb-0">
+                  Are you sure you want to delete the <strong>{countryToDelete?.name}</strong> country permanently? This action cannot be undone.
+                </p>
+              </div>
+              <div className="d-flex justify-content-end gap-2 px-12 pb-3">
+                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  data-bs-dismiss="modal"
+                  onClick={handleDeleteConfirm}
+                  disabled={isLoading}
+                >
+                  {isLoading ? "Deleting..." : "Delete"}
+                </button>
+              </div>
             </div>
           </div>
         </div>
