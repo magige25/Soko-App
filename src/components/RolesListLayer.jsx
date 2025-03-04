@@ -23,8 +23,8 @@ const RolesLayer = () => {
   const [selectedRole, setSelectedRole] = useState(null);
 
   // API endpoints
-  const ROLES_API_URL = "https://biz-system-production.up.railway.app/v1/roles";
-  const MODULES_API_URL = "https://biz-system-production.up.railway.app/v1/module-permission"; // Base URL
+  const ROLES_API_URL = "https://api.bizchain.co.ke/v1/roles";
+  const MODULES_API_URL = "https://api.bizchain.co.ke/v1/module-permission"; // Base URL
 
   const addModalRef = useRef(null);
 
@@ -49,7 +49,7 @@ const RolesLayer = () => {
     const fetchEntityTypes = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("https://biz-system-production.up.railway.app/v1/entity-types", {
+        const response = await axios.get("https://api.bizchain.co.ke/v1/entity-types", {
           headers: { Authorization: `Bearer ${token}` }
         });
         setEntityTypes(response.data.data);
@@ -113,8 +113,8 @@ const RolesLayer = () => {
   const formatDate = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
-    const options = { day: "2-digit", month: "long", year: "numeric" };
-    return date.toLocaleDateString(undefined, options);
+    const options = { day: "numeric", month: "short", year: "numeric" };
+    return date.toLocaleDateString('en-GB', options);
   };
 
   const buildModulePermissionsPayload = (modulesState) => {
@@ -272,7 +272,7 @@ const RolesLayer = () => {
           <div className="card-body">
             <div className="table-responsive">
               <table className="table table-borderless">
-                <thead className="table-light">
+                <thead className="table-light text-start small-text" style={{fontSize:"15px"}}>
                   <tr>
                     <th>Role Name</th>
                     <th>Date Created</th>
@@ -280,7 +280,7 @@ const RolesLayer = () => {
                     <th>Actions</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ fontSize: "14px" }}>
                   {currentItems.map((role) => (
                     <tr key={role.roleId}>
                       <td>{role.roleName}</td>
@@ -288,7 +288,7 @@ const RolesLayer = () => {
                       <td>{role.entityType?.name || "N/A"}</td>
                       <td>
                         <div className="dropdown">
-                          <button className="btn btn-light dropdown-toggle btn-sm" data-bs-toggle="dropdown">
+                          <button className="btn btn-outline-secondary dropdown-toggle btn-sm" data-bs-toggle="dropdown" style={{padding:"4px 8px"}}>
                             Actions
                           </button>
                           <ul className="dropdown-menu">

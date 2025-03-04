@@ -41,6 +41,15 @@ const SettledBillsLayer = () => {
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+  };
+
   const handleDeleteClick = (bill) => {
     setSettledBillsToDelete(bill);
   };
@@ -96,10 +105,10 @@ const SettledBillsLayer = () => {
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: "visible" }}>
-              <table className="table table-borderless text-start small-text" style={{ width: "100%" }}>
-                <thead className="table-light text-start small-text">
+              <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
+                <thead className="table-light text-start small-text" style={{fontSize:"15px"}}>
                   <tr>
-                    <th scope="col" className="text-start">#</th>
+                    <th scope="col" className="text-start" style={{width: "50px"}}>#</th>
                     <th scope="col" className="text-start">Name</th>
                     <th scope="col" className="text-start">Country</th>
                     <th scope="col" className="text-start">Order No.</th>
@@ -110,7 +119,7 @@ const SettledBillsLayer = () => {
                     <th scope="col" className="text-start">Action</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ fontSize: "14px" }}>
                   {currentItems.map((bill, index) => (
                     <tr key={bill.id}>
                       <th scope="row" className="text-start small-text">
@@ -121,15 +130,16 @@ const SettledBillsLayer = () => {
                       <td className="text-start small-text">{bill.orderNo}</td>
                       <td className="text-start small-text">{bill.numberOfItems}</td>
                       <td className="text-start small-text">{formatCurrency(bill.amount)}</td>
-                      <td className="text-start small-text">{bill.dateSettled}</td>
+                      <td className="text-start small-text">{formatDate(bill.dateSettled)}</td>
                       <td className="text-start small-text">{bill.status}</td>
                       <td className="text-start small-text">
                         <div className="dropdown">
                           <button
-                            className="btn btn-light dropdown-toggle btn-sm"
+                            className="btn btn-outline-secondary dropdown-toggle btn-sm"
                             type="button"
                             data-bs-toggle="dropdown"
                             aria-expanded="false"
+                            style={{padding:"4px 8px"}}
                           >
                             Actions
                           </button>

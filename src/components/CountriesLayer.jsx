@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
-import "react-datepicker/dist/react-datepicker.css";
 import axios from "axios";
 
-const API_URL = "https://biz-system-production.up.railway.app/v1/countries";
-const CURRENCY_API_URL = "https://biz-system-production.up.railway.app/v1/currencies";
+const API_URL = "https://api.bizchain.co.ke/v1/countries";
+const CURRENCY_API_URL = "https://api.bizchain.co.ke/v1/currencies";
 
 const CountriesLayer = () => {
   const [countries, setCountries] = useState([]);
@@ -543,7 +542,7 @@ const CountriesLayer = () => {
                     disabled={isLoading}
                     data-bs-dismiss={!isLoading && !error ? "modal" : undefined}
                   >
-                    {isLoading ? "Saving..." : "Save"}
+                    {isLoading ? "Saving" : "Save"}
                   </button>
                 </div>
               </form>

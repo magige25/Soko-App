@@ -415,7 +415,7 @@ const MasterLayout = ({ children }) => {
             <li className="dropdown">
               <Link to="#">
                 <Icon icon="ri:clipboard-line" className="menu-icon" />
-                <span>Supplier Management</span>
+                <span>Farmer Management</span>
               </Link>
               <ul className="sidebar-submenu">
                 <li>
@@ -445,7 +445,7 @@ const MasterLayout = ({ children }) => {
                       navData.isActive ? "active-page" : ""
                     }
                   >
-                    Pending Bills
+                    Pending Invoices
                   </NavLink>
                 </li>
                 <li>
@@ -455,7 +455,7 @@ const MasterLayout = ({ children }) => {
                       navData.isActive ? "active-page" : ""
                     }
                   >
-                    Settled Bills
+                    Settled Invoices
                   </NavLink>
                 </li>
                 <li>
@@ -465,26 +465,26 @@ const MasterLayout = ({ children }) => {
                       navData.isActive ? "active-page" : ""
                     }
                   >
-                    Supply Residence
+                    Farmer Residence
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Warehouse Management */}
+            {/* Deport Management */}
             <li className="dropdown">
               <Link to="#">
                 <Icon icon="ri:store-3-line" className="menu-icon" />
-                <span>Warehouse Management</span>
+                <span>Deport Management</span>
               </Link>
               <ul className="sidebar-submenu">
                 <li>
                   <NavLink
-                    to="/warehouses"
+                    to="/deports"
                     className={(navData) =>
                       navData.isActive ? "active-page" : ""
                     }
                   >
-                    Warehouses
+                    Deports
                   </NavLink>
                 </li>
               </ul>

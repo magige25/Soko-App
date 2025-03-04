@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast"; // Import toast and Toaster
 
 const API_URL = "https://api.bizchain.co.ke/v1/supplier-deliveries";
 
@@ -13,8 +14,8 @@ const EditDelivery = () => {
   const [editDelivery, setEditDelivery] = useState(
     delivery
       ? {
-          supplier: delivery.supplier?.id || "",          
-          supplierName: delivery.supplier?.name || "",          
+          supplier: delivery.supplier?.id || "",
+          supplierName: delivery.supplier?.name || "",
           litres: delivery.litres || "",
           pricePerLitre: delivery.pricePerLitre || "",
         }
@@ -23,7 +24,7 @@ const EditDelivery = () => {
 
   useEffect(() => {
     if (!delivery) {
-      alert("No delivery selected to edit.");
+      toast.error("No delivery selected to edit."); // Toast for missing delivery
       navigate("/deliveries");
     }
   }, [delivery, navigate]);
@@ -32,14 +33,15 @@ const EditDelivery = () => {
     e.preventDefault();
 
     if (!editDelivery.supplier || !editDelivery.litres || !editDelivery.pricePerLitre) {
-      alert("Please fill in all required fields before saving.");
+      toast.error("Please fill in all required fields before saving."); // Toast for validation error
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
       if (!token) {
-        alert("Please log in.");
+        toast.error("Please log in."); 
+        
         return;
       }
 
@@ -57,12 +59,12 @@ const EditDelivery = () => {
       });
 
       if (response.status === 200) {
-        alert("Delivery updated successfully!");
+        toast.success("Delivery updated successfully!");
         navigate("/deliveries");
       }
     } catch (error) {
       console.error("Error updating Delivery:", error);
-      alert("Failed to update Delivery. Please try again.");
+      toast.error("Failed to update Delivery. Please try again."); // Toast for API error
     }
   };
 
@@ -70,6 +72,12 @@ const EditDelivery = () => {
 
   return (
     <div className="page-wrapper">
+      <Toaster position="top-center" 
+      reverseOrder={false}
+      toastOptions={{
+        success: { style: { background: "#d4edda", color: "#155724" } },
+        error: { style: { background: "#f8d7da", color: "#721c24" } },
+      }} /> {/* Add Toaster component */}
       <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
