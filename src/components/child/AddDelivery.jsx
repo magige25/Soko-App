@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
 
 const API_URL = "https://api.bizchain.co.ke/v1/supplier-deliveries";
 const SUPPLIERS_API_URL = "https://api.bizchain.co.ke/v1/suppliers";
+const STG_FACILITY_API = "https://api.bizchain.co.ke/v1/storage-facilities";
 
 const AddDelivery = () => {
   const navigate = useNavigate();
@@ -11,10 +13,13 @@ const AddDelivery = () => {
     supplier: "",
     litres: "",
     pricePerLitre: "",
+    storageFacilityId: "",
   });
   const [suppliers, setSuppliers] = useState([]);
+  const [storageFacilities, setStorageFacilities] = useState([]);
   const [loading, setLoading] = useState(false);
   const [fetchingSuppliers, setFetchingSuppliers] = useState(true);
+  const [fetchingStorageFacilities, setFetchingStorageFacilities] = useState(true);
   const [error, setError] = useState(null);
   const [formError, setFormError] = useState("");
 
@@ -29,7 +34,7 @@ const AddDelivery = () => {
           },
         });
 
-        console.log("Suppliers API response:", response.data);
+        console.log("Suppliers API response:", response.data.data);
 
         if (Array.isArray(response.data.data)) {
           setSuppliers(response.data.data);
@@ -38,7 +43,6 @@ const AddDelivery = () => {
         } else {
           throw new Error("Unexpected API response format");
         }
-
       } catch (error) {
         console.error("Error fetching suppliers:", error);
         setError("Failed to load suppliers");
@@ -46,8 +50,34 @@ const AddDelivery = () => {
         setFetchingSuppliers(false);
       }
     };
+    const fetchStorageFacilities = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(STG_FACILITY_API, {
+          headers: {
+            Authorization:`Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log("Storage Facility API response:", response.data.data);
+        if (Array.isArray(response.data.data)) {
+          setStorageFacilities(response.data.data);
+        } else if (response.data.data && typeof response.data.data === "object") {
+          setStorageFacilities([response.data.data]);
+        } else {
+          throw new Error("Unexpected API response");      
+        }
+      } catch (error) {
+        console.error("Error fetching Storage Facilities:", error);
+        setError("Failed to load Storage Facilities");
+      } finally {
+        setFetchingStorageFacilities(false);
+      }
+    };
 
     fetchSuppliers();
+    fetchStorageFacilities();
+    
   }, []);
 
   const handleAddDelivery = async (e) => {
@@ -63,6 +93,7 @@ const AddDelivery = () => {
       supplier: parseInt(newDelivery.supplier),
       litres: parseFloat(newDelivery.litres),
       pricePerLitre: parseFloat(newDelivery.pricePerLitre),
+      storageFacilityId: parseInt(newDelivery.storageFacilityId),
     };
 
     setLoading(true);
@@ -75,8 +106,14 @@ const AddDelivery = () => {
         },
       });
 
-      if (response.status === 201) {
-        alert("Delivery added successfully!");
+      if (response.status === 200) {
+        toast.success("Delivery added successfully!"); 
+        setNewDelivery({
+          supplier: "",
+          litres: "",
+          pricePerLitre: "",
+          storageFacilityId: "",
+        });
         navigate("/deliveries");
       }
     } catch (error) {
@@ -91,6 +128,10 @@ const AddDelivery = () => {
 
   return (
     <div className="page-wrapper">
+      <Toaster 
+            position="top-center" 
+            reverseOrder={false}
+            />
       <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
@@ -151,6 +192,31 @@ const AddDelivery = () => {
                     }
                     required
                   />
+                </div>
+                <div className="col-md-6">
+                <label className="form-label">
+                    Storage Facility <span className="text-danger">*</span>
+                  </label>
+                  <select
+                    className="form-control"
+                    value={newDelivery.storageFacilityId}
+                    onChange={(e) =>
+                      setNewDelivery({ ...newDelivery, storageFacilityId: e.target.value })
+                    }
+                    required
+                    disabled={fetchingStorageFacilities}
+                  >
+                    <option value="">Select a Storage Facility</option>
+                    {storageFacilities.length > 0 ? (
+                      storageFacilities.map((storageFacilities) => (
+                        <option key={storageFacilities.id} value={storageFacilities.id}>
+                          {`${storageFacilities.name}`}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="">No storage Facilities available</option>
+                    )}
+                  </select>                  
                 </div>
               </div>
               {formError && <div className="text-danger mb-3">{formError}</div>}

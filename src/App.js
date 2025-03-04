@@ -194,9 +194,9 @@ function App() {
             <Route path="/pending-bills" element={<PendingBillsPage />} />
             <Route path="/settled-bills" element={<SettledBillsPage />} />
             <Route path="/deliveries" element={<DeliveriesPage />} />
-            <Route path="/supply-residence" element={<SupplyResidencePage />} />
-            <Route path="/add-delivery" element={<AddDeliveryPage />} />
-            <Route path="/edit-delivery" element={<EditDeliveryPage />} />
+            <Route path="/deliveries/edit-delivery" element={<EditDeliveryPage />} />
+            <Route path="/deliveries/add-delivery" element={<AddDeliveryPage />} />
+            <Route path="/supply-residence" element={<SupplyResidencePage />} />          
             <Route path="/category" element={<CategoryPage />} />
             <Route path="/sub-category" element={<SubCategoryPage />} />
             <Route path="/brands" element={<BrandsPage />} />

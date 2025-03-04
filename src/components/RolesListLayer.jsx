@@ -74,8 +74,8 @@ const RolesLayer = () => {
     const fetchEntityTypes = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("https://biz-system-production.up.railway.app/v1/entity-types", {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await axios.get("https://api.bizchain.co.ke/v1/entity-types", {
+          headers: { Authorization: `Bearer ${token}` }
         });
         setEntityTypes(response.data.data);
       } catch (error) {

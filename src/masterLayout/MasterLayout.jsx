@@ -387,7 +387,7 @@ const MasterLayout = ({ children }) => {
             <li className={`dropdown ${isSubmenuActive(submenuPaths.supplierManagement) ? "submenu-active" : ""}`}>
               <Link to="#">
                 <Icon icon="ri:clipboard-line" className="menu-icon" />
-                <span>Supplier Management</span>
+                <span>Farmer Management</span>
               </Link>
               <ul className="sidebar-submenu">
                 <li>
@@ -411,7 +411,7 @@ const MasterLayout = ({ children }) => {
                     to="/pending-bills"
                     className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
-                    Pending Bills
+                    Pending Invoices
                   </NavLink>
                 </li>
                 <li>
@@ -419,7 +419,7 @@ const MasterLayout = ({ children }) => {
                     to="/settled-bills"
                     className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
-                    Settled Bills
+                    Settled Invoices
                   </NavLink>
                 </li>
                 <li>
@@ -427,24 +427,26 @@ const MasterLayout = ({ children }) => {
                     to="/supply-residence"
                     className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
-                    Supply Residence
+                    Farmer Residence
                   </NavLink>
                 </li>
               </ul>
             </li>
-            {/* Warehouse Management */}
-            <li className={`dropdown ${isSubmenuActive(submenuPaths.warehouseManagement) ? "submenu-active" : ""}`}>
+            {/* Deport Management */}
+            <li className="dropdown">
               <Link to="#">
                 <Icon icon="ri:store-3-line" className="menu-icon" />
-                <span>Warehouse Management</span>
+                <span>Deport Management</span>
               </Link>
               <ul className="sidebar-submenu">
                 <li>
                   <NavLink
-                    to="/warehouses"
-                    className={(navData) => (navData.isActive ? "active-page" : "")}
+                    to="/deports"
+                    className={(navData) =>
+                      navData.isActive ? "active-page" : ""
+                    }
                   >
-                    Warehouses
+                    Deports
                   </NavLink>
                 </li>
               </ul>

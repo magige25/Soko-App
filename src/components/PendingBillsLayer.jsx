@@ -20,10 +20,8 @@ const PendingSuppliesLayer = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
 
-  // Function to format amount as dollars
-  const formatAmount = (amount) => {
-    return `$${Number(amount).toLocaleString()}`;
-  };
+  const formatAmount = (amount) =>
+    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
 
   // Function to format the date as "24 Jan 2025"
   const formatDate = (dateString) => {
