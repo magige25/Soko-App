@@ -4,6 +4,7 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 
 const API_URL = "https://api.bizchain.co.ke/v1/unit-of-measure";
+const STATUS_API_URL = "https://api.bizchain.co.ke/v1/unit-of-measure/update-status"; // Added status endpoint
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -63,6 +64,38 @@ const UnitsOfMeasureLayer = () => {
   useEffect(() => {
     fetchUnitsOfMeasure(currentPage, debouncedQuery);
   }, [currentPage, debouncedQuery, fetchUnitsOfMeasure]);
+
+  const handleToggleStatus = async (unitOfMeasure) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("token");
+      const newStatusCode = unitOfMeasure.status.name === "Active" ? "INACTV" : "ACTV";
+
+      const response = await axios.put(
+        STATUS_API_URL,
+        null,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+          params: {
+            id: unitOfMeasure.id,
+            status: newStatusCode,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        toast.success(`Unit of Measure ${newStatusCode === "ACTV" ? "activated" : "deactivated"} successfully!`);
+        await fetchUnitsOfMeasure(currentPage, debouncedQuery);
+      }
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      setError(error.response?.data?.message || "Failed to toggle status. Please try again.");
+      toast.error(error.response?.data?.message || "Failed to toggle status.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleEditClick = (unitOfMeasure) => {
     setEditUnitOfMeasure({ id: unitOfMeasure.id, name: unitOfMeasure.name, qty: unitOfMeasure.qty });
@@ -147,9 +180,8 @@ const UnitsOfMeasureLayer = () => {
       });
       if (response.status === 200) {
         toast.success("Unit of Measure added successfully!");
-        setNewUnitOfMeasure({ name: "", qty: "" });               
+        setNewUnitOfMeasure({ name: "", qty: "" });
         fetchUnitsOfMeasure(currentPage, debouncedQuery);
-        //setUnitsOfMeasure((prevUnits) => [...prevUnits, response.data]);
       }
     } catch (error) {
       console.error("Error adding Unit of Measure:", error);
@@ -244,9 +276,9 @@ const UnitsOfMeasureLayer = () => {
                         <td className="text-start small-text py-3 px-4">
                           <span
                             className={`bg-${
-                              unitOfMeasure.status.name === "Active" ? "success-focus" : "neutral-200"
+                              unitOfMeasure.status.name === "Inactive" ? "danger-focus" : "success-focus"
                             } text-${
-                              unitOfMeasure.status.name === "Inactive" ? "danger-600" : "neutral-600"
+                              unitOfMeasure.status.name === "Inactive" ? "danger-600" : "success-600"
                             } px-24 py-4 radius-8 fw-medium text-sm`}
                           >
                             {unitOfMeasure.status.name || "N/A"}
@@ -281,6 +313,14 @@ const UnitsOfMeasureLayer = () => {
                                   onClick={() => handleEditClick(unitOfMeasure)}
                                 >
                                   Edit
+                                </button>
+                              </li>
+                              <li>
+                                <button
+                                  className="dropdown-item"
+                                  onClick={() => handleToggleStatus(unitOfMeasure)}
+                                >
+                                  {unitOfMeasure.status.name === "Active" ? "Deactivate" : "Activate"}
                                 </button>
                               </li>
                               <li>
@@ -483,7 +523,16 @@ const UnitsOfMeasureLayer = () => {
                       <strong>Quantity:</strong> {unitOfMeasureToView.qty}
                     </p>
                     <p>
-                      <strong>Status:</strong> {unitOfMeasureToView.status.name || "N/A"}
+                      <strong>Status:</strong>{" "}
+                      <span
+                        className={`bg-${
+                          unitOfMeasureToView.status.name === "Inactive" ? "danger-focus" : "success-focus"
+                        } text-${
+                          unitOfMeasureToView.status.name === "Inactive" ? "danger-600" : "success-600"
+                        } px-24 py-4 radius-8 fw-medium text-sm`}
+                      >
+                        {unitOfMeasureToView.status.name || "N/A"}
+                      </span>
                     </p>
                   </div>
                 )}

@@ -108,6 +108,9 @@ import BrandsPage from "./pages/BrandsPage";
 import ProductsPage from "./pages/ProductsPage";
 import CountriesPage from "./pages/CountriesPage";
 import SalespersonsPage from "./pages/SalespersonsPage";
+import AddSalespersonsPage from "./pages/AddSalespersonsPage";
+import EditSalespersonsPage from "./pages/EditSalespersonsPage";
+import SalespersonsDetailsPage from "./pages/SalespersonsDetailsPage";
 import CustomersPage from "./pages/CustomersPage";
 import CustomerTypePage from "./pages/CustomerTypePage";
 import PricingCategoriesPage from "./pages/PricingCategoriesPage";
@@ -129,6 +132,11 @@ import StorageFacilityPage from "./pages/StorageFacilityPage";
 import AddStorageFacilityPage from "./pages/AddStorageFacilityPage";
 import EditStorageFacilityPage from "./pages/EditStorageFacilityPage";
 import StorageFacilityDetailsPage from "./pages/StorageFacilityDetailsPage";
+import TargetsPage from "./pages/TargetsPage";
+import AddTargetsPage from "./pages/AddTargetsPage";
+import EditTargetsPage from "./pages/EditTargetsPage";
+import TargetsDetailsPage from "./pages/TargetsDetailsPage";
+import BatchPage from "./pages/BatchPage";
 
 function App() {
   return (
@@ -184,6 +192,11 @@ function App() {
             <Route path="/storage-facility/add-facility" element={<AddStorageFacilityPage />} />
             <Route path="/storage-facility/edit-facility" element={<EditStorageFacilityPage />} />
             <Route path="/storage-facility/facility-details" element={<StorageFacilityDetailsPage />} />
+            <Route path="/targets" element={<TargetsPage />} />
+            <Route path="/targets/add-target" element={<AddTargetsPage />} />
+            <Route path="/targets/edit-target" element={<EditTargetsPage />} />
+            <Route path="/targets/details" element={<TargetsDetailsPage />} />
+            <Route path="/batch" element={<BatchPage />} />
             <Route path="/roles-list" element={<RolesListPage />} />
             <Route path="/create-role" element={<CreateRolePage />} />
             <Route path="/suppliers" element={<SuppliersPage />} />
@@ -201,8 +214,11 @@ function App() {
             <Route path="/sub-category" element={<SubCategoryPage />} />
             <Route path="/brands" element={<BrandsPage />} />
             <Route path="/products" element={<ProductsPage />} />
-            <Route path="/countries" element={<CountriesPage />} />
+            <Route path="/countries" element={<CountriesPage />} /> 
             <Route path="/salespersons" element={<SalespersonsPage />} />
+            <Route path="/salespersons/add-salesperson" element={<AddSalespersonsPage />} />
+            <Route path="/salespersons/edit-salesperson" element={<EditSalespersonsPage />} />
+            <Route path="/salespersons/details" element={<SalespersonsDetailsPage />} />
             <Route path="/customers" element={<CustomersPage />} />
             <Route path="/customer-type" element={<CustomerTypePage />} />
             <Route path="/pricing-categories" element={<PricingCategoriesPage />} />

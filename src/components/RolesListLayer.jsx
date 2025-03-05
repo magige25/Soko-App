@@ -2,8 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 
-const ROLES_API_URL = "https://biz-system-production.up.railway.app/v1/roles";
-const MODULES_API_URL = "https://biz-system-production.up.railway.app/v1/module-permission";
+const ROLES_API_URL = "https://api.bizchain.co.ke/v1/roles";
+const MODULES_API_URL = "https://api.bizchain.co.ke/v1/module-permission";
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -137,7 +137,7 @@ const RolesLayer = () => {
     if (!dateString || isNaN(new Date(dateString).getTime())) return "";
     const date = new Date(dateString);
     const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "short" });
+    const month = date.toLocaleString("en-GB", { month: "long" });
     const year = date.getFullYear();
     const suffix = (day % 10 === 1 && day !== 11) ? "st" :
                    (day % 10 === 2 && day !== 12) ? "nd" :

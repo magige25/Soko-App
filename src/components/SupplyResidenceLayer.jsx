@@ -1,7 +1,18 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
+
+const API_URL = "https://api.bizchain.co.ke/v1/supplier-residence";
+
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+};
 
 const SupplyResidenceLayer = () => {
   const [residence, setResidence] = useState([]);
@@ -11,160 +22,139 @@ const SupplyResidenceLayer = () => {
   const [residenceToDelete, setResidenceToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
+  const [query, setQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const debouncedQuery = useDebounce(query, 300);
 
-  const addModalRef = useRef(null);
-  const editModalRef = useRef(null);
-
-  // Fetch supply residence from API
-  const fetchResidence = async () => {
-    setLoading(true);
-    try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get("https://biz-system-production.up.railway.app/v1/supplier-residence", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("Fetched residence data:", response.data.data);
-      const cleanData = (response.data.data || []).filter(item => item && item.name);
-      setResidence(cleanData);
-    } catch (err) {
-      setError("Failed to fetch supply residence. Please try again.");
-      console.error("Fetch error:", err.response?.data || err.message);
-    } finally {
-      setLoading(false);
+  const fetchResidence = useCallback(async (page = 1, searchQuery = "") => {
+    setIsLoading(true);
+    setError(null);
+    const token = localStorage.getItem("token");
+    if (!token || token.trim() === "") {
+      setError("No authentication token found. Please log in.");
+      setIsLoading(false);
+      return;
     }
-  };
+    try {
+      const response = await axios.get(API_URL, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: { page: page, limit: itemsPerPage, searchValue: searchQuery },
+      });
+      const result = response.data;
+      if (result.status.code === 0 && Array.isArray(result.data)) {
+        const cleanData = result.data.map(item => ({
+          id: item.id,
+          name: item.name,
+          tarmacked: item.tarmacked,
+          storageFacility: item.storageFacility,
+          dateCreated: item.dateCreated,
+          suppliers: item.suppliers, // Number of suppliers
+          createdBy: item.createdBy?.name || "Unknown",
+        }));
+        setResidence(cleanData);
+        setTotalItems(result.totalElements); // Use server-provided total
+      } else {
+        setError(`Failed to fetch residence: ${result.status.message || "Invalid response"}`);
+        setResidence([]);
+        setTotalItems(0);
+      }
+    } catch (err) {
+      setError(`Failed to fetch supply residence: ${err.response?.data?.message || err.message}`);
+      setResidence([]);
+      setTotalItems(0);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [itemsPerPage]);
 
   useEffect(() => {
-    fetchResidence();
-  }, []);
+    fetchResidence(currentPage, debouncedQuery);
+  }, [currentPage, debouncedQuery, fetchResidence]);
 
-  // Filter supply residence based on search query with null guard
-  const filteredResidence = residence.filter((residence) =>
-    residence?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  // Pagination logic
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredResidence.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredResidence.length / itemsPerPage);
-
-  // Function to hide modals manually
-  const hideModal = (modalId) => {
-    const modal = document.getElementById(modalId);
-    if (modal) {
-      modal.classList.remove("show");
-      modal.style.display = "none"; // Ensure it’s hidden
-      document.body.classList.remove("modal-open"); // Remove Bootstrap’s body class
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove(); // Remove the backdrop
-    }
-  };
-
-  // Handlers
   const handleAddResidence = async (e) => {
     e.preventDefault();
     if (!newResidence.name) {
-      alert("Please fill in the name field.");
+      setError("Please fill in the name field.");
       return;
     }
-
-    setLoading(true);
+    setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      console.log("Adding residence with payload:", newResidence);
-      const response = await axios.post(
-        "https://biz-system-production.up.railway.app/v1/supplier-residence",
-        newResidence,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Add response:", response.data);
-      await fetchResidence();
-      resetAddForm();
-      hideModal("addresiModal");
+      await axios.post(API_URL, newResidence, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+      fetchResidence(currentPage, debouncedQuery);
+      setNewResidence({ name: "", tarmacked: false, storageFacility: false });
+      e.target.closest(".modal").querySelector('[data-bs-dismiss="modal"]').click();
     } catch (err) {
-      setError("Failed to add residence.");
-      console.error("Add error:", err.response?.data || err.message);
+      setError(`Failed to add residence: ${err.response?.data?.message || err.message}`);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
-
-  const resetAddForm = () => setNewResidence({ name: "", tarmacked: false, storageFacility: false });
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     if (!editResidence.name) {
-      alert("Please fill in the name field.");
+      setError("Please fill in the name field.");
       return;
     }
-
-    setLoading(true);
+    setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      console.log("Editing residence with payload:", editResidence);
-      const response = await axios.put(
-        `https://biz-system-production.up.railway.app/v1/supplier-residence/${editResidence.id}`,
-        {
-          name: editResidence.name,
-          tarmacked: editResidence.tarmacked,
-          storageFacility: editResidence.storageFacility,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        }
-      );
-      console.log("Edit response:", response.data);
-      await fetchResidence();
+      const payload = {
+        name: editResidence.name,
+        tarmacked: editResidence.tarmacked,
+        storageFacility: editResidence.storageFacility,
+      };
+      await axios.put(`${API_URL}/${editResidence.id}`, payload, {
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      });
+      fetchResidence(currentPage, debouncedQuery);
       setEditResidence(null);
-      hideModal("editModal");
+      e.target.closest(".modal").querySelector('[data-bs-dismiss="modal"]').click();
     } catch (err) {
-      setError("Failed to update residence.");
-      console.error("Edit error:", err.response?.data || err.message);
+      setError(`Failed to update residence: ${err.response?.data?.message || err.message}`);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleDeleteConfirm = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      console.log("Deleting residence:", residenceToDelete);
-      await axios.delete(`https://biz-system-production.up.railway.app/v1/supplier-residence/${residenceToDelete.id}`, {
+      await axios.delete(`${API_URL}/${residenceToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Delete successful");
-      await fetchResidence();
+      fetchResidence(currentPage, debouncedQuery);
       setResidenceToDelete(null);
-      hideModal("deleteModal");
+      document.querySelector("#deleteModal [data-bs-dismiss='modal']").click();
     } catch (err) {
-      setError("Failed to delete residence.");
-      console.error("Delete error:", err.response?.data || err.message);
+      setError(`Failed to delete residence: ${err.response?.data?.message || err.message}`);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
+  const handleSearchInputChange = (e) => {
+    setQuery(e.target.value);
+    setCurrentPage(1);
+  };
 
   const formatDate = (dateString) => {
-    if (!dateString) return "";
+    if (!dateString || isNaN(new Date(dateString).getTime())) return "N/A";
     const date = new Date(dateString);
-    const options = { day: "2-digit", month: "long", year: "numeric" };
-    return date.toLocaleDateString(undefined, options);
+    const day = date.getDate();
+    const month = date.toLocaleString("en-GB", { month: "long" });
+    const year = date.getFullYear();
+    const suffix = day % 10 === 1 && day !== 11 ? "st" : day % 10 === 2 && day !== 12 ? "nd" : day % 10 === 3 && day !== 13 ? "rd" : "th";
+    return `${day}${suffix} ${month} ${year}`;
   };
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <div className="page-wrapper">
@@ -172,159 +162,176 @@ const SupplyResidenceLayer = () => {
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <button
-              type="button"
-              className="btn btn-primary btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
+              className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
               data-bs-toggle="modal"
               data-bs-target="#addresiModal"
             >
               <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Add residence
+              Add Residence
             </button>
           </div>
         </div>
 
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
-            <form className="navbar-search" style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+            {error && <div className="alert alert-danger">{error}</div>}
+            <form className="navbar-search mb-3" style={{ display: "flex", alignItems: "center", gap: "10px" }}>
               <input
                 type="text"
                 placeholder="Search by residence name"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={query}
+                onChange={handleSearchInputChange}
                 className="form-control"
-                style={{ width: "200px" }}
+                style={{ maxWidth: "300px" }}
               />
               <Icon icon="ion:search-outline" className="icon" style={{ width: "16px", height: "16px" }} />
             </form>
 
-            {loading && <p>Loading...</p>}
-            {error && <p className="text-danger">{error}</p>}
-            {!loading && !error && (
-              <>
-                <div className="table-responsive" style={{ overflow: "visible" }}>
-                  <table className="table table-borderless text-start small-text">
-                    <thead className="table-light">
-                      <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Tarmacked</th>
-                        <th>Storage Facility</th>
-                        <th>Date Created</th>
-                        <th>Suppliers</th>
-                        <th>Created By</th>
-                        <th>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {currentItems.map((residence, index) => (
-                        <tr key={residence.id || index}>
-                          <th>{indexOfFirstItem + index + 1}</th>
-                          <td>{residence.name}</td>
-                          <td>{residence.tarmacked ? "Yes" : "No"}</td>
-                          <td>{residence.storageFacility ? "Yes" : "No"}</td>
-                          <td>{formatDate(residence.dateCreated) || "N/A"}</td>
-                          <td>{residence.suppliers}</td>
-                          <td>{residence.createdBy?.name || "Unknown"}</td>
-                          <td>
-                            <div className="dropdown">
-                              <button className="btn btn-outline-secondary btn-sm dropdown-toggle btn-sm" 
+            <div className="table-responsive" style={{ overflow: "visible" }}>
+              <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
+                <thead className="table-light text-start small-text" style={{ fontSize: "15px" }}>
+                  <tr>
+                    <th className="text-center py-3 px-6" style={{ width: "50px" }}>#</th>
+                    <th className="text-start py-3 px-4">Name</th>
+                    <th className="text-start py-3 px-4">Tarmacked</th>
+                    <th className="text-start py-3 px-4">Storage Facility</th>
+                    <th className="text-start py-3 px-4">Date Created</th>
+                    <th className="text-start py-3 px-4">Suppliers</th>
+                    <th className="text-start py-3 px-4">Created By</th>
+                    <th className="text-start py-3 px-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody style={{ fontSize: "14px" }}>
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan="8" className="text-center py-3">Loading...</td>
+                    </tr>
+                  ) : residence.length > 0 ? (
+                    residence.map((residence, index) => (
+                      <tr key={residence.id} style={{ transition: "background-color 0.2s" }}>
+                        <td className="text-center small-text py-3 px-6">{(currentPage - 1) * itemsPerPage + index + 1}</td>
+                        <td className="text-start small-text py-3 px-4">{residence.name}</td>
+                        <td className="text-start small-text py-3 px-4">{residence.tarmacked ? "Yes" : "No"}</td>
+                        <td className="text-start small-text py-3 px-4">{residence.storageFacility ? "Yes" : "No"}</td>
+                        <td className="text-start small-text py-3 px-4">{formatDate(residence.dateCreated)}</td>
+                        <td className="text-start small-text py-3 px-4">{residence.suppliers}</td>
+                        <td className="text-start small-text py-3 px-4">{residence.createdBy}</td>
+                        <td className="text-start small-text py-3 px-4">
+                          <div className="dropdown">
+                            <button
+                              className="btn btn-outline-secondary btn-sm dropdown-toggle"
                               type="button"
-                              data-bs-toggle="dropdown">
-                                Actions
-                              </button>
-                              <ul className="dropdown-menu">
-                                <li>
-                                  <Link
-                                    className="dropdown-item"
-                                    to="#"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#viewModal"
-                                    onClick={() => setSelectedResidence(residence)}
-                                  >
-                                    View
-                                  </Link>
-                                </li>
-                                <li>
-                                  <Link
-                                    className="dropdown-item"
-                                    to="#"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#editModal"
-                                    onClick={() => setEditResidence(residence)}
-                                  >
-                                    Edit
-                                  </Link>
-                                </li>
-                                <li>
-                                  <button
-                                    className="dropdown-item text-danger"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal"
-                                    onClick={() => setResidenceToDelete(residence)}
-                                  >
-                                    Delete
-                                  </button>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                              data-bs-toggle="dropdown"
+                            >
+                              Actions
+                            </button>
+                            <ul className="dropdown-menu">
+                              <li>
+                                <Link
+                                  className="dropdown-item"
+                                  to="#"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#viewModal"
+                                  onClick={() => setSelectedResidence(residence)}
+                                >
+                                  View
+                                </Link>
+                              </li>
+                              <li>
+                                <Link
+                                  className="dropdown-item"
+                                  to="#"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#editModal"
+                                  onClick={() => setEditResidence(residence)}
+                                >
+                                  Edit
+                                </Link>
+                              </li>
+                              <li>
+                                <button
+                                  className="dropdown-item text-danger"
+                                  data-bs-toggle="modal"
+                                  data-bs-target="#deleteModal"
+                                  onClick={() => setResidenceToDelete(residence)}
+                                >
+                                  Delete
+                                </button>
+                              </li>
+                            </ul>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="8" className="text-center py-3">No residence found</td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
 
-                <div className="d-flex justify-content-between align-items-start mt-3">
-                  <div className="text-muted">
-                    Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredResidence.length)} of{" "}
-                    {filteredResidence.length} entries
-                  </div>
-                  <nav>
-                    <ul className="pagination mb-0">
-                      <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                        <button
-                          className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
-                          onClick={() => handlePageChange(currentPage - 1)}
-                          disabled={currentPage === 1}
-                        >
-                          <Icon icon="ep:d-arrow-left" />
-                        </button>
-                      </li>
-                      {Array.from({ length: totalPages }, (_, i) => (
-                        <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-                          <button
-                            className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
-                            onClick={() => handlePageChange(i + 1)}
-                          >
-                            {i + 1}
-                          </button>
-                        </li>
-                      ))}
-                      <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                        <button
-                          className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
-                          onClick={() => handlePageChange(currentPage + 1)}
-                          disabled={currentPage === totalPages}
-                        >
-                          <Icon icon="ep:d-arrow-right" />
-                        </button>
-                      </li>
-                    </ul>
-                  </nav>
+            {!isLoading && (
+              <div className="d-flex justify-content-between align-items-center mt-3">
+                <div className="text-muted" style={{ fontSize: "13px" }}>
+                  Showing {(currentPage - 1) * itemsPerPage + 1} to {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
                 </div>
-              </>
+                <nav aria-label="Page navigation">
+                  <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                      <button
+                        className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                        disabled={currentPage === 1}
+                      >
+                        <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
+                      </button>
+                    </li>
+                    {Array.from({ length: totalPages }, (_, i) => (
+                      <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                        <button
+                          className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle d-flex align-items-center justify-content-center`}
+                          style={{
+                            width: "30px",
+                            height: "30px",
+                            padding: "0",
+                            transition: "all 0.2s",
+                            fontSize: "10px",
+                            color: currentPage === i + 1 ? "#fff" : "",
+                          }}
+                          onClick={() => setCurrentPage(i + 1)}
+                        >
+                          {i + 1}
+                        </button>
+                      </li>
+                    ))}
+                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                      <button
+                        className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                        disabled={currentPage === totalPages}
+                      >
+                        <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                      </button>
+                    </li>
+                  </ul>
+                </nav>
+              </div>
             )}
           </div>
         </div>
 
         {/* Add Residence Modal */}
-        <div className="modal fade" id="addresiModal" tabIndex="-1" aria-hidden="true" ref={addModalRef}>
+        <div className="modal fade" id="addresiModal" tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-sm modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
                   Add Residence
-                  <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={resetAddForm}></button>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </h6>
                 <form onSubmit={handleAddResidence}>
                   <div className="row">
@@ -342,14 +349,10 @@ const SupplyResidenceLayer = () => {
                       <label className="form-label d-flex align-items-center gap-2">
                         Tarmacked
                         <input
-                          id="tarmacked"
                           type="checkbox"
                           className="form-check-input"
                           checked={newResidence.tarmacked}
-                          onChange={(e) => {
-                            console.log("Tarmacked changed to:", e.target.checked);
-                            setNewResidence({ ...newResidence, tarmacked: e.target.checked });
-                          }}
+                          onChange={(e) => setNewResidence({ ...newResidence, tarmacked: e.target.checked })}
                           style={{ width: "20px", height: "20px" }}
                         />
                       </label>
@@ -358,22 +361,18 @@ const SupplyResidenceLayer = () => {
                       <label className="form-label d-flex align-items-center gap-2">
                         Storage Facility
                         <input
-                          id="storageFacility"
                           type="checkbox"
                           className="form-check-input"
                           checked={newResidence.storageFacility}
-                          onChange={(e) => {
-                            console.log("Storage Facility changed to:", e.target.checked);
-                            setNewResidence({ ...newResidence, storageFacility: e.target.checked });
-                          }}
+                          onChange={(e) => setNewResidence({ ...newResidence, storageFacility: e.target.checked })}
                           style={{ width: "20px", height: "20px" }}
                         />
                       </label>
                     </div>
                   </div>
                   <div className="d-flex justify-content-end gap-2">
-                    <button type="submit" className="btn btn-primary" disabled={loading}>
-                      {loading ? "Saving..." : "Save"}
+                    <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                      {isLoading ? "Saving..." : "Save"}
                     </button>
                   </div>
                 </form>
@@ -389,16 +388,16 @@ const SupplyResidenceLayer = () => {
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
                   Supply Details
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </h6>
                 {selectedResidence && (
                   <>
                     <div className="mb-3"><strong>Name:</strong> {selectedResidence.name}</div>
                     <div className="mb-3"><strong>Tarmacked:</strong> {selectedResidence.tarmacked ? "Yes" : "No"}</div>
                     <div className="mb-3"><strong>Storage Facility:</strong> {selectedResidence.storageFacility ? "Yes" : "No"}</div>
-                    <div className="mb-3"><strong>Date Created:</strong> {formatDate(selectedResidence.dateCreated) || "N/A"}</div>
+                    <div className="mb-3"><strong>Date Created:</strong> {formatDate(selectedResidence.dateCreated)}</div>
                     <div className="mb-3"><strong>Suppliers:</strong> {selectedResidence.suppliers}</div>
-                    <div className="mb-3"><strong>Created By:</strong> {selectedResidence.createdBy?.name || "Unknown"}</div>
+                    <div className="mb-3"><strong>Created By:</strong> {selectedResidence.createdBy}</div>
                   </>
                 )}
               </div>
@@ -407,13 +406,13 @@ const SupplyResidenceLayer = () => {
         </div>
 
         {/* Edit Residence Modal */}
-        <div className="modal fade" id="editModal" tabIndex="-1" aria-hidden="true" ref={editModalRef}>
+        <div className="modal fade" id="editModal" tabIndex="-1" aria-hidden="true">
           <div className="modal-dialog modal-sm modal-dialog-centered">
             <div className="modal-content">
               <div className="modal-body">
                 <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
                   Edit Supply Residence
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </h6>
                 {editResidence && (
                   <form onSubmit={handleEditSubmit}>
@@ -432,14 +431,10 @@ const SupplyResidenceLayer = () => {
                         <label className="form-label d-flex align-items-center gap-2">
                           Tarmacked
                           <input
-                            id="tarmacked"
                             type="checkbox"
                             className="form-check-input"
                             checked={editResidence.tarmacked}
-                            onChange={(e) => {
-                              console.log("Edit Tarmacked changed to:", e.target.checked);
-                              setEditResidence({ ...editResidence, tarmacked: e.target.checked });
-                            }}
+                            onChange={(e) => setEditResidence({ ...editResidence, tarmacked: e.target.checked })}
                             style={{ width: "20px", height: "20px" }}
                           />
                         </label>
@@ -448,22 +443,18 @@ const SupplyResidenceLayer = () => {
                         <label className="form-label d-flex align-items-center gap-2">
                           Storage Facility
                           <input
-                            id="storageFacility"
                             type="checkbox"
                             className="form-check-input"
                             checked={editResidence.storageFacility}
-                            onChange={(e) => {
-                              console.log("Edit Storage Facility changed to:", e.target.checked);
-                              setEditResidence({ ...editResidence, storageFacility: e.target.checked });
-                            }}
+                            onChange={(e) => setEditResidence({ ...editResidence, storageFacility: e.target.checked })}
                             style={{ width: "20px", height: "20px" }}
                           />
                         </label>
                       </div>
                     </div>
                     <div className="d-flex justify-content-end gap-2">
-                      <button type="submit" className="btn btn-primary" disabled={loading}>
-                        {loading ? "Saving..." : "Save"}
+                      <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                        {isLoading ? "Saving..." : "Save"}
                       </button>
                     </div>
                   </form>
@@ -479,8 +470,8 @@ const SupplyResidenceLayer = () => {
             <div className="modal-content">
               <div className="modal-body pt-3 ps-18 pe-18">
                 <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h6 className="modal-title fs-6">Delete</h6>
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                  <h6 className="modal-title fs-6">Delete Residence</h6>
+                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <p className="pb-3 mb-0">
                   Are you sure you want to delete <strong>{residenceToDelete?.name}</strong>? This action cannot be undone.
@@ -490,8 +481,8 @@ const SupplyResidenceLayer = () => {
                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
                   Cancel
                 </button>
-                <button type="button" className="btn btn-danger" onClick={handleDeleteConfirm} disabled={loading}>
-                  {loading ? "Deleting..." : "Delete"}
+                <button type="button" className="btn btn-danger" onClick={handleDeleteConfirm} disabled={isLoading}>
+                  {isLoading ? "Deleting..." : "Delete"}
                 </button>
               </div>
             </div>

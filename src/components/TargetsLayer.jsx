@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
-const API_URL = "https://api.bizchain.co.ke/v1/suppliers";
+const API_URL = "https://api.bizchain.co.ke/v1/targets";
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -16,10 +16,10 @@ const useDebounce = (value, delay) => {
   return debouncedValue;
 };
 
-const SuppliersLayer = () => {
-  const [suppliers, setSuppliers] = useState([]);
+const TargetsLayer = () => {
+  const [targets, setTargets] = useState([]);
   const [query, setQuery] = useState("");
-  const [supplierToDelete, setSupplierToDelete] = useState(null);
+  const [targetToDelete, setTargetToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
@@ -27,7 +27,7 @@ const SuppliersLayer = () => {
   const [error, setError] = useState(null);
   const debouncedQuery = useDebounce(query, 300);
 
-  const fetchSuppliers = useCallback(async (page = 1, searchQuery = "") => {
+  const fetchTargets = useCallback(async (page = 1, searchQuery = "") => {
     setIsLoading(true);
     setError(null);
     const token = localStorage.getItem("token");
@@ -47,42 +47,32 @@ const SuppliersLayer = () => {
       });
       const result = response.data;
       if (result.status.code === 0) {
-        const mappedSuppliers = result.data.map((supplier) => ({
-          id: supplier.id,
-          firstName: supplier.firstName,
-          lastName: supplier.lastName,
-          phoneNumber: supplier.phoneNumber,
-          productionQuantity: supplier.productionQuantity,
-          numberCattle: supplier.numberCattle,
-          pendingBills: supplier.pendingBills,
-          unpaidBills: supplier.unpaidBills,
-          residence: supplier.supplierResidence.name,
-          paymentMethod: supplier.disbursementMethod.name,
-          transportMode: supplier.transportMode.name,
-          disbursementCriteria: supplier.disbursementCriteria?.name || "",
-          disbursementPhoneNumber: supplier.disbursementPhoneNumber || "",
-          expansionSpace: supplier.expansionSpace,
-          expansionCapacity: supplier.expansionCapacity,
-          contactPersonName: supplier.contactPersonName || "",
-          contactPersonPhoneNumber: supplier.contactPersonPhoneNumber || "",
-          paymentCycle: supplier.paymentCycle || "WKLY",
-          dateCreated: supplier.dateCreated?.split("T")[0] || "N/A",
-        }));
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = Math.min(page * itemsPerPage, result.data.length);
-        const paginatedData = mappedSuppliers.slice(startIndex, endIndex);
-
-        setSuppliers(paginatedData);
-        setTotalItems(result.data.length);
+        const currentDate = new Date();
+        const mappedTargets = result.data.map((target) => {
+          const endDate = new Date(target.endDate);
+          const status = endDate < currentDate ? "Closed" : "Active";
+          return {
+            id: target.id,
+            salesperson: target.salesperson.name,
+            target: target.target || 0,
+            targetType: target.targetType.name,
+            achieved: target.achievement || 0,
+            startDate: target.startDate?.split("T")[0] || "N/A",
+            endDate: target.endDate?.split("T")[0] || "N/A",
+            status: status,
+          };
+        });
+        setTargets(mappedTargets);
+        setTotalItems(result.totalElements);
       } else {
-        setError(`Failed to fetch suppliers: ${result.status.message}`);
-        setSuppliers([]);
+        setError(`Failed to fetch targets: ${result.status.message}`);
+        setTargets([]);
         setTotalItems(0);
       }
     } catch (error) {
-      console.error("Error fetching suppliers:", error);
-      setError(`Error fetching suppliers: ${error.response?.data?.message || error.message}`);
-      setSuppliers([]);
+      console.error("Error fetching targets:", error);
+      setError(`Error fetching targets: ${error.response?.data?.message || error.message}`);
+      setTargets([]);
       setTotalItems(0);
     } finally {
       setIsLoading(false);
@@ -90,11 +80,11 @@ const SuppliersLayer = () => {
   }, [itemsPerPage]);
 
   useEffect(() => {
-    fetchSuppliers(currentPage, debouncedQuery);
-  }, [currentPage, debouncedQuery, fetchSuppliers]);
+    fetchTargets(currentPage, debouncedQuery);
+  }, [currentPage, debouncedQuery, fetchTargets]);
 
-  const handleDeleteClick = (supplier) => {
-    setSupplierToDelete(supplier);
+  const handleDeleteClick = (target) => {
+    setTargetToDelete(target);
   };
 
   const handleDeleteConfirm = async () => {
@@ -107,14 +97,14 @@ const SuppliersLayer = () => {
       return;
     }
     try {
-      await axios.delete(`${API_URL}/${supplierToDelete.id}`, {
+      await axios.delete(`${API_URL}/${targetToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setSupplierToDelete(null);
-      fetchSuppliers(currentPage, debouncedQuery);
+      setTargetToDelete(null);
+      fetchTargets(currentPage, debouncedQuery);
     } catch (error) {
-      console.error("Error deleting supplier:", error);
-      setError(error.response?.data?.message || "Failed to delete supplier.");
+      console.error("Error deleting target:", error);
+      setError(error.response?.data?.message || "Failed to delete target.");
     } finally {
       setIsLoading(false);
     }
@@ -126,8 +116,11 @@ const SuppliersLayer = () => {
     setCurrentPage(1);
   };
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(value || 0);
+  const formatValue = (value, targetType) => {
+    if (targetType === "Sales") {
+      return new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(value || 0);
+    }
+    return value || 0;
   };
 
   const formatDate = (dateString) => {
@@ -158,11 +151,11 @@ const SuppliersLayer = () => {
         <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
           <div className="ms-auto">
             <Link
-              to="/suppliers/add-supplier"
+              to="/targets/add-target"
               className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
             >
               <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Add New Supplier
+              Add New Target
             </Link>
           </div>
         </div>
@@ -178,7 +171,7 @@ const SuppliersLayer = () => {
                 <input
                   type="text"
                   name="search"
-                  placeholder="Search Name or Residence"
+                  placeholder="Search Salesperson"
                   value={query}
                   onChange={handleSearchInputChange}
                   className="form-control"
@@ -201,49 +194,54 @@ const SuppliersLayer = () => {
                     <th className="text-center py-3 px-6" style={{ width: "50px" }}>
                       #
                     </th>
-                    <th className="text-start py-3 px-4">Name</th>
-                    <th className="text-start py-3 px-4">Phone Number</th>
-                    <th className="text-start py-3 px-4">Production (L)</th>
-                    <th className="text-start py-3 px-4">Cattle</th>
-                    <th className="text-start py-3 px-4">Pending Bills</th>
-                    <th className="text-start py-3 px-4">Unpaid Bills</th>
-                    <th className="text-start py-3 px-4">Residence</th>
-                    <th className="text-start py-3 px-4">Payment Method</th>
-                    <th className="text-start py-3 px-4">Date Created</th>
+                    <th className="text-start py-3 px-4">Salesperson</th>
+                    <th className="text-start py-3 px-4">Target</th>
+                    <th className="text-start py-3 px-4">Target Type</th>
+                    <th className="text-start py-3 px-4">Achieved</th>
+                    <th className="text-start py-3 px-4">Start Date</th>
+                    <th className="text-start py-3 px-4">End Date</th>
+                    <th className="text-start py-3 px-4">Status</th>
                     <th className="text-start py-3 px-4">Action</th>
                   </tr>
                 </thead>
                 <tbody style={{ fontSize: "14px" }}>
                   {isLoading ? (
                     <tr>
-                      <td colSpan="11" className="text-center py-3">
+                      <td colSpan="9" className="text-center py-3">
                         <div>
                           <span className="visually-hidden">Loading...</span>
                         </div>
                       </td>
                     </tr>
-                  ) : suppliers.length > 0 ? (
-                    suppliers.map((supplier, index) => (
-                      <tr key={supplier.id} style={{ transition: "background-color 0.2s" }}>
+                  ) : targets.length > 0 ? (
+                    targets.map((target, index) => (
+                      <tr key={target.id} style={{ transition: "background-color 0.2s" }}>
                         <td className="text-center small-text py-3 px-6">
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
-                        <td className="text-start small-text py-3 px-4">{`${supplier.firstName} ${supplier.lastName}`}</td>
-                        <td className="text-start small-text py-3 px-4">{supplier.phoneNumber}</td>
-                        <td className="text-start small-text py-3 px-4">{supplier.productionQuantity}</td>
-                        <td className="text-start small-text py-3 px-4">{supplier.numberCattle}</td>
-                        <td className="text-start small-text py-3 px-4">{formatCurrency(supplier.pendingBills)}</td>
-                        <td className="text-start small-text py-3 px-4">{formatCurrency(supplier.unpaidBills)}</td>
-                        <td className="text-start small-text py-3 px-4">{supplier.residence}</td>
-                        <td className="text-start small-text py-3 px-4">{supplier.paymentMethod}</td>
-                        <td className="text-start small-text py-3 px-4">{formatDate(supplier.dateCreated)}</td>
+                        <td className="text-start small-text py-3 px-4">{target.salesperson}</td>
+                        <td className="text-start small-text py-3 px-4">{formatValue(target.target, target.targetType)}</td>
+                        <td className="text-start small-text py-3 px-4">{target.targetType}</td>
+                        <td className="text-start small-text py-3 px-4">{formatValue(target.achieved, target.targetType)}</td>
+                        <td className="text-start small-text py-3 px-4">{formatDate(target.startDate)}</td>
+                        <td className="text-start small-text py-3 px-4">{formatDate(target.endDate)}</td>
+                        <td className="text-start small-text py-3 px-4">
+                          <span
+                            className={`bg-${
+                              target.status === "Closed" ? "danger-focus" : "success-focus"
+                            } text-${
+                              target.status === "Closed" ? "danger-600" : "success-600"
+                            } px-24 py-4 radius-8 fw-medium text-sm`}
+                          >
+                            {target.status}
+                          </span>
+                        </td>
                         <td className="text-start small-text py-3 px-4">
                           <div className="dropdown">
                             <button
                               className="btn btn-outline-secondary btn-sm dropdown-toggle"
                               type="button"
                               data-bs-toggle="dropdown"
-                              style={{ padding: "4px 8px" }}
                             >
                               Actions
                             </button>
@@ -251,8 +249,8 @@ const SuppliersLayer = () => {
                               <li>
                                 <Link
                                   className="dropdown-item"
-                                  to="/suppliers/details"
-                                  state={{ supplierId: supplier.id }}
+                                  to="/targets/details"
+                                  state={{ targetId: target.id }}
                                 >
                                   Details
                                 </Link>
@@ -260,8 +258,8 @@ const SuppliersLayer = () => {
                               <li>
                                 <Link
                                   className="dropdown-item"
-                                  to="/suppliers/edit-supplier"
-                                  state={{ supplierId: supplier.id }}
+                                  to="/targets/edit-target"
+                                  state={{ targetId: target.id }}
                                 >
                                   Edit
                                 </Link>
@@ -269,9 +267,9 @@ const SuppliersLayer = () => {
                               <li>
                                 <button
                                   className="dropdown-item text-danger"
-                                  onClick={() => handleDeleteClick(supplier)}
+                                  onClick={() => handleDeleteClick(target)}
                                   data-bs-toggle="modal"
-                                  data-bs-target="#deleteSupplierModal"
+                                  data-bs-target="#deleteTargetModal"
                                 >
                                   Delete
                                 </button>
@@ -283,8 +281,8 @@ const SuppliersLayer = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="11" className="text-center py-3">
-                        No suppliers found
+                      <td colSpan="9" className="text-center py-3">
+                        No targets found
                       </td>
                     </tr>
                   )}
@@ -350,18 +348,17 @@ const SuppliersLayer = () => {
         </div>
       </div>
 
-      <div className="modal fade" id="deleteSupplierModal" tabIndex={-1} aria-hidden="true">
+      <div className="modal fade" id="deleteTargetModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body pt-3 ps-18 pe-18">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="modal-title fs-6">Delete Supplier</h6>
+                <h6 className="modal-title fs-6">Delete Target</h6>
                 <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <p className="pb-3 mb-0">
-                Are you sure you want to delete the{" "}
-                <strong>{`${supplierToDelete?.firstName} ${supplierToDelete?.lastName}`}</strong>{" "}
-                supplier permanently? This action cannot be undone.
+                Are you sure you want to delete the target for{" "}
+                <strong>{targetToDelete?.salesperson}</strong> permanently? This action cannot be undone.
               </p>
             </div>
             <div className="d-flex justify-content-end gap-2 px-12 pb-3">
@@ -384,4 +381,4 @@ const SuppliersLayer = () => {
   );
 };
 
-export default SuppliersLayer;
+export default TargetsLayer;

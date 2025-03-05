@@ -1,19 +1,19 @@
 import React from 'react';
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import SalespersonsLayer from "../components/SalespersonsLayer";
+import AddSalespersonsLayer from "../components/AddSalespersonsLayer";
 
-const SalespersonsPage = () => {
+const AddSalespersonsPage = () => {
   return (
     <MasterLayout>
       {/* Breadcrumb */}
       <Breadcrumb title="Salespersons" />
 
-      {/* SalespersonsLayer */}
-      <SalespersonsLayer/>
+      {/* AddSalespersonsLayer */}
+      <AddSalespersonsLayer/>
 
     </MasterLayout>
   );
 };
 
-export default SalespersonsPage;
+export default AddSalespersonsPage;

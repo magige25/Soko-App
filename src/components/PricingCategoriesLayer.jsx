@@ -193,7 +193,7 @@ const PricingCategoriesLayer = () => {
           <div className="ms-auto">
             <button
               type="button"
-              className="btn btn-primary text-sm btn-sm px-12 py-4 radius-8 d-flex align-items-center gap-2"
+              className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
               data-bs-toggle="modal"
               data-bs-target="#exampleModal"
             >

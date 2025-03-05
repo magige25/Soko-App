@@ -346,10 +346,18 @@
 :where([contenteditable]:not([contenteditable="false"])) {
   -moz-user-modify: read-write;
   -webkit-user-modify: read-write;
+  
   overflow-wrap: break-word;
+  word-break: break-word;
+  
   -webkit-line-break: after-white-space;
+  line-break: after-white-space;
+  
   -webkit-user-select: auto;
+  user-select: auto;
 }
+
+
 
 :where([draggable="true"]) {
   -webkit-user-drag: element;
@@ -556,12 +564,13 @@ textarea {
   text-transform: inherit;
 }
 
-button,
 [type="button"],
 [type="reset"],
 [type="submit"] {
   cursor: pointer;
+  appearance: button;
   -webkit-appearance: button;
+  -moz-appearance: button;
 }
 
 button:disabled,
@@ -620,7 +629,9 @@ textarea {
 }
 
 [type="number"] {
+  appearance: textfield;
   -moz-appearance: textfield;
+  -webkit-appearance: textfield;
 }
 
 label[for] {
@@ -6729,27 +6740,29 @@ h6,
 }
 
 .text-line-1 {
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
+  max-height: 1.2em;
+  white-space: nowrap;
 }
 
 .text-line-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: normal;
+  line-height: 1.5em;
+  max-height: 3em;
 }
 
 .text-line-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  display: block;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: normal;
+  line-height: 1.5em;
+  max-height: 4.5em;
 }
 
 /* === typography css end === */
@@ -15817,6 +15830,7 @@ td.fc-header-center {
 /* Buttons (general, excluding action dropdown specific styling) */
 .btn {
   font-size: 13px !important;
+
 }
 
 .alert-danger {
@@ -15892,4 +15906,45 @@ td.fc-header-center {
 .dropdown .dropdown-item.text-danger:hover {
   color: #fff !important;
   background-color: #dc3545 !important;
+}
+
+.btn-secondary {
+  background-color: #f8f9fa !important;
+  color: #212529 !important;
+  border: 1px solid #dee2e6 !important;
+}
+
+.btn-secondary:hover {
+  background-color: #e2e6ea !important;
+}
+
+.form-select {
+  background-position: right 20px center !important; 
+  background-repeat: no-repeat !important;
+  padding-right: 2.5rem !important;
+}
+
+.btn-close {
+  position: relative;
+  transform: scale(0.7);
+}
+
+.btn-close::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 30px; 
+  height: 30px; 
+  background-color: rgba(0, 0, 0, 0.5); 
+  border: 2px solid rgba(0, 123, 255, 0.8); 
+  border-radius: 4px;
+  transform: translate(-50%, -50%) scale(0);
+  opacity: 0;
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.btn-close:hover::after {
+  transform: translate(-50%, -50%) scale(1.1);
+  opacity: 1;
 }

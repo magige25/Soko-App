@@ -282,6 +282,14 @@ const MasterLayout = ({ children }) => {
                     Salespersons
                   </NavLink>
                 </li>
+                <li>
+                  <NavLink
+                    to="/targets"
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
+                  >
+                    Targets
+                  </NavLink>
+                </li>
               </ul>
             </li>
             {/* Payment */}
@@ -489,6 +497,14 @@ const MasterLayout = ({ children }) => {
                     className={(navData) => (navData.isActive ? "active-page" : "")}
                   >
                     Storage Facility
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink
+                    to="/batch"
+                    className={(navData) => (navData.isActive ? "active-page" : "")}
+                  >
+                    Batch
                   </NavLink>
                 </li>
               </ul>

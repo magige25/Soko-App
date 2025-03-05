@@ -90,7 +90,7 @@ const StorageFacilityLayer = () => {
     if (!dateString || isNaN(new Date(dateString).getTime())) return "";
     const date = new Date(dateString);
     const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "short" });
+    const month = date.toLocaleString("en-GB", { month: "long" });
     const year = date.getFullYear();
     const suffix =
       day % 10 === 1 && day !== 11
@@ -101,7 +101,7 @@ const StorageFacilityLayer = () => {
         ? "rd"
         : "th";
     return `${day}${suffix} ${month} ${year}`;
-  };
+  }
 
   return (
     <div className="page-wrapper">

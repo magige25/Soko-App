@@ -13,7 +13,6 @@ const RegionsLayer = () => {
   const [editRegion, setEditRegion] = useState({ id: null, name: '', countryCode: '', country: '' });
   const [regionToDelete, setRegionToDelete] = useState(null);
   const [countries, setCountries] = useState([]);
-  const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
@@ -100,8 +99,8 @@ const RegionsLayer = () => {
       });
       console.log("API Response (Add):", response.data);
       await fetchRegions();
-      setNewRegion({ name: '', countryCode: '' }); // Reset form after success
-      document.getElementById("addRegionModal").classList.remove("show"); // Close modal
+      setNewRegion({ name: '', countryCode: '' });
+      document.getElementById("addRegionModal").classList.remove("show");
       document.body.classList.remove("modal-open");
       const backdrop = document.querySelector(".modal-backdrop");
       if (backdrop) backdrop.remove();
@@ -144,8 +143,8 @@ const RegionsLayer = () => {
       });
       console.log("API Response (Edit):", response.data);
       await fetchRegions();
-      setEditRegion({ id: null, name: '', countryCode: '', country: '' }); // Reset form after success
-      document.getElementById("editRegionModal").classList.remove("show"); // Close modal
+      setEditRegion({ id: null, name: '', countryCode: '', country: '' });
+      document.getElementById("editRegionModal").classList.remove("show");
       document.body.classList.remove("modal-open");
       const backdrop = document.querySelector(".modal-backdrop");
       if (backdrop) backdrop.remove();
@@ -206,7 +205,7 @@ const RegionsLayer = () => {
     if (!dateString || isNaN(new Date(dateString).getTime())) return "";
     const date = new Date(dateString);
     const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "short" });
+    const month = date.toLocaleString("en-GB", { month: "long" });
     const year = date.getFullYear();
     const suffix = (day % 10 === 1 && day !== 11) ? "st" :
                    (day % 10 === 2 && day !== 12) ? "nd" :
@@ -416,41 +415,21 @@ const RegionsLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">
+                    <label className="form-label fw-semibold text-primary-light mb-2">
                       Country <span className="text-danger">*</span>
                     </label>
-                    <div className="position-relative">
-                      <div
-                        className="form-control d-flex justify-content-between align-items-center"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                      >
-                        <span>
-                          {newRegion.countryCode
-                            ? countries.find(c => c.code === newRegion.countryCode)?.name
-                            : "Select Country"}
-                        </span>
-                        <i className="dropdown-toggle ms-2" />
-                      </div>
-                      {showCountryDropdown && (
-                        <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
-                          {countries.map((country) => (
-                            <li key={country.code}>
-                              <button
-                                type="button"
-                                className="dropdown-item"
-                                onClick={() => {
-                                  setNewRegion({ ...newRegion, countryCode: country.code });
-                                  setShowCountryDropdown(false);
-                                }}
-                              >
-                                {country.name}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+                    <select
+                      className="form-control rounded-lg form-select pr-4 bg-white"
+                      value={newRegion.countryCode || ""}
+                      onChange={(e) => setNewRegion({ ...newRegion, countryCode: e.target.value })}
+                    >
+                      <option value="" disabled>Select Country</option>
+                      {countries.map((country) => (
+                        <option key={country.code} value={country.code}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="text-muted small mt-3">
                     Fields marked with <span className="text-danger">*</span> are required.
@@ -495,41 +474,25 @@ const RegionsLayer = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label">
+                    <label className="form-label fw-semibold text-primary-light mb-2">
                       Country <span className="text-danger">*</span>
                     </label>
-                    <div className="position-relative">
-                      <div
-                        className="form-control d-flex justify-content-between align-items-center"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                      >
-                        <span>
-                          {editRegion.countryCode
-                            ? countries.find(c => c.code === editRegion.countryCode)?.name
-                            : "Select Country"}
-                        </span>
-                        <i className="dropdown-toggle ms-2" />
-                      </div>
-                      {showCountryDropdown && (
-                        <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
-                          {countries.map((country) => (
-                            <li key={country.code}>
-                              <button
-                                type="button"
-                                className="dropdown-item"
-                                onClick={() => {
-                                  setEditRegion({ ...editRegion, countryCode: country.code, country: country.name });
-                                  setShowCountryDropdown(false);
-                                }}
-                              >
-                                {country.name}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
+                    <select
+                      className="form-control rounded-lg form-select pr-4 bg-white"
+                      value={editRegion.countryCode || ""}
+                      onChange={(e) => setEditRegion({ 
+                        ...editRegion, 
+                        countryCode: e.target.value,
+                        country: countries.find(c => c.code === e.target.value)?.name || ''
+                      })}
+                    >
+                      <option value="" disabled>Select Country</option>
+                      {countries.map((country) => (
+                        <option key={country.code} value={country.code}>
+                          {country.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="text-muted small mt-3">
                     Fields marked with <span className="text-danger">*</span> are required.
