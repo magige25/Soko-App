@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
-import toast, { Toaster } from "react-hot-toast"; // Import toast and Toaster
+import toast, { Toaster } from "react-hot-toast";
 
 const API_URL = "https://api.bizchain.co.ke/v1/supplier-deliveries";
+const STG_FACILITY_API = "https://api.bizchain.co.ke/v1/storage-facilities";
 
 const EditDelivery = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { delivery } = location.state || {};
+  const [storageFacilities, setStorageFacilities] = useState([]);
+  const [fetchingStorageFacilities, setFetchingStorageFacilities] = useState(true);
+ 
 
   // Initialize state with delivery data or fallback values
   const [editDelivery, setEditDelivery] = useState(
@@ -18,22 +22,49 @@ const EditDelivery = () => {
           supplierName: delivery.supplier?.name || "",
           litres: delivery.litres || "",
           pricePerLitre: delivery.pricePerLitre || "",
+          storageFacility: delivery?.storageFacility?.id || "",          
         }
-      : { supplier: "", supplierName: "", litres: "", pricePerLitre: "" }
+      : { supplier: "", supplierName: "", litres: "", pricePerLitre: "", storageFacility: ""}
   );
 
   useEffect(() => {
+    const fetchStorageFacilities = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(STG_FACILITY_API, {
+          headers: {
+            Authorization:`Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+        console.log("Storage Facility API response:", response.data.data);
+        if (Array.isArray(response.data.data)) {
+          setStorageFacilities(response.data.data);
+        } else if (response.data.data && typeof response.data.data === "object") {
+          setStorageFacilities([response.data.data]);
+        } else {
+          throw new Error("Unexpected API response");      
+        }
+      } catch (error) {
+        console.error("Error fetching Storage Facilities:", error);
+        
+      } finally {
+        setFetchingStorageFacilities(false);
+      }
+    };
+    fetchStorageFacilities();
     if (!delivery) {
-      toast.error("No delivery selected to edit."); // Toast for missing delivery
+      toast.error("No delivery selected to edit.");
       navigate("/deliveries");
+      
     }
   }, [delivery, navigate]);
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
 
-    if (!editDelivery.supplier || !editDelivery.litres || !editDelivery.pricePerLitre) {
-      toast.error("Please fill in all required fields before saving."); // Toast for validation error
+    if (!editDelivery.supplier || !editDelivery.litres || !editDelivery.pricePerLitre || !editDelivery.storageFacility) {
+      toast.error("Please fill in all required fields before saving.");
       return;
     }
 
@@ -49,7 +80,11 @@ const EditDelivery = () => {
         supplier: editDelivery.supplier,
         litres: parseFloat(editDelivery.litres),
         pricePerLitre: parseFloat(editDelivery.pricePerLitre),
+        storageFacilityId: editDelivery.storageFacility,
       };
+
+      console.log("Available storage facilities:", storageFacilities);
+      console.log("Payload being sent:", payload);
 
       const response = await axios.put(`${API_URL}/${delivery.id}`, payload, {
         headers: {
@@ -63,8 +98,8 @@ const EditDelivery = () => {
         navigate("/deliveries");
       }
     } catch (error) {
-      console.error("Error updating Delivery:", error);
-      toast.error("Failed to update Delivery. Please try again."); // Toast for API error
+      console.error("Error updating Delivery:", error.response?.data || error.message);
+      toast.error("Failed to update Delivery. Please try again.");
     }
   };
 
@@ -77,7 +112,7 @@ const EditDelivery = () => {
       toastOptions={{
         success: { style: { background: "#d4edda", color: "#155724" } },
         error: { style: { background: "#f8d7da", color: "#721c24" } },
-      }} /> {/* Add Toaster component */}
+      }} />
       <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
@@ -123,6 +158,31 @@ const EditDelivery = () => {
                     }
                     required
                   />
+                </div>
+                <div className="col-md-6">
+                  <label className="form-label">
+                    Storage Facility <span className="text-danger">*</span>
+                  </label>
+                  <select                    
+                    className="form-control"
+                    value={editDelivery.storageFacility}
+                    onChange={(e) =>
+                      setEditDelivery({ ...editDelivery, storageFacility: e.target.value })
+                    }
+                    required
+                    disabled={fetchingStorageFacilities}
+                  >
+                  <option value ="">Select Storage Facility</option>
+                  {storageFacilities.length > 0 ? (
+                      storageFacilities.map((facility) => (
+                        <option key={facility.id} value={facility.id}>
+                          {`${facility.name}`}
+                        </option>
+                      ))
+                    ) : (
+                      <option value="">No storage facilities available</option>
+                    )}
+                  </select>
                 </div>
               </div>
               <div className="d-flex justify-content-end gap-2">

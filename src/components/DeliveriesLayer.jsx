@@ -167,7 +167,8 @@ const DeliveriesLayer = () => {
                     <th className="text-start py-3 px-4">Name of Supplier</th>
                     <th className="text-start py-3 px-4">Volume (L)</th>
                     <th className="text-start py-3 px-4">Price/Litre</th>
-                    <th className="text-start py-3 px-4">Total Amount</th>
+                    <th className="text-start py-3 px-4">Storage Facility</th>
+                    <th className="text-start py-3 px-4">Total Amount</th>                    
                     <th className="text-start py-3 px-4">Status</th>
                     <th className="text-start py-3 px-4">Created By</th>
                     <th className="text-start py-3 px-4">Date Created</th>
@@ -192,6 +193,7 @@ const DeliveriesLayer = () => {
                         <td className="text-start small-text py-3 px-4">{delivery.supplier.name}</td>
                         <td className="text-start small-text py-3 px-4">{delivery.litres}</td>
                         <td className="text-start small-text py-3 px-4">{formatCurrency(delivery.pricePerLitre.toFixed(2))}</td>
+                        <td className="text-start small-text py-3 px-4">{delivery?.storageFacility?.name || "N/A" }</td>
                         <td className="text-start small-text py-3 px-4">{formatCurrency(delivery.totalAmount.toFixed(2))}</td>
                         <td className="text-start small-text py-3 px-4">{delivery.status.name}</td>
                         <td className="text-start small-text py-3 px-4">{delivery.createdBy.name}</td>
