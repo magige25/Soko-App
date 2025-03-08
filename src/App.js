@@ -137,6 +137,9 @@ import AddTargetsPage from "./pages/AddTargetsPage";
 import EditTargetsPage from "./pages/EditTargetsPage";
 import TargetsDetailsPage from "./pages/TargetsDetailsPage";
 import BatchPage from "./pages/BatchPage";
+import EditProductPage from "./pages/EditProductPage";
+import AddProductPage from "./pages/AddProductPage";
+import AddImagePage from "./pages/AddImagePage";
 
 function App() {
   return (
@@ -209,6 +212,8 @@ function App() {
             <Route path="/deliveries" element={<DeliveriesPage />} />
             <Route path="/deliveries/edit-delivery" element={<EditDeliveryPage />} />
             <Route path="/deliveries/add-delivery" element={<AddDeliveryPage />} />
+            <Route path="/products/add-product" element={<AddProductPage />} />
+            <Route path="/products/edit-product" element={<EditProductPage />} />
             <Route path="/supply-residence" element={<SupplyResidencePage />} />          
             <Route path="/category" element={<CategoryPage />} />
             <Route path="/sub-category" element={<SubCategoryPage />} />
@@ -290,6 +295,7 @@ function App() {
             <Route path="/wallet" element={<WalletPage />} />
             <Route path="/widgets" element={<WidgetsPage />} />
             <Route path="/wizard" element={<WizardPage />} />
+            <Route path="/add-image" element={<AddImagePage />} />
           </Route>
 
           {/* Catch-all route */}
