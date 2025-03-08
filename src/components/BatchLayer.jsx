@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-// import { Link } from "react-router-dom";
 import axios from "axios";
 
-const API_URL = "https://api.bizchain.co.ke/v1/batches";
+const API_URL = "https://api.bizchain.co.ke/v1/stock-batches";
 
 const BatchLayer = () => {
   const [batches, setBatches] = useState([]);
@@ -110,6 +109,10 @@ const BatchLayer = () => {
     return `${day}${suffix} ${month} ${year}`;
   };
 
+  const formatLitres = (value) => {
+    return value !== null && value !== undefined ? `${value.toLocaleString()} L` : "-";
+  };
+
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -139,7 +142,7 @@ const BatchLayer = () => {
                 <Icon icon="ion:search-outline" className="icon" style={{ width: "16px", height: "16px" }} />
               </form>
             </div>
-            <div className="table-responsive" style={{ overflow: "visible" }}>
+            <div className="table-responsive" style={{ overflow: "hidden" }}>
               <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
                 <thead className="table-light text-start small-text" style={{ fontSize: "15px" }}>
                   <tr>
@@ -148,6 +151,8 @@ const BatchLayer = () => {
                     </th>
                     <th className="text-start py-3 px-4">Batch Number</th>
                     <th className="text-start py-3 px-4">Amount</th>
+                    <th className="text-start py-3 px-4">Litres on Production</th>
+                    <th className="text-start py-3 px-4">Remaining Litres</th>
                     <th className="text-start py-3 px-4">Date Created</th>
                     <th className="text-start py-3 px-4">Action</th>
                   </tr>
@@ -155,7 +160,7 @@ const BatchLayer = () => {
                 <tbody style={{ fontSize: "14px" }}>
                   {isLoading ? (
                     <tr>
-                      <td colSpan="5" className="text-center py-3">
+                      <td colSpan="7" className="text-center py-3">
                         <div>
                           <span className="visually-hidden">Loading...</span>
                         </div>
@@ -167,8 +172,10 @@ const BatchLayer = () => {
                         <td className="text-center small-text py-3 px-6">
                           {(currentPage - 1) * itemsPerPage + index + 1}
                         </td>
-                        <td className="text-start small-text py-3 px-4">{batch.batchNumber}</td>
+                        <td className="text-start small-text py-3 px-4">{batch.batchNo}</td>
                         <td className="text-start small-text py-3 px-4">{formatCurrency(batch.amount)}</td>
+                        <td className="text-start small-text py-3 px-4">{formatLitres(batch.productionAmount)}</td>
+                        <td className="text-start small-text py-3 px-4">{formatLitres(batch.remainingAmount)}</td>
                         <td className="text-start small-text py-3 px-4">{formatDate(batch.dateCreated)}</td>
                         <td className="text-start small-text py-3 px-4">
                           <div className="dropdown">
@@ -207,7 +214,7 @@ const BatchLayer = () => {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="5" className="text-center py-3">
+                      <td colSpan="7" className="text-center py-3">
                         No batches found
                       </td>
                     </tr>
@@ -286,10 +293,16 @@ const BatchLayer = () => {
                 {batchToView && (
                   <div className="mt-3">
                     <p>
-                      <strong>Batch Number:</strong> {batchToView.batchNumber}
+                      <strong>Batch Number:</strong> {batchToView.batchNo}
                     </p>
                     <p>
                       <strong>Amount:</strong> {formatCurrency(batchToView.amount)}
+                    </p>
+                    <p>
+                      <strong>Litres on Production:</strong> {formatLitres(batchToView.productionAmount)}
+                    </p>
+                    <p>
+                      <strong>Remaining Litres:</strong> {formatLitres(batchToView.remainingAmount)}
                     </p>
                     <p>
                       <strong>Date Created:</strong> {formatDate(batchToView.dateCreated)}
@@ -316,7 +329,7 @@ const BatchLayer = () => {
                   <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <p className="pb-3 mb-0">
-                  Are you sure you want to delete the batch <strong>{batchToDelete?.batchNumber}</strong>{" "}
+                  Are you sure you want to delete the batch <strong>{batchToDelete?.batchNo}</strong>{" "}
                   permanently? This action cannot be undone.
                 </p>
               </div>

@@ -135,8 +135,8 @@ const UsersListLayer = () => {
               </form>
             </div>
             <div className="table-responsive" style={{ overflow: "visible" }}>
-              <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
-                <thead className="table-light text-start small-text" style={{ fontSize: "15px" }}>
+              <table className="table table-borderless table-hover text-start small-text">
+                <thead className="table-light text-start small-text">
                   <tr>
                     <th className="text-center py-3 px-6" style={{ width: "50px" }}>#</th>
                     <th className="text-start py-3 px-4">First Name</th>

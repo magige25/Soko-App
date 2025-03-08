@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const API_URL = "https://api.bizchain.co.ke/v1/suppliers";
 const DISBURSEMENT_CRITERIA_API = "https://api.bizchain.co.ke/v1/disbursement-criteria";
 const DISBURSEMENT_METHODS_API = "https://api.bizchain.co.ke/v1/disbursement-methods";
 const TRANSPORT_MODE_API = "https://api.bizchain.co.ke/v1/transport-mode";
 const SUPPLIER_RESIDENCE_API = "https://api.bizchain.co.ke/v1/supplier-residence";
+const PAYMENT_CYCLE_API = "https://api.bizchain.co.ke/v1/payment-cycle";
 
 const EditSuppliersLayer = () => {
   const location = useLocation();
@@ -21,7 +24,6 @@ const EditSuppliersLayer = () => {
     numberCattle: "",
     pendingBills: "",
     unpaidBills: "",
-    residence地上: "",
     residence: "",
     paymentMethod: "",
     transportMode: "",
@@ -32,7 +34,7 @@ const EditSuppliersLayer = () => {
     expansionCapacity: "",
     contactPersonName: "",
     contactPersonPhoneNumber: "",
-    paymentCycle: "WKLY",
+    paymentCycle: "", // Not prefilled
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -40,26 +42,30 @@ const EditSuppliersLayer = () => {
   const [disbursementMethods, setDisbursementMethods] = useState([]);
   const [transportModes, setTransportModes] = useState([]);
   const [residences, setResidences] = useState([]);
+  const [paymentCycles, setPaymentCycles] = useState([]);
 
   useEffect(() => {
     if (!supplierId) {
-      navigate("/suppliers");
+      toast.error("No supplier ID provided. Redirecting...");
+      setTimeout(() => navigate("/suppliers"), 1500);
+      return;
     }
 
     const fetchData = async () => {
       const token = localStorage.getItem("token");
       if (!token) {
-        setErrors({ submit: "No authentication token found. Please log in." });
+        toast.error("No authentication token found. Please log in.");
         return;
       }
 
       try {
-        const [supplierRes, criteriaRes, methodsRes, modesRes, residencesRes] = await Promise.all([
+        const [supplierRes, criteriaRes, methodsRes, modesRes, residencesRes, paymentCyclesRes] = await Promise.all([
           axios.get(`${API_URL}/${supplierId}`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(DISBURSEMENT_CRITERIA_API, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(DISBURSEMENT_METHODS_API, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(TRANSPORT_MODE_API, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(SUPPLIER_RESIDENCE_API, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(PAYMENT_CYCLE_API, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
         if (supplierRes.data.status.code === 0) {
@@ -83,65 +89,118 @@ const EditSuppliersLayer = () => {
             expansionCapacity: supplier.expansionCapacity,
             contactPersonName: supplier.contactPersonName || "",
             contactPersonPhoneNumber: supplier.contactPersonPhoneNumber || "",
-            paymentCycle: supplier.paymentCycle || "WKLY", // Ensure this is a string
+            paymentCycle: supplier.paymentCycle?.code || "", // Use code if object, otherwise empty
           });
         }
         if (criteriaRes.data.status.code === 0) setDisbursementCriteria(criteriaRes.data.data);
         if (methodsRes.data.status.code === 0) setDisbursementMethods(methodsRes.data.data);
         if (modesRes.data.status.code === 0) setTransportModes(modesRes.data.data);
         if (residencesRes.data.status.code === 0) setResidences(residencesRes.data.data);
+        if (paymentCyclesRes.data.status.code === 0) setPaymentCycles(paymentCyclesRes.data.data);
       } catch (err) {
         console.error("Error fetching data:", err.response?.data || err.message);
-        setErrors({ submit: "Failed to load supplier data. Please try again." });
+        toast.error("Failed to load supplier data. Please try again.");
       }
     };
     fetchData();
   }, [supplierId, navigate]);
 
   const validateField = (field, value) => {
-    if (field === "expansionSpace" || field === "pendingBills" || field === "unpaidBills") return "";
-    if (typeof value === "string" && !value.trim() && 
-        field !== "expansionCapacity" && field !== "paymentCycle" && 
-        !(field === "disbursementPhoneNumber" && disbursementMethods.find(m => m.name === formData.paymentMethod)?.code !== "MPS") &&
-        !(field === "disbursementLitresTarget" && formData.disbursementCriteria !== "Litres")) {
-      return `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} is required`;
+    const errors = {};
+
+    // Skip validation for non-required fields
+    if (field === "pendingBills" || field === "unpaidBills") return errors;
+
+    // Basic required field validation
+    if (typeof value === "string" && !value.trim()) {
+      if (field === "expansionCapacity" && !formData.expansionSpace) return errors;
+      if (field === "disbursementPhoneNumber" && disbursementMethods.find(m => m.name === formData.paymentMethod)?.code !== "MPS") return errors;
+      if (field === "disbursementLitresTarget" && disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name !== "Litres") return errors;
+      if (field === "paymentCycle" && disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name !== "Time") return errors;
+
+      errors[field] = `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} is required`;
+      return errors;
     }
-    if ((field === "phoneNumber" || field === "contactPersonPhoneNumber" || field === "disbursementPhoneNumber") && 
-        value && typeof value === "string" && !/^\+?\d{9,}$/.test(value)) {
-      return "Please enter a valid phone number";
+
+    // Phone number validation
+    if ((field === "phoneNumber" || field === "contactPersonPhoneNumber" || field === "disbursementPhoneNumber") && value) {
+      const digitsOnly = value.replace(/\D/g, '');
+      if (digitsOnly.length < 9) {
+        errors[field] = "Please enter a valid phone number (at least 9 digits)";
+      }
+      if (value.startsWith("+254") && digitsOnly.length !== 12) {
+        errors[field] = "Phone number with +254 must be 12 digits long (e.g., +254796543648)";
+      }
+      if (value.startsWith("0") && digitsOnly.length !== 10) {
+        errors[field] = "Phone number starting with 0 must be 10 digits long (e.g., 0796543648)";
+      }
     }
-    if ((field === "productionQuantity" || field === "numberCattle" || field === "expansionCapacity" || 
-         field === "pendingBills" || field === "unpaidBills" || field === "disbursementLitresTarget") && value && isNaN(value)) {
-      return `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} must be a number`;
+
+    // Numeric field validation
+    if ((field === "productionQuantity" || field === "numberCattle" || field === "disbursementLitresTarget" || field === "expansionCapacity") && value) {
+      if (isNaN(value)) {
+        errors[field] = `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} must be a number`;
+      } else if (parseFloat(value) < 0) {
+        errors[field] = `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} cannot be negative`;
+      }
     }
-    return "";
+
+    return errors;
   };
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    const error = validateField(field, value);
-    setErrors((prev) => ({
-      ...prev,
-      [field]: error,
-    }));
+    const fieldErrors = validateField(field, value);
+    setErrors((prev) => {
+      if (Object.keys(fieldErrors).length === 0) {
+        const { [field]: _, ...remainingErrors } = prev;
+        return remainingErrors;
+      }
+      return {
+        ...prev,
+        ...fieldErrors,
+      };
+    });
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    const requiredFields = [
+      "firstName", "lastName", "phoneNumber", "productionQuantity",
+      "numberCattle", "residence", "paymentMethod", "transportMode",
+      "disbursementCriteria", "contactPersonName", "contactPersonPhoneNumber"
+    ];
+
+    requiredFields.forEach(field => {
+      Object.assign(newErrors, validateField(field, formData[field]));
+    });
+
+    if (formData.expansionSpace && formData.expansionCapacity) {
+      Object.assign(newErrors, validateField("expansionCapacity", formData.expansionCapacity));
+    }
+
+    if (disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name === "Litres") {
+      Object.assign(newErrors, validateField("disbursementLitresTarget", formData.disbursementLitresTarget));
+    }
+
+    if (disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name === "Time") {
+      Object.assign(newErrors, validateField("paymentCycle", formData.paymentCycle));
+    }
+
+    if (disbursementMethods.find(m => m.name === formData.paymentMethod)?.code === "MPS") {
+      Object.assign(newErrors, validateField("disbursementPhoneNumber", formData.disbursementPhoneNumber));
+    }
+
+    return newErrors;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newErrors = {};
-    Object.keys(formData).forEach((field) => {
-      if (field !== "expansionSpace" && field !== "expansionCapacity" && field !== "paymentCycle" && 
-          field !== "pendingBills" && field !== "unpaidBills" &&
-          !(field === "disbursementPhoneNumber" && disbursementMethods.find(m => m.name === formData.paymentMethod)?.code !== "MPS") &&
-          !(field === "disbursementLitresTarget" && formData.disbursementCriteria !== "Litres")) {
-        const error = validateField(field, formData[field]);
-        if (error) newErrors[field] = error;
-      }
-    });
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
+    const formErrors = validateForm();
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      toast.error("Please fix all errors before submitting");
       return;
     }
 
@@ -181,16 +240,14 @@ const EditSuppliersLayer = () => {
         contactPersonName: formData.contactPersonName,
         contactPersonPhoneNumber: contactPhoneNumber,
         disbursementCriteria: disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.code || "TM",
-        ...(formData.disbursementCriteria === "Litres" && {
+        ...(disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name === "Litres" && {
           disbursementLitresTarget: parseFloat(formData.disbursementLitresTarget) || 0,
         }),
-        paymentCycle: typeof formData.paymentCycle === "object" ? formData.paymentCycle.code : formData.paymentCycle, // Ensure string
+        paymentCycle: formData.paymentCycle,
         ...(disbursementMethods.find(m => m.name === formData.paymentMethod)?.code === "MPS" && {
           disbursementPhoneNumber: disbursementPhoneNumber,
         }),
       };
-
-      console.log("Submitting payload:", JSON.stringify(payload, null, 2));
 
       const response = await axios.put(`${API_URL}/${formData.id}`, payload, {
         headers: {
@@ -200,17 +257,14 @@ const EditSuppliersLayer = () => {
       });
 
       if (response.status === 200 && response.data.status?.code === 0) {
-        navigate("/suppliers");
+        toast.success("Supplier updated successfully!");
+        setTimeout(() => navigate("/suppliers"), 1500);
       } else {
         throw new Error("Unexpected server response");
       }
     } catch (error) {
       console.error("Error updating supplier:", error.response?.data || error.message);
-      setErrors({ 
-        submit: error.response?.data?.message || 
-                error.message || 
-                "Failed to update supplier. Please check your connection and try again." 
-      });
+      toast.error(error.response?.data?.message || error.message || "Failed to update supplier");
     } finally {
       setIsLoading(false);
     }
@@ -218,9 +272,8 @@ const EditSuppliersLayer = () => {
 
   return (
     <div className="card h-100 p-0 radius-12">
+      <ToastContainer position="top-right" autoClose={3000} />
       <div className="card-body">
-        {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
-
         <form onSubmit={handleSubmit}>
           <div className="row gx-3" style={{ fontSize: "14px" }}>
             {/* First Column */}
@@ -407,12 +460,7 @@ const EditSuppliersLayer = () => {
               </label>
               <div 
                 className="form-control radius-8 d-flex align-items-center"
-                style={{ 
-                  border: 'none', 
-                  background: 'transparent', 
-                  height: '38px',
-                  padding: '0' 
-                }}
+                style={{ border: 'none', background: 'transparent', height: '38px', padding: '0' }}
               >
                 <input
                   type="checkbox"
@@ -422,17 +470,48 @@ const EditSuppliersLayer = () => {
                   onChange={(e) => handleInputChange("expansionSpace", e.target.checked)}
                   style={{ width: "30px", height: "30px" }}
                 />
-                <label 
-                  className="form-check-label text-primary-light" 
-                  htmlFor="expansionSpace"
-                  style={{ cursor: 'pointer' }}
-                >
-                  
-                </label>
+                <label className="form-check-label text-primary-light" htmlFor="expansionSpace" style={{ cursor: 'pointer' }}></label>
               </div>
             </div>
 
             {/* Conditional Fields */}
+            {disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name === "Litres" && (
+              <div className="col-md-4 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Disbursement Litres Target <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="number"
+                  className={`form-control radius-8 ${errors.disbursementLitresTarget ? "is-invalid" : ""}`}
+                  placeholder="Enter Litres Target"
+                  value={formData.disbursementLitresTarget}
+                  onChange={(e) => handleInputChange("disbursementLitresTarget", e.target.value)}
+                />
+                {errors.disbursementLitresTarget && <div className="invalid-feedback">{errors.disbursementLitresTarget}</div>}
+              </div>
+            )}
+
+            {disbursementCriteria.find(c => c.name === formData.disbursementCriteria)?.name === "Time" && (
+              <div className="col-md-4 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Payment Cycle <span className="text-danger">*</span>
+                </label>
+                <select
+                  className={`form-control radius-8 form-select ${errors.paymentCycle ? "is-invalid" : ""}`}
+                  value={formData.paymentCycle}
+                  onChange={(e) => handleInputChange("paymentCycle", e.target.value)}
+                >
+                  <option value="">Select Payment Cycle</option>
+                  {paymentCycles.map((cycle) => (
+                    <option key={cycle.code} value={cycle.code}>
+                      {cycle.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.paymentCycle && <div className="invalid-feedback">{errors.paymentCycle}</div>}
+              </div>
+            )}
+
             {disbursementMethods.find(m => m.name === formData.paymentMethod)?.code === "MPS" && (
               <div className="col-md-4 mb-3">
                 <label className="form-label fw-semibold text-primary-light text-sm mb-2">
@@ -446,22 +525,6 @@ const EditSuppliersLayer = () => {
                   onChange={(e) => handleInputChange("disbursementPhoneNumber", e.target.value)}
                 />
                 {errors.disbursementPhoneNumber && <div className="invalid-feedback">{errors.disbursementPhoneNumber}</div>}
-              </div>
-            )}
-
-            {formData.disbursementCriteria === "Litres" && (
-              <div className="col-md-4 mb-3">
-                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
-                  Disbursement Litres Target <span className="text-danger">*</span>
-                </label>
-                <input
-                  type="number"
-                  className={`form-control radius-8 ${errors.disbursementLitresTarget ? "is-invalid" : ""}`}
-                  placeholder="Enter Litres Target"
-                  value={formData.disbursementLitresTarget}
-                  onChange={(e) => handleInputChange("disbursementLitresTarget", e.target.value)}
-                />
-                {errors.disbursementLitresTarget && <div className="invalid-feedback">{errors.disbursementLitresTarget}</div>}
               </div>
             )}
 
