@@ -30,7 +30,6 @@ const CreditorsRequestLayer = () => {
     setCreditorsRequests(updatedCreditorsRequests);
   };
 
-  // Format date as day month year (e.g., "15 Jan 2023")
   const formatDate = (dateString) => {
     if (dateString === "TBD") return "TBD";
     const date = new Date(dateString);
@@ -41,7 +40,6 @@ const CreditorsRequestLayer = () => {
     return `${day} ${month} ${year}`;
   };
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = creditorsRequests.slice(indexOfFirstItem, indexOfLastItem);
@@ -51,69 +49,79 @@ const CreditorsRequestLayer = () => {
     setCurrentPage(pageNumber);
   };
 
-  // Function to determine status class with tighter padding
   const getStatusClass = (status) => {
     switch (status) {
       case "Approved":
-        return "bg-success text-white px-1 py-0 rounded";
+        return "bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm";
       case "Pending":
-        return "bg-warning text-dark px-1 py-0 rounded";
+        return "bg-warning-focus text-warning-600 px-24 py-4 radius-8 fw-medium text-sm";
       case "Rejected":
-        return "bg-danger text-white px-1 py-0 rounded";
+        return "bg-danger-focus text-danger-600 px-24 py-4 radius-8 fw-medium text-sm";
       default:
-        return "bg-secondary text-white px-1 py-0 rounded";
+        return "bg-neutral-200 text-neutral-600 px-24 py-4 radius-8 fw-medium text-sm";
     }
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="row">
-        {/* Creditors Requests table */}
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
-          <div className="card-body">
-            <div>
-              <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}>
-                <input type="text" name="search" placeholder="Search" />
-                <Icon icon="ion:search-outline" className="icon" style={{ width: '16px', height: '16px' }} />
-              </form>
-            </div>
-            <div className="table-responsive" style={{ overflow: 'visible' }}>
-              <table className="table table-borderless text-start small-text" style={{ width: '100%' }}>
-                <thead className="table-light text-start small-text">
-                  <tr>
-                    <th className="text-start">#</th>
-                    <th className="text-start">Name</th>
-                    <th className="text-start">Phone No.</th>
-                    <th className="text-start">Pricing Category</th>
-                    <th className="text-start">Customer Type</th>
-                    <th className="text-start">Route</th>
-                    <th className="text-start">Salesperson</th>
-                    <th className="text-start">Date Created</th>
-                    <th className="text-start">Status</th>
-                    <th className="text-start">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((creditorRequest, index) => (
-                    <tr key={index}>
-                      <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
-                      <td className="text-start small-text">{creditorRequest.name}</td>
-                      <td className="text-start small-text">{creditorRequest.phoneNo}</td>
-                      <td className="text-start small-text">{creditorRequest.pricingCategory}</td>
-                      <td className="text-start small-text">{creditorRequest.customerType}</td>
-                      <td className="text-start small-text">{creditorRequest.route}</td>
-                      <td className="text-start small-text">{creditorRequest.salesperson}</td>
-                      <td className="text-start small-text">{formatDate(creditorRequest.dateCreated)}</td>
-                      <td className="text-start small-text">
-                        <span className={getStatusClass(creditorRequest.status)}>{creditorRequest.status}</span>
-                      </td>
-                      <td className="text-start small-text">
+    <div className="card h-100 p-0 radius-12">
+      <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
+        <div className="d-flex align-items-center flex-wrap gap-3">
+          <form className="navbar-search">
+            <input
+              type="text"
+              className="bg-base h-40-px w-auto"
+              name="search"
+              placeholder="Search"
+            />
+            <Icon icon="ion:search-outline" className="icon" />
+          </form>
+        </div>
+      </div>
 
+      <div className="card-body p-24">
+        <div className="table-responsive scroll-sm">
+          <table className="table table-borderless sm-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-start py-3 px-4">Name</th>
+                <th scope="col" className="text-start py-3 px-4">Phone No.</th>
+                <th scope="col" className="text-start py-3 px-4">Pricing Category</th>
+                <th scope="col" className="text-start py-3 px-4">Customer Type</th>
+                <th scope="col" className="text-start py-3 px-4">Route</th>
+                <th scope="col" className="text-start py-3 px-4">Salesperson</th>
+                <th scope="col" className="text-start py-3 px-4">Date Created</th>
+                <th scope="col" className="text-start py-3 px-4">Status</th>
+                <th scope="col" className="text-start py-3 px-4">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.length > 0 ? (
+                currentItems.map((creditorRequest, index) => (
+                  <tr key={index} style={{ transition: "background-color 0.2s" }}>
+                    <td className="text-center small-text py-3 px-6">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="text-start small-text py-3 px-4">{creditorRequest.name}</td>
+                    <td className="text-start small-text py-3 px-4">{creditorRequest.phoneNo}</td>
+                    <td className="text-start small-text py-3 px-4">{creditorRequest.pricingCategory}</td>
+                    <td className="text-start small-text py-3 px-4">{creditorRequest.customerType}</td>
+                    <td className="text-start small-text py-3 px-4">{creditorRequest.route}</td>
+                    <td className="text-start small-text py-3 px-4">{creditorRequest.salesperson}</td>
+                    <td className="text-start small-text py-3 px-4">{formatDate(creditorRequest.dateCreated)}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      <span className={getStatusClass(creditorRequest.status)}>
+                        {creditorRequest.status}
+                      </span>
+                    </td>
+                    <td className="text-start small-text py-3 px-4">
+                      <div className="action-dropdown">
                         <div className="dropdown">
-                          <button 
-                            className="btn btn-outline-secondary btn-sm dropdown-toggle btn-sm" 
-                            type="button" 
-                            data-bs-toggle="dropdown">
+                          <button
+                            className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                          >
                             Actions
                           </button>
                           <ul className="dropdown-menu">
@@ -145,83 +153,103 @@ const CreditorsRequestLayer = () => {
                             </li>
                           </ul>
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="d-flex justify-content-between align-items-start mt-3">
-              <div className="text-muted">
-                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, creditorsRequests.length)} of {creditorsRequests.length} entries</span>
-              </div>
-              <nav aria-label="Page navigation">
-                <ul className="pagination mb-0">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      <Icon icon="ep:d-arrow-left" />
-                    </button>
-                  </li>
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                      <button
-                        className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      <Icon icon="ep:d-arrow-right" />
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="10" className="text-center py-3">
+                    No creditors requests found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
 
-        {/* View Creditor Request Modal */}
-        <div className="modal fade" id="viewModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body">
-                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  View Creditor Request
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-                </h6>
-                {creditorRequestToView && (
-                  <div className="mt-3">
-                    <p><strong>Name:</strong> {creditorRequestToView.name}</p>
-                    <p><strong>Phone No:</strong> {creditorRequestToView.phoneNo}</p>
-                    <p><strong>Pricing Category:</strong> {creditorRequestToView.pricingCategory}</p>
-                    <p><strong>Customer Type:</strong> {creditorRequestToView.customerType}</p>
-                    <p><strong>Route:</strong> {creditorRequestToView.route}</p>
-                    <p><strong>Salesperson:</strong> {creditorRequestToView.salesperson}</p>
-                    <p><strong>Date Created:</strong> {formatDate(creditorRequestToView.dateCreated)}</p>
-                    <p>
-                      <strong>Status:</strong>
-                      <span className={getStatusClass(creditorRequestToView.status)} style={{ marginLeft: '8px' }}>
-                        {creditorRequestToView.status}
-                      </span>
-                    </p>
-                  </div>
-                )}
-                <div className="d-flex justify-content-end gap-2 mt-3">
-                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          <div className="text-muted" style={{ fontSize: "13px" }}>
+            <span>
+              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+              {Math.min(currentPage * itemsPerPage, creditorsRequests.length)} of {creditorsRequests.length} entries
+            </span>
+          </div>
+          <nav aria-label="Page navigation">
+            <ul className="pagination mb-0" style={{ gap: "6px" }}>
+              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <button
+                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
+                </button>
+              </li>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                  <button
+                    className={`page-link btn ${
+                      currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
+                    } rounded-circle d-flex align-items-center justify-content-center`}
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      padding: "0",
+                      transition: "all 0.2s",
+                      fontSize: "10px",
+                      color: currentPage === i + 1 ? "#fff" : "",
+                    }}
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                </li>
+              ))}
+              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <button
+                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      {/* View Creditor Request Modal */}
+      <div className="modal fade" id="viewModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                View Creditor Request
+                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+              </h6>
+              {creditorRequestToView && (
+                <div className="mt-3">
+                  <p><strong>Name:</strong> {creditorRequestToView.name}</p>
+                  <p><strong>Phone No:</strong> {creditorRequestToView.phoneNo}</p>
+                  <p><strong>Pricing Category:</strong> {creditorRequestToView.pricingCategory}</p>
+                  <p><strong>Customer Type:</strong> {creditorRequestToView.customerType}</p>
+                  <p><strong>Route:</strong> {creditorRequestToView.route}</p>
+                  <p><strong>Salesperson:</strong> {creditorRequestToView.salesperson}</p>
+                  <p><strong>Date Created:</strong> {formatDate(creditorRequestToView.dateCreated)}</p>
+                  <p>
+                    <strong>Status:</strong>
+                    <span className={getStatusClass(creditorRequestToView.status)} style={{ marginLeft: '8px' }}>
+                      {creditorRequestToView.status}
+                    </span>
+                  </p>
                 </div>
+              )}
+              <div className="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               </div>
             </div>
           </div>

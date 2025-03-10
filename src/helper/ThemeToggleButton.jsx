@@ -25,7 +25,7 @@ const ThemeToggleButton = () => {
     return (
         <button
             type="button"
-            className="position-relative border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-1"
+            className="position-relative text-xl border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-1"
             data-theme-toggle
             aria-label={theme} 
             onClick={handleThemeToggle}

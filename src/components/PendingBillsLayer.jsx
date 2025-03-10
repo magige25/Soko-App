@@ -23,7 +23,6 @@ const PendingSuppliesLayer = () => {
   const formatAmount = (amount) =>
     new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
 
-  // Function to format the date as "24 Jan 2025"
   const formatDate = (dateString) => {
     if (!dateString || isNaN(new Date(dateString).getTime())) return "";
     const date = new Date(dateString);
@@ -36,7 +35,6 @@ const PendingSuppliesLayer = () => {
     return `${day}${suffix} ${month} ${year}`;
   };
 
-  // Handle form submission for adding new pending supplies
   const handleAddPendingSupplies = (e) => {
     e.preventDefault();
     if (!newPendingSupplies.name || !newPendingSupplies.country || !newPendingSupplies.orderNo || 
@@ -50,19 +48,17 @@ const PendingSuppliesLayer = () => {
       orderNo: newPendingSupplies.orderNo,
       numberOfItems: Number(newPendingSupplies.numberOfItems),
       amount: Number(newPendingSupplies.amount),
-      dateOrdered: newPendingSupplies.dateOrdered,
+      dateOrdered: newPendingSupplies.dateOrdered || new Date().toISOString().split('T')[0], // Default to today if not set
       status: newPendingSupplies.status,
     };
     setPendingSupplies([...pendingSupplies, newPendingSuppliesData]);
     setNewPendingSupplies({ name: '', country: '', orderNo: '', numberOfItems: '', amount: '', status: '' });
   };
 
-  // Handle edit click
   const handleEditClick = (pendingSupply) => {
     setEditPendingSupplies(pendingSupply);
   };
 
-  // Handle edit submission
   const handleEditSubmit = (e) => {
     e.preventDefault();
     const updatedPendingSupplies = pendingSupplies.map((r) =>
@@ -72,19 +68,16 @@ const PendingSuppliesLayer = () => {
     setEditPendingSupplies({ name: '', country: '', orderNo: '', numberOfItems: '', amount: '', status: '' });
   };
 
-  // Handle delete click
   const handleDeleteClick = (pendingSupply) => {
     setPendingSuppliesToDelete(pendingSupply);
   };
 
-  // Handle delete confirmation
   const handleDeleteConfirm = () => {
     const updatedPendingSupplies = pendingSupplies.filter((r) => r.name !== pendingSuppliesToDelete.name || r.orderNo !== pendingSuppliesToDelete.orderNo);
     setPendingSupplies(updatedPendingSupplies);
     setPendingSuppliesToDelete(null);
   };
 
-  // Pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = pendingSupplies.slice(indexOfFirstItem, indexOfLastItem);
@@ -95,63 +88,66 @@ const PendingSuppliesLayer = () => {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="row">
-        {/* Add Supply */}
-        <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
-          <div className="ms-auto">
-            <button
-              type="button"
-              className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-              data-bs-toggle="modal"
-              data-bs-target="#exampleModal"
-            >
-              <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Add Supply
-            </button>
-          </div>
+    <div className="card h-100 p-0 radius-12">
+      <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
+        <div className="d-flex align-items-center flex-wrap gap-3">
+          <form className="navbar-search">
+            <input
+              type="text"
+              className="bg-base h-40-px w-auto"
+              name="search"
+              placeholder="Search"
+            />
+            <Icon icon="ion:search-outline" className="icon" />
+          </form>
         </div>
+        <button
+          type="button"
+          className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
+          data-bs-toggle="modal"
+          data-bs-target="#exampleModal"
+        >
+          <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
+          Add Supply
+        </button>
+      </div>
 
-        {/* Pending Supplies table */}
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: '100%' }}>
-          <div className="card-body">
-            <div>
-              <form className="navbar-search" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px', width: "32px" }}>
-                <input type="text" name="search" placeholder="Search" />
-                <Icon icon="ion:search-outline" className="icon" style={{ width: '16px', height: '16px' }} />
-              </form>
-            </div>
-            <div className="table-responsive" style={{ overflow: 'visible' }}>
-              <table className="table table-borderless text-start small-text" style={{ width: '100%' }}>
-                <thead className="table-light text-start small-text">
-                  <tr>
-                    <th className="text-start">#</th>
-                    <th className="text-start">Name</th>
-                    <th className="text-start">Country</th>
-                    <th className="text-start">Order No.</th>
-                    <th className="text-start">No. Of Items</th>
-                    <th className="text-start">Amount</th>
-                    <th className="text-start">Date Ordered</th>
-                    <th className="text-start">Status</th>
-                    <th className="text-start">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {currentItems.map((pendingSupply, index) => (
-                    <tr key={index}>
-                      <th scope="row" className="text-start small-text">{indexOfFirstItem + index + 1}</th>
-                      <td className="text-start small-text">{pendingSupply.name}</td>
-                      <td className="text-start small-text">{pendingSupply.country}</td>
-                      <td className="text-start small-text">{pendingSupply.orderNo}</td>
-                      <td className="text-start small-text">{pendingSupply.numberOfItems}</td>
-                      <td className="text-start small-text">{formatAmount(pendingSupply.amount)}</td>
-                      <td className="text-start small-text">{formatDate(pendingSupply.dateOrdered)}</td>
-                      <td className="text-start small-text">{pendingSupply.status}</td>
-                      <td className="text-start small-text">
-                        <div className="action-dropdown">
+      <div className="card-body p-24">
+        <div className="table-responsive scroll-sm">
+          <table className="table table-borderless sm-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-start py-3 px-4">Name</th>
+                <th scope="col" className="text-start py-3 px-4">Country</th>
+                <th scope="col" className="text-start py-3 px-4">Order No.</th>
+                <th scope="col" className="text-start py-3 px-4">No. Of Items</th>
+                <th scope="col" className="text-start py-3 px-4">Amount</th>
+                <th scope="col" className="text-start py-3 px-4">Date Ordered</th>
+                <th scope="col" className="text-start py-3 px-4">Status</th>
+                <th scope="col" className="text-start py-3 px-4">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.length > 0 ? (
+                currentItems.map((pendingSupply, index) => (
+                  <tr key={index} style={{ transition: "background-color 0.2s" }}>
+                    <td className="text-center small-text py-3 px-6">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="text-start small-text py-3 px-4">{pendingSupply.name}</td>
+                    <td className="text-start small-text py-3 px-4">{pendingSupply.country}</td>
+                    <td className="text-start small-text py-3 px-4">{pendingSupply.orderNo}</td>
+                    <td className="text-start small-text py-3 px-4">{pendingSupply.numberOfItems}</td>
+                    <td className="text-start small-text py-3 px-4">{formatAmount(pendingSupply.amount)}</td>
+                    <td className="text-start small-text py-3 px-4">{formatDate(pendingSupply.dateOrdered)}</td>
+                    <td className="text-start small-text py-3 px-4">{pendingSupply.status}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      <div className="action-dropdown">
                         <div className="dropdown">
-                          <button className="btn btn-outline-secondary btn-sm-dropdown-toggle btn-sm" 
-                            type="button" 
+                          <button
+                            className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                            type="button"
                             data-bs-toggle="dropdown"
                           >
                             Actions
@@ -189,195 +185,219 @@ const PendingSuppliesLayer = () => {
                             </li>
                           </ul>
                         </div>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            <div className="d-flex justify-content-between align-items-start mt-3">
-              <div className="text-muted">
-                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, pendingSupplies.length)} of {pendingSupplies.length} entries</span>
-              </div>
-              <nav aria-label="Page navigation">
-                <ul className="pagination mb-0">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
-                    >
-                      <Icon icon="ep:d-arrow-left" />
-                    </button>
-                  </li>
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
-                      <button
-                        className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px w-32-px"
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <button
-                      className="page-link bg-neutral-200 text-secondary-light fw-semibold radius-8 border-0 d-flex align-items-center justify-content-center h-32-px text-md"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      <Icon icon="ep:d-arrow-right" />
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center py-3">
+                    No pending supplies found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
 
-        {/* Add Pending Supplies Modal */}
-        <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body">
-                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Add Supply
-                  <button type="button" className="btn-close" data-bs-dismiss="modal" onClick={() => setNewPendingSupplies({ name: '', country: '', orderNo: '', numberOfItems: '', amount: '', status: '' })}></button>
-                </h6>
-                <form onSubmit={handleAddPendingSupplies}>
-                  <div className="mb-3">
+        <div className="d-flex justify-content-between align-items-center mt-3">
+          <div className="text-muted" style={{ fontSize: "13px" }}>
+            <span>
+              Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+              {Math.min(currentPage * itemsPerPage, pendingSupplies.length)} of {pendingSupplies.length} entries
+            </span>
+          </div>
+          <nav aria-label="Page navigation">
+            <ul className="pagination mb-0" style={{ gap: "6px" }}>
+              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <button
+                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                >
+                  <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
+                </button>
+              </li>
+              {Array.from({ length: totalPages }, (_, i) => (
+                <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                  <button
+                    className={`page-link btn ${
+                      currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
+                    } rounded-circle d-flex align-items-center justify-content-center`}
+                    style={{
+                      width: "30px",
+                      height: "30px",
+                      padding: "0",
+                      transition: "all 0.2s",
+                      fontSize: "10px",
+                      color: currentPage === i + 1 ? "#fff" : "",
+                    }}
+                    onClick={() => handlePageChange(i + 1)}
+                  >
+                    {i + 1}
+                  </button>
+                </li>
+              ))}
+              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <button
+                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                >
+                  <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      {/* Add Pending Supplies Modal */}
+      <div className="modal fade" id="exampleModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                Add Supply
+                <button
+                  type="button"
+                  className="btn-close"
+                  data-bs-dismiss="modal"
+                  onClick={() => setNewPendingSupplies({ name: '', country: '', orderNo: '', numberOfItems: '', amount: '', status: '' })}
+                ></button>
+              </h6>
+              <form onSubmit={handleAddPendingSupplies}>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Name <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control w-100"
+                    name="name"
+                    placeholder="Enter Supplier Name"
+                    value={newPendingSupplies.name}
+                    onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, name: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <div className="position-relative">
                     <label className="form-label">
-                      Name <span className="text-danger">*</span>
+                      Country <span className="text-danger">*</span>
                     </label>
-                    <input
-                      type="text"
-                      className="form-control w-100"
-                      name="name"
-                      placeholder="Enter Supplier Name"
-                      value={newPendingSupplies.name}
-                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, name: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <div className="position-relative">
-                      <label className="form-label">
-                        Country <span className="text-danger">*</span>
-                      </label>
-                      <div
-                        className="form-control d-flex justify-content-between align-items-center"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                      >
-                        <span>{newPendingSupplies.country || "Select Country"}</span>
-                        <i className="dropdown-toggle ms-2"></i>
-                      </div>
-                      {showCountryDropdown && (
-                        <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
-                          {["Kenya", "Uganda", "Tanzania", "USA", "Nigeria", "United Kingdom"].map((country, index) => (
-                            <li key={index}>
-                              <button
-                                type="button"
-                                className="dropdown-item"
-                                onClick={() => {
-                                  setNewPendingSupplies({ ...newPendingSupplies, country });
-                                  setShowCountryDropdown(false);
-                                }}
-                              >
-                                {country}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                    <div
+                      className="form-control d-flex justify-content-between align-items-center"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                    >
+                      <span>{newPendingSupplies.country || "Select Country"}</span>
+                      <i className="dropdown-toggle ms-2"></i>
                     </div>
+                    {showCountryDropdown && (
+                      <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
+                        {["Kenya", "Uganda", "Tanzania", "USA", "Nigeria", "United Kingdom"].map((country, index) => (
+                          <li key={index}>
+                            <button
+                              type="button"
+                              className="dropdown-item"
+                              onClick={() => {
+                                setNewPendingSupplies({ ...newPendingSupplies, country });
+                                setShowCountryDropdown(false);
+                              }}
+                            >
+                              {country}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                  <div className="mb-3">
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Order No. <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    className="form-control w-100"
+                    name="orderNo"
+                    placeholder="Enter Order Number"
+                    value={newPendingSupplies.orderNo}
+                    onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, orderNo: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    No. Of Items <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control w-100"
+                    name="numberOfItems"
+                    placeholder="Enter No. Of Items"
+                    value={newPendingSupplies.numberOfItems}
+                    onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, numberOfItems: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Amount <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control w-100"
+                    name="amount"
+                    placeholder="Enter Amount"
+                    value={newPendingSupplies.amount}
+                    onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, amount: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <div className="position-relative">
                     <label className="form-label">
-                      Order No. <span className="text-danger">*</span>
+                      Status <span className="text-danger">*</span>
                     </label>
-                    <input
-                      type="text"
-                      className="form-control w-100"
-                      name="orderNo"
-                      placeholder="Enter Order Number"
-                      value={newPendingSupplies.orderNo}
-                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, orderNo: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      No. Of Items <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      className="form-control w-100"
-                      name="numberOfItems"
-                      placeholder="Enter No. Of Items"
-                      value={newPendingSupplies.numberOfItems}
-                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, numberOfItems: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Amount <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      className="form-control w-100"
-                      name="amount"
-                      placeholder="Enter Amount"
-                      value={newPendingSupplies.amount}
-                      onChange={(e) => setNewPendingSupplies({ ...newPendingSupplies, amount: e.target.value })}
-                      required
-                    />
-                  </div>
-                  <div className="mb-3">
-                    <div className="position-relative">
-                      <label className="form-label">
-                        Status <span className="text-danger">*</span>
-                      </label>
-                      <div
-                        className="form-control d-flex justify-content-between align-items-center"
-                        style={{ cursor: "pointer" }}
-                        onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                      >
-                        <span>{newPendingSupplies.status || "Select Status"}</span>
-                        <i className="dropdown-toggle ms-2"></i>
-                      </div>
-                      {showStatusDropdown && (
-                        <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
-                          {["Received", "Not Received"].map((status, index) => (
-                            <li key={index}>
-                              <button
-                                type="button"
-                                className="dropdown-item"
-                                onClick={() => {
-                                  setNewPendingSupplies({ ...newPendingSupplies, status });
-                                  setShowStatusDropdown(false);
-                                }}
-                              >
-                                {status}
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+                    <div
+                      className="form-control d-flex justify-content-between align-items-center"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                    >
+                      <span>{newPendingSupplies.status || "Select Status"}</span>
+                      <i className="dropdown-toggle ms-2"></i>
                     </div>
+                    {showStatusDropdown && (
+                      <ul className="dropdown-menu w-100 show" style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}>
+                        {["Received", "Not Received"].map((status, index) => (
+                          <li key={index}>
+                            <button
+                              type="button"
+                              className="dropdown-item"
+                              onClick={() => {
+                                setNewPendingSupplies({ ...newPendingSupplies, status });
+                                setShowStatusDropdown(false);
+                              }}
+                            >
+                              {status}
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
-                  <div className="text-muted small mt-3">
-                    Fields marked with <span className="text-danger">*</span> are required.
-                  </div>
-                  <div className="d-flex justify-content-end gap-2">
-                    <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
-                  </div>
-                </form>
-              </div>
+                </div>
+                <div className="text-muted small mt-3">
+                  Fields marked with <span className="text-danger">*</span> are required.
+                </div>
+                <div className="d-flex justify-content-end gap-2">
+                  <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

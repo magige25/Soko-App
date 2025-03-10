@@ -1117,7 +1117,7 @@ const MasterLayout = ({ children }) => {
                   <ThemeToggleButton />
                   <div className="dropdown">
                     <button
-                      className="position-relative border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-3"
+                      className="position-relative border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-1"
                       type="button"
                       data-bs-toggle="dropdown"
                     >
@@ -1125,7 +1125,6 @@ const MasterLayout = ({ children }) => {
                         icon="mage:email"
                         className="text-primary-light text-xl"
                       />
-                      <span className="indicator-dot"></span>
                     </button>
                     <div className="dropdown-menu to-top dropdown-menu-lg p-0">
                       <div className="m-16 py-12 px-16 radius-4 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
@@ -1210,9 +1209,9 @@ const MasterLayout = ({ children }) => {
                       </div>
                     </div>
                   </div>
-                  <div className="notification-dropdown">
+                  <div className="dropdown">
                     <button
-                      className="position-relative border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-3"
+                      className="position-relative border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-1"
                       type="button"
                       data-bs-toggle="dropdown"
                     >
@@ -1220,7 +1219,6 @@ const MasterLayout = ({ children }) => {
                         icon="iconoir:bell"
                         className="text-primary-light text-xl"
                       />
-                      <span className="indicator-dot"></span>
                     </button>
                     <div className="dropdown-menu to-top dropdown-menu-lg p-0">
                       <div className="m-16 py-12 px-16 radius-4 bg-primary-50 mb-16 d-flex align-items-center justify-content-between gap-2">
@@ -1229,7 +1227,7 @@ const MasterLayout = ({ children }) => {
                             Notifications
                           </h6>
                         </div>
-                        <span className="text-primary-600 fw-semibold text-lg w-40-px h-40-px square-shape bg-base d-flex justify-content-center align-items-center">
+                        <span className="text-primary-600 fw-semibold text-lg w-40-px h-40-px rounded-circle bg-base d-flex justify-content-center align-items-center">
                           05
                         </span>
                       </div>
@@ -1239,7 +1237,7 @@ const MasterLayout = ({ children }) => {
                           className="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between"
                         >
                           <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
-                            <span className="w-44-px h-44-px bg-success-subtle text-success-main square-shape d-flex justify-content-center align-items-center flex-shrink-0">
+                            <span className="w-44-px h-44-px bg-success-subtle text-success-main rounded-circle d-flex justify-content-center align-items-center flex-shrink-0">
                               <Icon
                                 icon="bitcoin-icons:verify-outline"
                                 className="icon text-xxl"
@@ -1296,7 +1294,7 @@ const MasterLayout = ({ children }) => {
                   </div>
                   <div className="dropdown">
                     <button
-                      className="user-image d-flex justify-content-center align-items-center rounded-circle position-relative gap-3"
+                      className="user-image d-flex justify-content-center align-items-center rounded-circle position-relative gap-2"
                       type="button"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
@@ -1363,7 +1361,7 @@ const MasterLayout = ({ children }) => {
                         </li>
                         <li>
                           <button
-                            className="dropdown-item text-black px-0 py-8 hover-text-danger d-flex align-items-center gap-3 w-100"
+                            className="dropdown-item text-black px-0 py-8 hover-text-danger d-flex align-items-center gap-3 w-100 mt-32"
                             onClick={signOut}
                           >
                             <Icon icon="lucide:power" className="icon text-md" />{" "}

@@ -101,186 +101,190 @@ const StorageFacilityLayer = () => {
         ? "rd"
         : "th";
     return `${day}${suffix} ${month} ${year}`;
-  }
+  };
 
   return (
-    <div className="page-wrapper">
-      <div className="row">
-        <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
-          <div className="ms-auto">
-            <Link
-              to="/storage-facility/add-facility"
-              className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-            >
-              <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Add New Facility
-            </Link>
-          </div>
+    <div className="card h-100 p-0 radius-12">
+      <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
+        <div className="d-flex align-items-center flex-wrap gap-3">
+          <form className="navbar-search">
+            <input
+              type="text"
+              className="bg-base h-40-px w-auto"
+              name="search"
+              placeholder="Search by name or location"
+              value={query}
+              onChange={handleSearchInputChange}
+            />
+            <Icon icon="ion:search-outline" className="icon" />
+          </form>
         </div>
+        <Link
+          to="/storage-facility/add-facility"
+          className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
+        >
+          <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
+          Add New Facility
+        </Link>
+      </div>
 
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
-          <div className="card-body">
-            {error && <div className="alert alert-danger">{error}</div>}
-            <div>
-              <form
-                className="navbar-search mb-3"
-                style={{ display: "flex", alignItems: "center", gap: "10px" }}
-              >
-                <input
-                  type="text"
-                  name="search"
-                  placeholder="Search by name or location"
-                  value={query}
-                  onChange={handleSearchInputChange}
-                  className="form-control"
-                  style={{ maxWidth: "300px" }}
-                />
-                <Icon icon='ion:search-outline' className='icon' style={{ width: '16px', height: '16px' }} />
-              </form>
-            </div>
-            <div className="table-responsive" style={{ overflow: "visible" }}>
-              <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
-                <thead className="table-light text-start small-text" style={{ fontSize: "15px" }}><tr><th className="text-center py-3 px-6" style={{ width: "50px" }}>#</th><th className="text-start py-3 px-4">Name</th><th className="text-start py-3 px-4">Location</th><th className="text-start py-3 px-4">Capacity (L)</th><th className="text-start py-3 px-4">Stock Volume (L)</th><th className="text-start py-3 px-4">Overflow (L)</th><th className="text-start py-3 px-4">Last Refilled</th><th className="text-start py-3 px-4">Last Drawn</th><th className="text-start py-3 px-4">Action</th></tr></thead>
-                <tbody style={{ fontSize: "14px" }}>
-                  {isLoading ? (
-                    <tr>
-                      <td colSpan="9" className="text-center py-3">
-                        <div>
-                          <span className="visually-hidden">Loading...</span>
+      <div className="card-body p-24">
+        {error && <div className="alert alert-danger">{error}</div>}
+        <div className="table-responsive scroll-sm">
+          <table className="table table-borderless sm-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-start py-3 px-4">Name</th>
+                <th scope="col" className="text-start py-3 px-4">Location</th>
+                <th scope="col" className="text-start py-3 px-4">Capacity (L)</th>
+                <th scope="col" className="text-start py-3 px-4">Stock Volume (L)</th>
+                <th scope="col" className="text-start py-3 px-4">Overflow (L)</th>
+                <th scope="col" className="text-start py-3 px-4">Last Refilled</th>
+                <th scope="col" className="text-start py-3 px-4">Last Drawn</th>
+                <th scope="col" className="text-start py-3 px-4">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan="9" className="text-center py-3">
+                    <div>
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : facilities.length > 0 ? (
+                facilities.map((facility, index) => (
+                  <tr key={facility.id} style={{ transition: "background-color 0.2s" }}>
+                    <td className="text-center small-text py-3 px-6">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="text-start small-text py-3 px-4">{facility.name}</td>
+                    <td className="text-start small-text py-3 px-4">{facility.location || '-'}</td>
+                    <td className="text-start small-text py-3 px-4">{facility.capacity.toLocaleString()}</td>
+                    <td className="text-start small-text py-3 px-4">{facility.stockVolume?.toLocaleString() || '-'}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      {facility.overflow !== undefined && facility.overflow !== null
+                        ? facility.overflow === 0
+                          ? '0'
+                          : facility.overflow.toLocaleString()
+                        : '-'}
+                    </td>
+                    <td className="text-start small-text py-3 px-4">
+                      {formatDate(facility.dateLastRefilled) || '-'}
+                    </td>
+                    <td className="text-start small-text py-3 px-4">
+                      {formatDate(facility.dateLastDrawn) || '-'}
+                    </td>
+                    <td className="text-start small-text py-3 px-4">
+                      <div className="action-dropdown">
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                          >
+                            Actions
+                          </button>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <Link
+                                className="dropdown-item"
+                                to="/storage-facility/facility-details"
+                                state={{ facilityId: facility.id }}
+                              >
+                                Details
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                className="dropdown-item"
+                                to="/storage-facility/edit-facility"
+                                state={{ facilityId: facility.id }}
+                              >
+                                Edit
+                              </Link>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item text-danger"
+                                onClick={() => handleDeleteClick(facility)}
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteFacilityModal"
+                              >
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
                         </div>
-                      </td>
-                    </tr>
-                  ) : facilities.length > 0 ? (
-                    facilities.map((facility, index) => (
-                      <tr key={facility.id} style={{ transition: "background-color 0.2s" }}>
-                        <td className="text-center small-text py-3 px-6">
-                          {(currentPage - 1) * itemsPerPage + index + 1}
-                        </td>
-                        <td className="text-start small-text py-3 px-4">{facility.name}</td>
-                        <td className="text-start small-text py-3 px-4">{facility.location || '-'}</td>
-                        <td className="text-start small-text py-3 px-4">{facility.capacity.toLocaleString()}</td>
-                        <td className="text-start small-text py-3 px-4">{facility.stockVolume?.toLocaleString() || '-'}</td>
-                        <td className="text-start small-text py-3 px-4">
-                          {facility.overflow !== undefined && facility.overflow !== null
-                            ? facility.overflow === 0
-                              ? '0'
-                              : facility.overflow.toLocaleString()
-                            : '-'}
-                        </td>
-                        <td className="text-start small-text py-3 px-4">
-                          {formatDate(facility.dateLastRefilled) || '-'}
-                        </td>
-                        <td className="text-start small-text py-3 px-4">
-                          {formatDate(facility.dateLastDrawn) || '-'}
-                        </td>
-                        <td className="text-start small-text py-3 px-4">
-                          <div className="dropdown">
-                            <button
-                              className="btn btn-outline-secondary btn-sm dropdown-toggle"
-                              type="button"
-                              data-bs-toggle="dropdown"
-                            >
-                              Actions
-                            </button>
-                            <ul className="dropdown-menu">
-                              <li>
-                                <Link
-                                  className="dropdown-item"
-                                  to="/storage-facility/facility-details"
-                                  state={{ facilityId: facility.id }}
-                                >
-                                  Details
-                                </Link>
-                              </li>
-                              <li>
-                                <Link
-                                  className="dropdown-item"
-                                  to="/storage-facility/edit-facility"
-                                  state={{ facilityId: facility.id }}
-                                >
-                                  Edit
-                                </Link>
-                              </li>
-                              <li>
-                                <button
-                                  className="dropdown-item text-danger"
-                                  onClick={() => handleDeleteClick(facility)}
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#deleteFacilityModal"
-                                >
-                                  Delete
-                                </button>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="9" className="text-center py-3">
-                        No facilities found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-
-            {!isLoading && (
-              <div className="d-flex justify-content-between align-items-center mt-3">
-                <div className="text-muted" style={{ fontSize: "13px" }}>
-                  <span>
-                    Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
-                    {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
-                  </span>
-                </div>
-                <nav aria-label="Page navigation">
-                  <ul className="pagination mb-0" style={{ gap: "6px" }}>
-                    <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                      <button
-                        className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                        onClick={() => handlePageChange(currentPage - 1)}
-                        disabled={currentPage === 1}
-                      >
-                        <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
-                      </button>
-                    </li>
-                    {Array.from({ length: totalPages }, (_, i) => (
-                      <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-                        <button
-                          className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle d-flex align-items-center justify-content-center`}
-                          style={{
-                            width: "30px",
-                            height: "30px",
-                            padding: "0",
-                            transition: "all 0.2s",
-                            fontSize: "10px",
-                            color: currentPage === i + 1 ? "#fff" : "",
-                          }}
-                          onClick={() => handlePageChange(i + 1)}
-                        >
-                          {i + 1}
-                        </button>
-                      </li>
-                    ))}
-                    <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                      <button
-                        className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                        style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                        onClick={() => handlePageChange(currentPage + 1)}
-                        disabled={currentPage === totalPages}
-                      >
-                        <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
-                      </button>
-                    </li>
-                  </ul>
-                </nav>
-              </div>
-            )}
-          </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-center py-3">
+                    No facilities found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
+
+        {!isLoading && (
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <div className="text-muted" style={{ fontSize: "13px" }}>
+              <span>
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{' '}
+                {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+              </span>
+            </div>
+            <nav aria-label="Page navigation">
+              <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <button
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
+                  </button>
+                </li>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                    <button
+                      className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle d-flex align-items-center justify-content-center`}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        padding: "0",
+                        transition: "all 0.2s",
+                        fontSize: "10px",
+                        color: currentPage === i + 1 ? "#fff" : "",
+                      }}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
 
       <div className="modal fade" id="deleteFacilityModal" tabIndex={-1} aria-hidden="true">

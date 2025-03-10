@@ -109,7 +109,6 @@ const CountriesLayer = () => {
       }
     } catch (error) {
       console.error("Error adding country:", error);
-      // Enhanced error logging with server response if available
       const errorMessage = error.response?.data?.message || error.message || "Failed to add country. Server error occurred.";
       setError(errorMessage);
     } finally {
@@ -181,11 +180,6 @@ const CountriesLayer = () => {
     setCountryToView(country);
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    filterCountries(query);
-  };
-
   const handleSearchInputChange = (e) => {
     const searchQuery = e.target.value;
     setQuery(searchQuery);
@@ -223,356 +217,362 @@ const CountriesLayer = () => {
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="row">
-        <div className="d-flex align-items-center justify-content-between page-breadcrumb mb-3">
-          <div className="ms-auto">
-            <button
-              ref={addButtonRef}
-              type="button"
-              className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-              data-bs-toggle="modal"
-              data-bs-target="#addCountryModal"
-            >
-              <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-              Add New Country
-            </button>
-          </div>
+    <div className="card h-100 p-0 radius-12">
+      <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
+        <div className="d-flex align-items-center flex-wrap gap-3">
+          <form className="navbar-search">
+            <input
+              type="text"
+              className="bg-base h-40-px w-auto"
+              name="search"
+              placeholder="Search by code, name, or currency"
+              value={query}
+              onChange={handleSearchInputChange}
+            />
+            <Icon icon="ion:search-outline" className="icon" />
+          </form>
         </div>
+        <button
+          ref={addButtonRef}
+          type="button"
+          className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
+          data-bs-toggle="modal"
+          data-bs-target="#addCountryModal"
+        >
+          <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
+          Add New Country
+        </button>
+      </div>
 
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
-          <div className="card-body">
-            {error && <div className="alert alert-danger">{error}</div>}
-            <div>
-              <form
-                className="navbar-search mb-3"
-                onSubmit={handleSearch}
-                style={{ display: "flex", alignItems: "center", gap: "10px" }}
-              >
-                <input
-                  type="text"
-                  name="search"
-                  placeholder="Search by code, name, or currency"
-                  value={query}
-                  onChange={handleSearchInputChange}
-                  className="form-control"
-                  style={{ maxWidth: "300px" }}
-                />
-                <Icon icon="ion:search-outline" className="icon" style={{ width: "16px", height: "16px" }} />
-              </form>
-            </div>
-            <div className="table-responsive" style={{ overflow: "visible" }}>
-              <table className="table table-borderless table-hover text-start small-text" style={{ width: "100%" }}>
-                <thead className="table-light text-start small-text" style={{ fontSize: "15px" }}>
-                  <tr>
-                    <th className="text-center py-3 px-6" style={{ width: "50px"}}>#</th>
-                    <th className="text-start py-3 px-4">Code</th>
-                    <th className="text-start py-3 px-4">Name</th>
-                    <th className="text-start py-3 px-4">Currency</th>
-                    <th className="text-start py-3 px-4">Date Created</th>
-                    <th className="text-start py-3 px-4">Action</th>
+      <div className="card-body p-24">
+        {error && <div className="alert alert-danger">{error}</div>}
+        <div className="table-responsive scroll-sm">
+          <table className="table table-borderless sm-table mb-0">
+            <thead>
+              <tr>
+                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-start py-3 px-4">Code</th>
+                <th scope="col" className="text-start py-3 px-4">Name</th>
+                <th scope="col" className="text-start py-3 px-4">Currency</th>
+                <th scope="col" className="text-start py-3 px-4">Date Created</th>
+                <th scope="col" className="text-start py-3 px-4">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {isLoading ? (
+                <tr>
+                  <td colSpan="6" className="text-center py-3">
+                    <div>
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : currentItems.length > 0 ? (
+                currentItems.map((country, index) => (
+                  <tr key={country.code} style={{ transition: "background-color 0.2s" }}>
+                    <td className="text-center small-text py-3 px-6">
+                      {(currentPage - 1) * itemsPerPage + index + 1}
+                    </td>
+                    <td className="text-start small-text py-3 px-4">{country.code}</td>
+                    <td className="text-start small-text py-3 px-4">{country.name}</td>
+                    <td className="text-start small-text py-3 px-4">{country.currency?.name || 'N/A'}</td>
+                    <td className="text-start small-text py-3 px-4">{country.dateCreated ? formatDate(country.dateCreated) : ""}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      <div className="action-dropdown">
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                          >
+                            Actions
+                          </button>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <Link
+                                className="dropdown-item"
+                                to="#"
+                                data-bs-toggle="modal"
+                                data-bs-target="#viewCountryModal"
+                                onClick={() => handleViewClick(country)}
+                              >
+                                Details
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                className="dropdown-item"
+                                to="#"
+                                data-bs-toggle="modal"
+                                data-bs-target="#editCountryModal"
+                                onClick={() => handleEditClick(country)}
+                              >
+                                Edit
+                              </Link>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item text-danger"
+                                onClick={() => handleDeleteClick(country)}
+                                data-bs-toggle="modal"
+                                data-bs-target="#deleteCountryModal"
+                              >
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      </div>
+                    </td>
                   </tr>
-                </thead>
-                <tbody style={{ fontSize: "14px" }}>
-                  {currentItems.length > 0 ? (
-                    currentItems.map((country) => (
-                      <tr key={country.code} style={{ transition: "background-color 0.2s" }}>
-                        <td className="text-center small-text py-3 px-6">
-                          {indexOfFirstItem + currentItems.indexOf(country) + 1}
-                        </td>
-                        <td className="text-start small-text py-3 px-4">{country.code}</td>
-                        <td className="text-start small-text py-3 px-4">{country.name}</td>
-                        <td className="text-start small-text py-3 px-4">{country.currency?.name || 'N/A'}</td>
-                        <td className="text-start small-text py-3 px-4">{country.dateCreated ? formatDate(country.dateCreated) : ""}</td>
-                        <td className="text-start small-text py-3 px-4">
-                          <div className="dropdown">
-                            <button
-                              className="btn btn-outline-secondary btn-sm dropdown-toggle"
-                              type="button"
-                              data-bs-toggle="dropdown"
-                              style={{ padding: "4px 8px" }}
-                            >
-                              Actions
-                            </button>
-                            <ul className="dropdown-menu">
-                              <li>
-                                <Link
-                                  className="dropdown-item"
-                                  to="#"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#viewCountryModal"
-                                  onClick={() => handleViewClick(country)}
-                                >
-                                  Details
-                                </Link>
-                              </li>
-                              <li>
-                                <Link
-                                  className="dropdown-item"
-                                  to="#"
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#editCountryModal"
-                                  onClick={() => handleEditClick(country)}
-                                >
-                                  Edit
-                                </Link>
-                              </li>
-                              <li>
-                                <button
-                                  className="dropdown-item text-danger"
-                                  onClick={() => handleDeleteClick(country)}
-                                  data-bs-toggle="modal"
-                                  data-bs-target="#deleteCountryModal"
-                                >
-                                  Delete
-                                </button>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td colSpan="6" className="text-center py-3">
-                        No countries found
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="text-center py-3">
+                    No countries found
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
 
-            <div className="d-flex justify-content-between align-items-center mt-3">
-              <div className="text-muted">
-                <span>Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredCountries.length)} of {filteredCountries.length} entries</span>
-              </div>
-              <nav aria-label="Page navigation">
-                <ul className="pagination mb-0" style={{ gap: "8px" }}>
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+        {!isLoading && (
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <div className="text-muted" style={{ fontSize: "13px" }}>
+              <span>
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                {Math.min(currentPage * itemsPerPage, filteredCountries.length)} of {filteredCountries.length} entries
+              </span>
+            </div>
+            <nav aria-label="Page navigation">
+              <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <button
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                  >
+                    <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
+                  </button>
+                </li>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
                     <button
-                      className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                      style={{ width: "36px", height: "36px", padding: "0", transition: "all 0.2s" }}
-                      onClick={() => handlePageChange(currentPage - 1)}
-                      disabled={currentPage === 1}
+                      className={`page-link btn ${
+                        currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
+                      } rounded-circle d-flex align-items-center justify-content-center`}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        padding: "0",
+                        transition: "all 0.2s",
+                        fontSize: "10px",
+                        color: currentPage === i + 1 ? "#fff" : "",
+                      }}
+                      onClick={() => handlePageChange(i + 1)}
                     >
-                      <Icon icon="ep:d-arrow-left" style={{ fontSize: "18px" }} />
+                      {i + 1}
                     </button>
                   </li>
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-                      <button
-                        className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle d-flex align-items-center justify-content-center`}
-                        style={{
-                          width: "36px",
-                          height: "36px",
-                          padding: "0",
-                          transition: "all 0.2s",
-                          color: currentPage === i + 1 ? "#fff" : "",
-                        }}
-                        onClick={() => handlePageChange(i + 1)}
-                      >
-                        {i + 1}
-                      </button>
-                    </li>
-                  ))}
-                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                    <button
-                      className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                      style={{ width: "36px", height: "36px", padding: "0", transition: "all 0.2s" }}
-                      onClick={() => handlePageChange(currentPage + 1)}
-                      disabled={currentPage === totalPages}
-                    >
-                      <Icon icon="ep:d-arrow-right" style={{ fontSize: "18px" }} />
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
+                ))}
+                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                  </button>
+                </li>
+              </ul>
+            </nav>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* Add Country Modal */}
-        <div className="modal fade" id="addCountryModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body">
-                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Add Country
-                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </h6>
-                {error && <div className="alert alert-danger">{error}</div>}
-                <form onSubmit={handleAddCountry}>
-                  {["code", "name"].map((field) => (
-                    <div className="mb-3" key={field}>
-                      <label className="form-label">
-                        {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder={`Enter Country ${field.charAt(0).toUpperCase() + field.slice(1)}`}
-                        value={newCountry[field]}
-                        onChange={(e) => setNewCountry({ ...newCountry, [field]: e.target.value })}
-                        required
-                      />
-                    </div>
-                  ))}
-                  <div className="mb-3">
+      {/* Add Country Modal */}
+      <div className="modal fade" id="addCountryModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                Add Country
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </h6>
+              {error && <div className="alert alert-danger">{error}</div>}
+              <form onSubmit={handleAddCountry}>
+                {["code", "name"].map((field) => (
+                  <div className="mb-3" key={field}>
                     <label className="form-label">
-                      Currency <span className="text-danger">*</span>
+                      {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
                     </label>
-                    <select
+                    <input
+                      type="text"
                       className="form-control"
-                      value={newCountry.currencyCode}
-                      onChange={(e) => setNewCountry({ ...newCountry, currencyCode: e.target.value })}
+                      placeholder={`Enter Country ${field.charAt(0).toUpperCase() + field.slice(1)}`}
+                      value={newCountry[field]}
+                      onChange={(e) => setNewCountry({ ...newCountry, [field]: e.target.value })}
                       required
-                    >
-                      <option value="">Select Currency</option>
-                      {currencies.map((currency) => (
-                        <option key={currency.code} value={currency.code}>
-                          {currency.name}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </div>
-                  <div className="text-muted small mt-3">
-                    Fields marked with <span className="text-danger">*</span> are required.
-                  </div>
-                  <div className="d-flex justify-content-end gap-2">
-                    <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                      {isLoading ? "Saving..." : "Save"}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Edit Country Modal */}
-        <div className="modal fade" id="editCountryModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body">
-                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Edit Country
-                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </h6>
-                {error && <div className="alert alert-danger">{error}</div>}
-                <form onSubmit={handleEditSubmit}>
-                  {["code", "name"].map((field) => (
-                    <div className="mb-3" key={field}>
-                      <label className="form-label">
-                        {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder={`Enter Country ${field.charAt(0).toUpperCase() + field.slice(1)}`}
-                        value={editCountry[field]}
-                        onChange={(e) => setEditCountry({ ...editCountry, [field]: e.target.value })}
-                        required
-                      />
-                    </div>
-                  ))}
-                  <div className="mb-3">
-                    <label className="form-label">
-                      Currency <span className="text-danger">*</span>
-                    </label>
-                    <select
-                      className="form-control"
-                      value={editCountry.currencyCode}
-                      onChange={(e) => setEditCountry({ ...editCountry, currencyCode: e.target.value })}
-                      required
-                    >
-                      <option value="">Select Currency</option>
-                      {currencies.map((currency) => (
-                        <option key={currency.code} value={currency.code}>
-                          {currency.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="text-muted small mt-3">
-                    Fields marked with <span className="text-danger">*</span> are required.
-                  </div>
-                  <div className="d-flex justify-content-end gap-2">
-                    <button
-                      type="submit"
-                      className="btn btn-primary"
-                      disabled={isLoading}
-                      data-bs-dismiss={!isLoading && !error ? "modal" : undefined}
-                    >
-                      {isLoading ? "Saving..." : "Save"}
-                    </button>
-                  </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* View Country Modal */}
-        <div className="modal fade" id="viewCountryModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body">
-                <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                  Details
-                  <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </h6>
-                {countryToView && (
-                  <div className="mt-3">
-                    <p className="mb-3">
-                      <strong>Code:</strong> {countryToView.code}
-                    </p>
-                    <p className="mb-3">
-                      <strong>Name:</strong> {countryToView.name}
-                    </p>
-                    <p className="mb-3">
-                      <strong>Currency:</strong> {countryToView.currency?.name || 'N/A'}
-                    </p>
-                    <p className="mb-3">
-                      <strong>Date Created:</strong> {countryToView.dateCreated ? formatDate(countryToView.dateCreated) : "N/A"}
-                    </p>
-                  </div>
-                )}
-                <div className="d-flex justify-content-end gap-2 mt-3">
-                  <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                    Close
+                ))}
+                <div className="mb-3">
+                  <label className="form-label">
+                    Currency <span className="text-danger">*</span>
+                  </label>
+                  <select
+                    className="form-control"
+                    value={newCountry.currencyCode}
+                    onChange={(e) => setNewCountry({ ...newCountry, currencyCode: e.target.value })}
+                    required
+                  >
+                    <option value="">Select Currency</option>
+                    {currencies.map((currency) => (
+                      <option key={currency.code} value={currency.code}>
+                        {currency.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="text-muted small mt-3">
+                  Fields marked with <span className="text-danger">*</span> are required.
+                </div>
+                <div className="d-flex justify-content-end gap-2">
+                  <button type="submit" className="btn btn-primary" disabled={isLoading}>
+                    {isLoading ? "Saving..." : "Save"}
                   </button>
                 </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Edit Country Modal */}
+      <div className="modal fade" id="editCountryModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                Edit Country
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </h6>
+              {error && <div className="alert alert-danger">{error}</div>}
+              <form onSubmit={handleEditSubmit}>
+                {["code", "name"].map((field) => (
+                  <div className="mb-3" key={field}>
+                    <label className="form-label">
+                      {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder={`Enter Country ${field.charAt(0).toUpperCase() + field.slice(1)}`}
+                      value={editCountry[field]}
+                      onChange={(e) => setEditCountry({ ...editCountry, [field]: e.target.value })}
+                      required
+                    />
+                  </div>
+                ))}
+                <div className="mb-3">
+                  <label className="form-label">
+                    Currency <span className="text-danger">*</span>
+                  </label>
+                  <select
+                    className="form-control"
+                    value={editCountry.currencyCode}
+                    onChange={(e) => setEditCountry({ ...editCountry, currencyCode: e.target.value })}
+                    required
+                  >
+                    <option value="">Select Currency</option>
+                    {currencies.map((currency) => (
+                      <option key={currency.code} value={currency.code}>
+                        {currency.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="text-muted small mt-3">
+                  Fields marked with <span className="text-danger">*</span> are required.
+                </div>
+                <div className="d-flex justify-content-end gap-2">
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={isLoading}
+                    data-bs-dismiss={!isLoading && !error ? "modal" : undefined}
+                  >
+                    {isLoading ? "Saving..." : "Save"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* View Country Modal */}
+      <div className="modal fade" id="viewCountryModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+                Details
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </h6>
+              {countryToView && (
+                <div className="mt-3">
+                  <p className="mb-3">
+                    <strong>Code:</strong> {countryToView.code}
+                  </p>
+                  <p className="mb-3">
+                    <strong>Name:</strong> {countryToView.name}
+                  </p>
+                  <p className="mb-3">
+                    <strong>Currency:</strong> {countryToView.currency?.name || 'N/A'}
+                  </p>
+                  <p className="mb-3">
+                    <strong>Date Created:</strong> {countryToView.dateCreated ? formatDate(countryToView.dateCreated) : "N/A"}
+                  </p>
+                </div>
+              )}
+              <div className="d-flex justify-content-end gap-2 mt-3">
+                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                  Close
+                </button>
               </div>
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Delete Confirmation Modal */}
-        <div className="modal fade" id="deleteCountryModal" tabIndex={-1} aria-hidden="true">
-          <div className="modal-dialog modal-md modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-body pt-3 ps-18 pe-18">
-                <div className="d-flex justify-content-between align-items-center mb-3">
-                  <h6 className="modal-title fs-6">Delete Country</h6>
-                  <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <p className="pb-3 mb-0">
-                  Are you sure you want to delete the <strong>{countryToDelete?.name}</strong> country permanently? This action cannot be undone.
-                </p>
+      {/* Delete Confirmation Modal */}
+      <div className="modal fade" id="deleteCountryModal" tabIndex={-1} aria-hidden="true">
+        <div className="modal-dialog modal-md modal-dialog-centered">
+          <div className="modal-content">
+            <div className="modal-body pt-3 ps-18 pe-18">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h6 className="modal-title fs-6">Delete Country</h6>
+                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </div>
-              <div className="d-flex justify-content-end gap-2 px-12 pb-3">
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button
-                  type="button"
-                  className="btn btn-danger"
-                  data-bs-dismiss="modal"
-                  onClick={handleDeleteConfirm}
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Deleting..." : "Delete"}
-                </button>
-              </div>
+              <p className="pb-3 mb-0">
+                Are you sure you want to delete the <strong>{countryToDelete?.name}</strong> country permanently? This action cannot be undone.
+              </p>
+            </div>
+            <div className="d-flex justify-content-end gap-2 px-12 pb-3">
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
+                onClick={handleDeleteConfirm}
+                disabled={isLoading}
+              >
+                {isLoading ? "Deleting..." : "Delete"}
+              </button>
             </div>
           </div>
         </div>
