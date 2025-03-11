@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
-import "../styles/masterlayout.css";
 import { useAuth } from "../context/AuthContext";
+import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
 
 const MasterLayout = ({ children }) => {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -188,14 +189,14 @@ const MasterLayout = ({ children }) => {
                   to="/dashboard"
                   className={(navData) => (navData.isActive ? "active-page" : "")}
                 >
-                  <Icon icon="ri-home-5-line" className="menu-icon" />
+                  <HomeOutlinedIcon className="menu-icon" />
                   <span>Dashboards</span>
                 </NavLink>
               </li>
               {/* System Users */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.systemUsers) ? "submenu-active" : ""}`}>
                 <Link to="#">
-                  <Icon icon="ri-team-line" className="menu-icon" />
+                <GroupAddOutlinedIcon className="menu-icon" />
                   <span>System Users</span>
                 </Link>
                 <ul className="sidebar-submenu">
@@ -416,26 +417,47 @@ const MasterLayout = ({ children }) => {
                   </li>
                   <li>
                     <NavLink
-                      to="/pending-bills"
+                      to="/supply-residence"
                       className={(navData) => (navData.isActive ? "active-page" : "")}
+                    >
+                      Farmer Residence
+                    </NavLink>
+                  </li>
+                </ul>
+              </li>
+              {/* Invoices */}
+              <li className="dropdown">
+                <Link to="#">
+                  <Icon icon="hugeicons:invoice-03" className="menu-icon" />
+                  <span>Invoices</span>
+                </Link>
+                <ul className="sidebar-submenu">
+                <li>
+                    <NavLink
+                      to="/invoice-register"
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
+                    >
+                      Invoice Register
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/pending-invoices"
+                      className={(navData) =>
+                        navData.isActive ? "active-page" : ""
+                      }
                     >
                       Pending Invoices
                     </NavLink>
                   </li>
                   <li>
                     <NavLink
-                      to="/settled-bills"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
+                      to="/settled-invoices"
+                      className={(navData) =>
+                        navData.isActive ? "active-page" : ""
+                      }
                     >
                       Settled Invoices
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/supply-residence"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Farmer Residence
                     </NavLink>
                   </li>
                 </ul>
@@ -1300,7 +1322,7 @@ const MasterLayout = ({ children }) => {
                       aria-expanded="false"
                     >
                       <img
-                        src="/assets/images/user.png"
+                        src="/assets/images/user-img.png"
                         alt="image_user"
                         className="object-fit-cover rounded-circle"
                       />
@@ -1309,7 +1331,7 @@ const MasterLayout = ({ children }) => {
                     <div className="dropdown-menu to-top dropdown-menu-sm">
                       <div className="d-flex align-items-center gap-2">
                         <img
-                          src="/assets/images/user.png"
+                          src="/assets/images/user-img.png"
                           alt="image_user"
                           className="profile-image object-fit-cover rounded-circle"
                         />

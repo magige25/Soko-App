@@ -1,10 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import "../styles/spinner.css";
-import "../styles/otp.css";
-import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 import { useAuth } from "../context/AuthContext";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const OtpVerificationLayer = () => {
   const [formData, setFormData] = useState({
@@ -88,7 +87,7 @@ const OtpVerificationLayer = () => {
     if (otpCode.length !== 5) {
       toast.error("Please enter a valid 5-digit OTP.", {
         position: "top-right",
-        duration: 2000,
+        autoClose: 2000,
       });
       setLoading(false);
       return;
@@ -122,8 +121,7 @@ const OtpVerificationLayer = () => {
       if (response.status === 200 && response.data.status?.code === 0) {
         toast.success("OTP Verified Successfully", {
           position: "top-right",
-          duration: 2000,
-          icon: "✅",
+          autoClose: 2000,
         });
 
         const token = response.data.data?.accessToken;
@@ -131,19 +129,22 @@ const OtpVerificationLayer = () => {
           signIn(token);
         } else {
           console.error("No access token found in response!");
-          toast.error("Authentication failed: No token received.");
+          toast.error("Authentication failed: No token received.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
         }
       } else {
         toast.error("Invalid OTP. Please try again.", {
           position: "top-right",
-          duration: 2000,
+          autoClose: 2000,
         });
       }
     } catch (error) {
       console.error("OTP Validation Error:", error.message, error.response?.data);
       toast.error("Failed to validate OTP. Please try again.", {
         position: "top-right",
-        duration: 2000,
+        autoClose: 2000,
       });
     } finally {
       setLoading(false);
@@ -155,7 +156,7 @@ const OtpVerificationLayer = () => {
       console.log("Error: Email is missing!");
       toast.error("Email is required to resend OTP.", {
         position: "top-right",
-        duration: 2000,
+        autoClose: 2000,
       });
       return;
     }
@@ -184,8 +185,7 @@ const OtpVerificationLayer = () => {
       if (response.status === 200 && response.data.status?.code === 0) {
         toast.success("OTP Resent Successfully", {
           position: "top-right",
-          duration: 2000,
-          icon: "✅",
+          autoClose: 2000,
         });
 
         setTimer(180);
@@ -209,14 +209,14 @@ const OtpVerificationLayer = () => {
       } else {
         toast.error("Failed to resend OTP. Please try again.", {
           position: "top-right",
-          duration: 2000,
+          autoClose: 2000,
         });
       }
     } catch (error) {
       console.error("Resend OTP Error:", error.message, error.response?.data);
       toast.error("Failed to resend OTP. Please try again.", {
         position: "top-right",
-        duration: 2000,
+        autoClose: 2000,
       });
     } finally {
       setLoading(false);
@@ -225,11 +225,11 @@ const OtpVerificationLayer = () => {
 
   return (
     <section className="auth bg-base d-flex flex-wrap">
-      <Toaster />
+      <ToastContainer position="top-right" autoClose={2000} />
       <div className="auth-left d-lg-block d-none">
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
-            src="assets/images/auth/auth-img.png"
+            src="assets/images/auth/otp-img.png"
             alt="Authentication"
           />
         </div>
@@ -254,49 +254,63 @@ const OtpVerificationLayer = () => {
           </div>
 
           <form onSubmit={handleSubmit}>
-            <div className="form-container" style={{ width: "280px", margin: "0 auto" }}>
-              <div className="otp-inputs d-flex gap-2 mb-24" style={{ width: "100%" }}>
-                {formData.otp.map((digit, index) => (
-                  <input
-                    key={index}
-                    type="text"
-                    className={`otp-box form-control text-center ${digit ? "filled" : ""}`}
-                    value={digit}
-                    maxLength="1"
-                    onChange={(e) => handleOtpChange(index, e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(index, e)}
-                    ref={(el) => (inputRefs.current[index] = el)}
-                    style={{
-                      width: "50px",
-                      height: "50px",
-                      fontSize: "13px",
-                      fontWeight: "bold",
-                      borderRadius: "8px",
-                      border: "1.5px solid #d0d0d0",
-                      boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
-                      transition: "all 0.2s ease",
-                    }}
-                    autoFocus={index === 0}
-                  />
-                ))}
+            <div className="mb-20" style={{ position: "relative" }}>
+              <div style={{ maxWidth: "350px", margin: "0 auto" }}>
+                <label 
+                  className="mb-8 d-block" 
+                  style={{ 
+                    fontSize: "12px",
+                    textAlign: "left",
+                  }}
+                >
+                  OTP Code
+                </label>
+                <div className="otp-inputs d-flex gap-2" style={{ width: "100%" }}>
+                  {formData.otp.map((digit, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      className="form-control bg-neutral-50 radius-4 text-center"
+                      value={digit}
+                      maxLength="1"
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleKeyDown(index, e)}
+                      ref={(el) => (inputRefs.current[index] = el)}
+                      style={{
+                        height: "40px",
+                        boxSizing: "border-box",
+                        width: "20%", 
+                        textAlign: "center",
+                        padding: "0", 
+                        fontSize: "16px",
+                      }}
+                      autoFocus={index === 0}
+                    />
+                  ))}
+                </div>
               </div>
-
-              <button
-                type="submit"
-                className="btn btn-primary text-sm btn-sm px-12 py-16 radius-12"
-                style={{
-                  width: "100%",
-                  padding: "10px 20px",
-                  fontSize: "16px",
-                }}
-                disabled={formData.otp.includes("") || loading}
-              >
-                {loading ? <div className="spinner"></div> : "Submit"}
-              </button>
             </div>
+
+            <button
+              type="submit"
+              className="btn btn-primary text-sm btn-sm radius-4 mt-32"
+              disabled={formData.otp.includes("") || loading}
+              style={{ 
+                height: "40px",
+                maxWidth: "350px", 
+                margin: "32px auto 0", 
+                display: "block",
+                width: "100%",
+                border: "1px solid #ccc",
+                boxShadow: "inset 1px 1px 2px rgba(0,0,0,0.1)",
+                lineHeight: "1",
+              }}
+            >
+              {loading ? <div className="spinner"></div> : "Submit"}
+            </button>
           </form>
 
-          <p className="text-secondary-light text-center mt-20">
+          <p className="text-secondary-light text-center mt-20" style={{ fontSize: "13px" }}>
             Did not receive code?{" "}
             <button
               className="btn btn-link text-primary-400 fw-medium"

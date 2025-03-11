@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
-const API_URL = "";
+const API_URL = "https://api.bizchain.co.ke/v1/invoice";
 
-const SettledBillsLayer = () => {
-  const [settledBills, setSettledBills] = useState([]);
+const SettledInvoicesLayer = () => {
+  const [invoices, setInvoices] = useState([]);
   const [searchItem, setSearchItem] = useState("");
-  const [settledBillsToDelete, setSettledBillsToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedBill, setSelectedBill] = useState(null);
   const itemsPerPage = 10;
 
   useEffect(() => {
-    fetchSettledBills();
+    fetchInvoices();
   }, []);
 
-  const fetchSettledBills = async () => {
+  const fetchInvoices = async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(API_URL, {
@@ -24,15 +23,17 @@ const SettledBillsLayer = () => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log("Response Data:", response.data.data);
-      setSettledBills(response.data.data);
+      
+      const paidOnly = response.data.data.filter(invoice => invoice.status.code === "PD");
+      console.log("Settled Invoices Data:", paidOnly);
+      setInvoices(paidOnly);
     } catch (error) {
-      console.error("Error fetching Settled Bills:", error);
+      console.error("Error fetching Settled Invoices:", error);
     }
   };
 
-  const filteredItems = settledBills.filter((bill) =>
-    Object.values(bill).some((value) =>
+  const filteredItems = invoices.filter((invoice) =>
+    Object.values(invoice).some((value) =>
       String(value).toLowerCase().includes(searchItem.toLowerCase())
     )
   );
@@ -41,35 +42,20 @@ const SettledBillsLayer = () => {
     new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
 
   const formatDate = (dateString) => {
+    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    });
-  };
-
-  const handleDeleteClick = (bill) => {
-    setSettledBillsToDelete(bill);
-  };
-
-  const handleDeleteConfirm = async () => {
-    try {
-      const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}/${settledBillsToDelete.id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      console.log(`Successfully deleted bill with ID: ${settledBillsToDelete.id}`);
-      const updatedSettledBills = settledBills.filter(
-        (r) => r.id !== settledBillsToDelete.id
-      );
-      setSettledBills(updatedSettledBills);
-      setSettledBillsToDelete(null);
-    } catch (error) {
-      console.error("Error deleting Settled Bill:", error);
-    }
+    const day = date.getDate();
+    const month = date.toLocaleString("en-GB", { month: "long" });
+    const year = date.getFullYear();
+    const suffix =
+      day % 10 === 1 && day !== 11
+        ? "st"
+        : day % 10 === 2 && day !== 12
+        ? "nd"
+        : day % 10 === 3 && day !== 13
+        ? "rd"
+        : "th";
+    return `${day}${suffix} ${month} ${year}`;
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -105,30 +91,48 @@ const SettledBillsLayer = () => {
             <thead>
               <tr>
                 <th scope="col" className="text-center py-3 px-6">#</th>
-                <th scope="col" className="text-start py-3 px-4">Name</th>
-                <th scope="col" className="text-start py-3 px-4">Country</th>
-                <th scope="col" className="text-start py-3 px-4">Order No.</th>
-                <th scope="col" className="text-start py-3 px-4">No. Of Items</th>
-                <th scope="col" className="text-start py-3 px-4">Amount</th>
-                <th scope="col" className="text-start py-3 px-4">Date Settled</th>
+                <th scope="col" className="text-start py-3 px-4">Supplier</th>
+                <th scope="col" className="text-start py-3 px-4">Invoice Number</th>
+                <th scope="col" className="text-start py-3 px-4">Volume(L)</th>
+                <th scope="col" className="text-start py-3 px-4">Total Amount</th>
                 <th scope="col" className="text-start py-3 px-4">Status</th>
+                <th scope="col" className="text-start py-3 px-4">Disbursement Method</th>
+                <th scope="col" className="text-start py-3 px-4">Disbursement Criteria</th>
+                <th scope="col" className="text-start py-3 px-4">Phone Number</th>
+                <th scope="col" className="text-start py-3 px-4">Date Created</th>
                 <th scope="col" className="text-start py-3 px-4">Action</th>
               </tr>
             </thead>
             <tbody>
               {currentItems.length > 0 ? (
-                currentItems.map((bill, index) => (
-                  <tr key={bill.id} style={{ transition: "background-color 0.2s" }}>
+                currentItems.map((invoice, index) => (
+                  <tr key={invoice.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{bill.name}</td>
-                    <td className="text-start small-text py-3 px-4">{bill.country}</td>
-                    <td className="text-start small-text py-3 px-4">{bill.orderNo}</td>
-                    <td className="text-start small-text py-3 px-4">{bill.numberOfItems}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(bill.amount)}</td>
-                    <td className="text-start small-text py-3 px-4">{formatDate(bill.dateSettled)}</td>
-                    <td className="text-start small-text py-3 px-4">{bill.status}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      <Link
+                        to="/settled-invoices/invoice"
+                        state={{ invoiceId: invoice.id }}
+                        className="text-decoration-none text-primary-600 hover-text-primary-700"
+                      >
+                        {invoice.supplier.name}
+                      </Link>
+                    </td>
+                    <td className="text-start small-text py-3 px-4">{invoice.invoiceNo}</td>
+                    <td className="text-start small-text py-3 px-4">{invoice.litres}</td>
+                    <td className="text-start small-text py-3 px-4">{formatCurrency(invoice.amount)}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      <span
+                        className={`bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm`}
+                      >
+                        {invoice.status.name}
+                      </span>
+                    </td>
+                    <td className="text-start small-text py-3 px-4">{invoice.disbursementMethod.name}</td>
+                    <td className="text-start small-text py-3 px-4">{invoice.disbursementCriteria.name}</td>
+                    <td className="text-start small-text py-3 px-4">{invoice.disbursementNumber}</td>
+                    <td className="text-start small-text py-3 px-4">{formatDate(invoice.dateCreated)}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">
@@ -142,24 +146,13 @@ const SettledBillsLayer = () => {
                           </button>
                           <ul className="dropdown-menu">
                             <li>
-                              <button
+                              <Link
                                 className="dropdown-item"
-                                data-bs-toggle="modal"
-                                data-bs-target="#viewModal"
-                                onClick={() => setSelectedBill(bill)}
+                                to="/settled-invoices/invoice"
+                                state={{ invoiceId: invoice.id, from: "settled" }}
                               >
                                 View
-                              </button>
-                            </li>
-                            <li>
-                              <button
-                                className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(bill)}
-                                data-bs-toggle="modal"
-                                data-bs-target="#deleteModal"
-                              >
-                                Delete
-                              </button>
+                              </Link>
                             </li>
                           </ul>
                         </div>
@@ -169,8 +162,8 @@ const SettledBillsLayer = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="9" className="text-center py-3">
-                    No settled bills found
+                  <td colSpan="11" className="text-center py-3">
+                    No settled invoices found
                   </td>
                 </tr>
               )}
@@ -233,75 +226,8 @@ const SettledBillsLayer = () => {
           </nav>
         </div>
       </div>
-
-      {/* View Settled Bill Modal */}
-      <div className="modal fade" id="viewModal" tabIndex="-1" aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Settled Bills
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </h6>
-              {selectedBill && (
-                <>
-                  <div className="mb-3">
-                    <strong>Name:</strong> {selectedBill.name}
-                  </div>
-                  <div className="mb-3">
-                    <strong>Country:</strong> {selectedBill.country}
-                  </div>
-                  <div className="mb-3">
-                    <strong>No. of Items:</strong> {selectedBill.numberOfItems}
-                  </div>
-                  <div className="mb-3">
-                    <strong>Amount:</strong> {formatCurrency(selectedBill.amount)}
-                  </div>
-                  <div className="mb-3">
-                    <strong>Date Settled:</strong> {formatDate(selectedBill.dateSettled)}
-                  </div>
-                  <div className="mb-3">
-                    <strong>Status:</strong> {selectedBill.status}
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Delete Confirmation Modal */}
-      <div className="modal fade" id="deleteModal" tabIndex="-1" aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body pt-3 ps-18 pe-18">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="modal-title fs-6">Delete Settled Bill</h6>
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <p className="pb-3 mb-0">
-                Are you sure you want to delete the <strong>{settledBillsToDelete?.name}</strong> Settled Bill
-                permanently? This action cannot be undone.
-              </p>
-            </div>
-            <div className="d-flex justify-content-end gap-2 px-12 pb-3">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                Cancel
-              </button>
-              <button
-                type="button"
-                className="btn btn-danger"
-                data-bs-dismiss="modal"
-                onClick={handleDeleteConfirm}
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };
 
-export default SettledBillsLayer;
+export default SettledInvoicesLayer;

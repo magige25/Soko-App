@@ -5,7 +5,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const API_URL = "https://api.bizchain.co.ke/v1/categories";
+const API_URL = "https://api.bizchain.co.ke/v1/invoice-register";
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -18,17 +18,20 @@ const useDebounce = (value, delay) => {
   return debouncedValue;
 };
 
-const CategoryLayer = () => {
-  const [categories, setCategories] = useState([]);
+const InvoiceRegisterLayer = () => {
+  const [invoices, setInvoices] = useState([]);
   const [query, setQuery] = useState("");
-  const [categoryToDelete, setCategoryToDelete] = useState(null);
-  const [editCategory, setEditCategory] = useState({ id: null, name: '' });
+  const [invoiceToDelete, setInvoiceToDelete] = useState(null);
+  const [editInvoice, setEditInvoice] = useState({ litres: '', totalAmount: '', status: '' });
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const debouncedQuery = useDebounce(query, 300);
+
+  const formatAmount = (amount) =>
+    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
 
   const formatDate = (dateString) => {
     if (!dateString || isNaN(new Date(dateString).getTime())) return "";
@@ -47,7 +50,7 @@ const CategoryLayer = () => {
     return `${day}${suffix} ${month} ${year}`;
   };
 
-  const fetchCategories = useCallback(async (page = 1, searchQuery = "") => {
+  const fetchInvoices = useCallback(async (page = 1, searchQuery = "") => {
     setIsLoading(true);
     setError(null);
     const token = localStorage.getItem("token");
@@ -65,25 +68,28 @@ const CategoryLayer = () => {
           searchValue: searchQuery,
         },
       });
-      console.log("API Response:", response.data);
+      console.log("Raw API Response:", response.data);
       const result = response.data;
       if (result.status.code === 0) {
-        const mappedCategories = result.data.map((category) => ({
-          id: category.id,
-          name: category.name,
-          date: category.dateCreated,
+        const mappedInvoices = result.data.map((invoice) => ({
+          id: invoice.id,
+          litres: invoice.litres,
+          totalAmount: invoice.totalAmount,
+          status: invoice.status.name,
+          dateCreated: invoice.dateCreated,
         }));
-        setCategories(mappedCategories);
+        console.log("Mapped Invoices:", mappedInvoices);
+        setInvoices(mappedInvoices);
         setTotalItems(result.totalElements);
       } else {
-        setError(`Failed to fetch categories: ${result.status.message}`);
-        setCategories([]);
+        setError(`Failed to fetch invoices: ${result.status.message}`);
+        setInvoices([]);
         setTotalItems(0);
       }
     } catch (error) {
       console.error("Fetch error:", error);
-      setError(`Error fetching categories: ${error.response?.data?.message || error.message}`);
-      setCategories([]);
+      setError(`Error fetching invoices: ${error.response?.data?.message || error.message}`);
+      setInvoices([]);
       setTotalItems(0);
     } finally {
       setIsLoading(false);
@@ -91,20 +97,22 @@ const CategoryLayer = () => {
   }, [itemsPerPage]);
 
   useEffect(() => {
-    fetchCategories(currentPage, debouncedQuery);
-  }, [currentPage, debouncedQuery, fetchCategories]);
+    fetchInvoices(currentPage, debouncedQuery);
+  }, [currentPage, debouncedQuery, fetchInvoices]);
 
-  const handleEditClick = (category) => {
-    setEditCategory({
-      id: category.id,
-      name: category.name,
+  const handleEditClick = (invoice) => {
+    setEditInvoice({
+      id: invoice.id,
+      litres: invoice.litres,
+      totalAmount: invoice.totalAmount,
+      status: invoice.status,
     });
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
-    if (!editCategory.name.trim()) {
-      setError("Category name is required");
+    if (!editInvoice.litres || !editInvoice.totalAmount || !editInvoice.status) {
+      setError("All fields are required");
       return;
     }
     setIsLoading(true);
@@ -112,16 +120,18 @@ const CategoryLayer = () => {
     const token = localStorage.getItem("token");
     try {
       const payload = {
-        categoryRequestList: [
+        invoiceRequestList: [
           {
-            id: editCategory.id,
-            name: editCategory.name,
+            id: editInvoice.id,
+            litres: Number(editInvoice.litres),
+            totalAmount: Number(editInvoice.totalAmount),
+            status: { name: editInvoice.status },
           },
         ],
       };
 
       const response = await axios.put(
-        `${API_URL}/${editCategory.id}`,
+        `${API_URL}/${editInvoice.id}`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -129,9 +139,9 @@ const CategoryLayer = () => {
       );
 
       if (response.data.status.code === 0) {
-        setEditCategory({ id: null, name: '' });
-        fetchCategories(currentPage, debouncedQuery);
-        toast.success("Category updated successfully!", {
+        setEditInvoice({ litres: '', totalAmount: '', status: '' });
+        fetchInvoices(currentPage, debouncedQuery);
+        toast.success("Invoice updated successfully!", {
           position: "top-right",
           autoClose: 3000,
           hideProgressBar: false,
@@ -140,18 +150,18 @@ const CategoryLayer = () => {
           draggable: true,
         });
       } else {
-        setError(`Failed to update category: ${response.data.status.message}`);
+        setError(`Failed to update invoice: ${response.data.status.message}`);
       }
     } catch (error) {
-      console.error("Error updating category:", error.response?.data || error.message);
-      setError(`Error updating category: ${error.response?.data?.message || error.message}`);
+      console.error("Error updating invoice:", error.response?.data || error.message);
+      setError(`Error updating invoice: ${error.response?.data?.message || error.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleDeleteClick = (category) => {
-    setCategoryToDelete(category);
+  const handleDeleteClick = (invoice) => {
+    setInvoiceToDelete(invoice);
   };
 
   const handleDeleteConfirm = async () => {
@@ -159,13 +169,62 @@ const CategoryLayer = () => {
     setError(null);
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`${API_URL}/${categoryToDelete.id}`, {
+      await axios.delete(`${API_URL}/${invoiceToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCategoryToDelete(null);
-      fetchCategories(currentPage, debouncedQuery);
+      setInvoiceToDelete(null);
+      fetchInvoices(currentPage, debouncedQuery);
+      toast.success("Invoice deleted successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } catch (error) {
-      setError(`Error deleting category: ${error.response?.data?.message || error.message}`);
+      setError(`Error deleting invoice: ${error.response?.data?.message || error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePayInvoice = async (invoiceId) => {
+    setIsLoading(true);
+    setError(null);
+    const token = localStorage.getItem("token");
+    try {
+      const payload = {
+        invoiceRequestList: [{
+          id: invoiceId,
+          status: { name: "Paid" }
+        }]
+      };
+      
+      const response = await axios.put(
+        `${API_URL}/${invoiceId}`,
+        payload,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.data.status.code === 0) {
+        fetchInvoices(currentPage, debouncedQuery);
+        toast.success("Invoice marked as paid successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+      } else {
+        setError(`Failed to mark invoice as paid: ${response.data.status.message}`);
+      }
+    } catch (error) {
+      console.error("Error paying invoice:", error.response?.data || error.message);
+      setError(`Error paying invoice: ${error.response?.data?.message || error.message}`);
     } finally {
       setIsLoading(false);
     }
@@ -191,20 +250,13 @@ const CategoryLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search Categories"
+              placeholder="Search Invoices"
               value={query}
               onChange={handleSearchInputChange}
             />
             <Icon icon="ion:search-outline" className="icon" />
           </form>
         </div>
-        <Link
-          to="/category/add-category"
-          className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-        >
-          <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-          Add Category
-        </Link>
       </div>
 
       <div className="card-body p-24">
@@ -214,7 +266,9 @@ const CategoryLayer = () => {
             <thead>
               <tr>
                 <th scope="col" className="text-center py-3 px-6">#</th>
-                <th scope="col" className="text-start py-3 px-4">Name</th>
+                <th scope="col" className="text-start py-3 px-4">Litres</th>
+                <th scope="col" className="text-start py-3 px-4">Total Amount</th>
+                <th scope="col" className="text-start py-3 px-4">Status</th>
                 <th scope="col" className="text-start py-3 px-4">Date Created</th>
                 <th scope="col" className="text-start py-3 px-4">Action</th>
               </tr>
@@ -222,18 +276,30 @@ const CategoryLayer = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="4" className="text-center py-3">
+                  <td colSpan="6" className="text-center py-3">
                     <div>Loading...</div>
                   </td>
                 </tr>
-              ) : categories.length > 0 ? (
-                categories.map((category, index) => (
-                  <tr key={category.id} style={{ transition: "background-color 0.2s" }}>
+              ) : invoices.length > 0 ? (
+                invoices.map((invoice, index) => (
+                  <tr key={invoice.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{category.name}</td>
-                    <td className="text-start small-text py-3 px-4">{formatDate(category.date)}</td>
+                    <td className="text-start small-text py-3 px-4">{invoice.litres.toLocaleString()}</td>
+                    <td className="text-start small-text py-3 px-4">{formatAmount(invoice.totalAmount)}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      <span
+                        className={`bg-${
+                          invoice.status === "Not Paid" ? "danger-focus" : "success-focus"
+                        } text-${
+                          invoice.status === "Not Paid" ? "danger-600" : "success-600"
+                        } px-24 py-4 radius-8 fw-medium text-sm`}
+                      >
+                        {invoice.status}
+                      </span>
+                    </td>
+                    <td className="text-start small-text py-3 px-4">{formatDate(invoice.dateCreated)}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">
@@ -248,8 +314,8 @@ const CategoryLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/category/${category.id}`}
-                                state={{ category }}
+                                to={`/invoices/${invoice.id}`}
+                                state={{ invoice }}
                               >
                                 View
                               </Link>
@@ -257,18 +323,28 @@ const CategoryLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/category/add-category`}
+                                to="#"
                                 data-bs-toggle="modal"
                                 data-bs-target="#editModal"
-                                onClick={() => handleEditClick(category)}
+                                onClick={() => handleEditClick(invoice)}
                               >
                                 Edit
                               </Link>
                             </li>
+                            {invoice.status === "Not Paid" && (
+                              <li>
+                                <button
+                                  className="dropdown-item text-success"
+                                  onClick={() => handlePayInvoice(invoice.id)}
+                                >
+                                  Pay
+                                </button>
+                              </li>
+                            )}
                             <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(category)}
+                                onClick={() => handleDeleteClick(invoice)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
@@ -283,8 +359,8 @@ const CategoryLayer = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="4" className="text-center py-3">
-                    No categories found
+                  <td colSpan="6" className="text-center py-3">
+                    No invoices found
                   </td>
                 </tr>
               )}
@@ -348,27 +424,59 @@ const CategoryLayer = () => {
         )}
       </div>
 
-      {/* Edit Category Modal */}
+      {/* Edit Invoice Modal */}
       <div className="modal fade" id="editModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body">
               <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Edit Category
+                Edit Invoice
                 <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </h6>
               <form onSubmit={handleEditSubmit}>
                 <div className="mb-3">
                   <label className="form-label">
-                    Category Name <span className="text-danger">*</span>
+                    Litres <span className="text-danger">*</span>
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     className="form-control"
-                    placeholder="Enter Category Name"
-                    value={editCategory.name}
-                    onChange={(e) => setEditCategory({ ...editCategory, name: e.target.value })}
+                    placeholder="Enter Litres"
+                    value={editInvoice.litres}
+                    onChange={(e) => setEditInvoice({ ...editInvoice, litres: e.target.value })}
+                    required
                   />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Total Amount <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    placeholder="Enter Total Amount"
+                    value={editInvoice.totalAmount}
+                    onChange={(e) => setEditInvoice({ ...editInvoice, totalAmount: e.target.value })}
+                    required
+                  />
+                </div>
+                <div className="mb-3">
+                  <label className="form-label">
+                    Status <span className="text-danger">*</span>
+                  </label>
+                  <select
+                    className="form-control"
+                    value={editInvoice.status}
+                    onChange={(e) => setEditInvoice({ ...editInvoice, status: e.target.value })}
+                    required
+                  >
+                    <option value="">Select Status</option>
+                    <option value="Not Paid">Not Paid</option>
+                    <option value="Paid">Paid</option>
+                  </select>
+                </div>
+                <div className="text-muted small mt-3">
+                  Fields marked with <span className="text-danger">*</span> are required.
                 </div>
                 <div className="d-flex justify-content-end gap-2">
                   <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save</button>
@@ -385,11 +493,11 @@ const CategoryLayer = () => {
           <div className="modal-content">
             <div className="modal-body pt-3 ps-18 pe-18">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="modal-title fs-6">Delete Category</h6>
+                <h6 className="modal-title fs-6">Delete Invoice</h6>
                 <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <p className="pb-3 mb-0">
-                Are you sure you want to delete the <strong>{categoryToDelete?.name}</strong> category permanently? This action cannot be undone.
+                Are you sure you want to delete this invoice permanently? This action cannot be undone.
               </p>
             </div>
             <div className="d-flex justify-content-end gap-2 px-12 pb-3">
@@ -403,4 +511,4 @@ const CategoryLayer = () => {
   );
 };
 
-export default CategoryLayer;
+export default InvoiceRegisterLayer;

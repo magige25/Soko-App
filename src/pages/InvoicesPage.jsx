@@ -1,9 +1,9 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import PendingBillsLayer from "../components/PendingBillsLayer";
+import InvoicesLayer from "../components/InvoicesLayer";
 
-const PendingBillsPage= () => {
+const InvoicesPage= () => {
   return (
     <>
 
@@ -11,14 +11,14 @@ const PendingBillsPage= () => {
         <MasterLayout>
 
           {/* Breadcrumb */}
-          <Breadcrumb title="Pending Bills" />
+          <Breadcrumb title="Invoices" />
 
-            {/* PendingBillsLayer */}
-          <PendingBillsLayer/>
+            {/* InvoicesLayer */}
+          <InvoicesLayer/>
 
         </MasterLayout>
     </>
   );
 };
 
-export default PendingBillsPage; 
+export default InvoicesPage; 

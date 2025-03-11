@@ -1,7 +1,5 @@
-import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import "../styles/spinner.css";
 import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 
@@ -127,7 +125,7 @@ const ResetPasswordLayer = () => {
       <div className="auth-left d-lg-block d-none">
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
-            src="assets/images/auth/auth-img.png"
+            src="assets/images/auth/reset-forgot-img.png"
             alt="Reset Password"
           />
         </div>
@@ -135,7 +133,7 @@ const ResetPasswordLayer = () => {
       <div className="auth-right py-32 px-24 d-flex flex-column justify-content-center">
         <div className="max-w-464-px mx-auto w-100">
           <div className="text-center">
-            <Link to="/" className="mb-40 max-w-290-px">
+            <Link to="/sign-in" className="mb-40 max-w-290-px">
               <img
                 src="assets/images/logo.png"
                 alt="Logo"
@@ -152,77 +150,71 @@ const ResetPasswordLayer = () => {
           </div>
           <form onSubmit={handleSubmit}>
             {["password", "confirmPassword"].map((field) => (
-              <div className="position-relative mb-20" key={field}>
-                <div
-                  className="icon-field mb-16"
-                  style={{
-                    position: "relative",
-                    height: "56px",
-                  }}
-                >
-                  <span
-                    className="icon"
-                    style={{
-                      position: "absolute",
-                      left: "12px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      zIndex: 1,
-                      width: "24px",
-                      display: "flex",
-                      alignItems: "center",
+              <div className="mb-20" key={field} style={{ position: "relative" }}>
+                <div style={{ maxWidth: "350px", margin: "0 auto" }}>
+                  <label 
+                    className="mb-8 d-block" 
+                    style={{ 
+                      fontSize: "14px",
+                      textAlign: "left",
                     }}
                   >
-                    <Icon icon="solar:lock-password-outline" width="20" />
-                  </span>
-                  <input
-                    type={passwordVisibility[field] ? "text" : "password"}
-                    className="form-control h-56-px bg-neutral-50 radius-12"
-                    placeholder={field === "password" ? "New Password" : "Confirm New Password"}
-                    name={field}
-                    value={formData[field]}
-                    onChange={handlePasswordChange}
-                    required
-                    style={{
-                      paddingLeft: "44px",
-                      paddingRight: "44px",
-                      height: "100%",
-                      position: "relative",
-                      zIndex: 0,
-                      boxSizing: "border-box",
-                    }}
-                  />
-                  <span
-                    className={`cursor-pointer text-secondary-light ${
-                      passwordVisibility[field] ? "ri-eye-off-line" : "ri-eye-line"
-                    }`}
-                    onClick={() => togglePasswordVisibility(field)}
-                    aria-label={passwordVisibility[field] ? "Hide password" : "Show password"}
-                    title={passwordVisibility[field] ? "Hide password" : "Show password"}
-                    style={{
-                      position: "absolute",
-                      right: "12px",
-                      top: "50%",
-                      transform: "translateY(-50%)",
-                      zIndex: 1,
-                      width: "24px",
-                      display: "flex",
-                      alignItems: "center",
-                    }}
-                  >
-                  </span>
+                    {field === "password" ? "New Password" : "Confirm Password"}
+                  </label>
+                  <div style={{ position: "relative", height: "40px" }}>
+                    <input
+                      type={passwordVisibility[field] ? "text" : "password"}
+                      className="form-control bg-neutral-50 radius-4"
+                      value={formData[field]}
+                      onChange={handlePasswordChange}
+                      name={field}
+                      required
+                      style={{
+                        paddingLeft: "20px",
+                        paddingRight: "52px",
+                        height: "100%",
+                        boxSizing: "border-box",
+                        width: "100%",
+                      }}
+                    />
+                    <span
+                      className={`cursor-pointer text-secondary-light ${
+                        passwordVisibility[field] ? "ri-eye-off-line" : "ri-eye-line"
+                      }`}
+                      onClick={() => togglePasswordVisibility(field)}
+                      aria-label={passwordVisibility[field] ? "Hide password" : "Show password"}
+                      title={passwordVisibility[field] ? "Hide password" : "Show password"}
+                      style={{
+                        position: "absolute",
+                        right: "12px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        zIndex: 1,
+                        width: "24px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
+                    </span>
+                  </div>
+                  {(field === "password" && passwordError) || (field === "confirmPassword" && confirmPasswordError) ? (
+                    <p 
+                      style={{ 
+                        color: "red", 
+                        fontSize: "12px", 
+                        marginTop: "2px", 
+                        textAlign: "left",
+                      }}
+                    >
+                      {field === "password" ? passwordError : confirmPasswordError}
+                    </p>
+                  ) : null}
                 </div>
-                {field === "password" && passwordError && (
-                  <p style={{ color: "red", fontSize: "12px", marginTop: "2px" }}>{passwordError}</p>
-                )}
-                {field === "confirmPassword" && confirmPasswordError && (
-                  <p style={{ color: "red", fontSize: "12px", marginTop: "2px" }}>{confirmPasswordError}</p>
-                )}
               </div>
             ))}
             <button
               type="submit"
-              className="btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-32"
+              className="btn btn-primary text-sm btn-sm radius-4 mt-32"
               disabled={
                 loading ||
                 !formData.password ||
@@ -230,7 +222,14 @@ const ResetPasswordLayer = () => {
                 passwordError ||
                 confirmPasswordError
               }
-              style={{ padding: "10px 20px", fontSize: "16px" }}
+              style={{ 
+                height: "40px",
+                maxWidth: "350px", 
+                margin: "32px auto 0", 
+                display: "block",
+                width: "100%",
+                lineHeight: "1",
+              }}
             >
               {loading ? <div className="spinner"></div> : "Reset Password"}
             </button>

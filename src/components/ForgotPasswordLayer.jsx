@@ -1,9 +1,8 @@
-import { Icon } from '@iconify/react/dist/iconify.js';
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import toast, { Toaster } from "react-hot-toast";
-import "../styles/spinner.css";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ForgotPasswordLayer = () => {
     const [emailError, setEmailError] = useState("");
@@ -35,7 +34,7 @@ const ForgotPasswordLayer = () => {
             console.log("Email field is empty");
             toast.error("Please enter an email address", {
                 position: "top-right",
-                duration: 2000,
+                autoClose: 2000,
             });
             return;
         }
@@ -44,7 +43,7 @@ const ForgotPasswordLayer = () => {
             console.log("Validation failed:", { emailError });
             toast.error("Please fix the errors before submitting", {
                 position: "top-right",
-                duration: 2000,
+                autoClose: 2000,
             });
             return;
         }
@@ -74,8 +73,7 @@ const ForgotPasswordLayer = () => {
                 console.log("Success condition met (code 29), showing success toast and navigating");
                 toast.success("Password reset email sent! Please check your inbox.", {
                     position: "top-right",
-                    duration: 2000,
-                    icon: "✅",
+                    autoClose: 2000,
                 });
 
                 setTimeout(() => {
@@ -87,7 +85,7 @@ const ForgotPasswordLayer = () => {
                     response.data?.status?.message || "Failed to send reset email. Please try again.",
                     {
                         position: "top-right",
-                        duration: 2000,
+                        autoClose: 2000,
                     }
                 );
             }
@@ -101,7 +99,7 @@ const ForgotPasswordLayer = () => {
                 error.response?.data?.status?.message || "Failed to send reset email. Server error occurred.",
                 {
                     position: "top-right",
-                    duration: 2000,
+                    autoClose: 2000,
                 }
             );
         } finally {
@@ -112,11 +110,11 @@ const ForgotPasswordLayer = () => {
 
     return (
         <section className="auth bg-base d-flex flex-wrap">
-            <Toaster />
+            <ToastContainer position="top-right" autoClose={2000} />
             <div className="auth-left d-lg-block d-none">
                 <div className="d-flex align-items-center flex-column h-100 justify-content-center">
                     <img
-                        src="assets/images/auth/forgot-pass-img.png"
+                        src="assets/images/auth/reset-forgot-img.png"
                         alt="Forgot Password"
                     />
                 </div>
@@ -139,57 +137,60 @@ const ForgotPasswordLayer = () => {
                             Enter the email linked to your account
                         </p>
                     </div>
-                    <form>
+                    <form onSubmit={handleClick}>
                         <div className="mb-20" style={{ position: "relative" }}>
-                            <div
-                                className="icon-field mb-16"
-                                style={{
-                                    position: "relative",
-                                    height: "56px",
-                                }}
-                            >
-                                <span
-                                    className="icon"
-                                    style={{
-                                        position: "absolute",
-                                        left: "12px",
-                                        top: "50%",
-                                        transform: "translateY(-50%)",
-                                        zIndex: 1,
-                                        width: "24px",
-                                        display: "flex",
-                                        alignItems: "center",
+                            <div style={{ maxWidth: "350px", margin: "0 auto" }}>
+                                <label 
+                                    className="mb-8 d-block" 
+                                    style={{ 
+                                        fontSize: "14px",
+                                        textAlign: "left",
                                     }}
                                 >
-                                    <Icon icon="mage:email" width="20" />
-                                </span>
-                                <input
-                                    type="email"
-                                    className="form-control h-56-px bg-neutral-50 radius-12"
-                                    placeholder="Email"
-                                    value={formData.email}
-                                    onChange={handleEmailChange}
-                                    required
-                                    style={{
-                                        paddingLeft: "44px",
-                                        paddingRight: "12px",
-                                        height: "100%",
-                                        position: "relative",
-                                        zIndex: 0,
-                                        boxSizing: "border-box",
-                                    }}
-                                />
+                                    Email
+                                </label>
+                                <div style={{ position: "relative", height: "40px" }}>
+                                    <input
+                                        type="email"
+                                        className="form-control bg-neutral-50 radius-4"
+                                        value={formData.email}
+                                        onChange={handleEmailChange}
+                                        required
+                                        style={{
+                                            paddingLeft: "20px",
+                                            paddingRight: "20px",
+                                            height: "100%",
+                                            boxSizing: "border-box",
+                                            width: "100%",
+                                        }}
+                                    />
+                                </div>
+                                {emailError && (
+                                    <p 
+                                        style={{ 
+                                            color: "red", 
+                                            fontSize: "12px", 
+                                            marginTop: "2px", 
+                                            textAlign: "left",
+                                        }}
+                                    >
+                                        {emailError}
+                                    </p>
+                                )}
                             </div>
-                            {emailError && (
-                                <p style={{ color: "red", fontSize: "12px", marginTop: "2px" }}>{emailError}</p>
-                            )}
                         </div>
                         <button
                             type="submit"
-                            className="btn btn-primary text-sm btn-sm px-12 py-16 w-100 radius-12 mt-32"
-                            onClick={handleClick}
+                            className="btn btn-primary text-sm btn-sm radius-4 mt-32"
                             disabled={loading || !formData.email || emailError}
-                            style={{ padding: "10px 20px", fontSize: "16px" }}
+                            style={{ 
+                                height: "40px",
+                                maxWidth: "350px", 
+                                margin: "32px auto 0", 
+                                display: "block",
+                                width: "100%",
+                                lineHeight: "1",
+                            }}
                         >
                             {loading ? <div className="spinner"></div> : "Continue"}
                         </button>

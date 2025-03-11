@@ -100,10 +100,15 @@ import RolesListPage from "./pages/RolesListPage";
 import CreateRolePage from "./pages/CreateRolePage";
 import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
-import PendingBillsPage from "./pages/PendingBillsPage";
-import SettledBillsPage from "./pages/SettledBillsPage";
+import InvoiceRegisterPage from "./pages/InvoiceRegisterPage";
+import InvoicesPage from "./pages/InvoicesPage";
+import InvoicesPreviewPage from "./pages/InvoicesPreviewPage";
+import SettledInvoicesPage from "./pages/SettledInvoicesPage";
+import SettledInvoicesPreviewPage from "./pages/SettledInvoicesPreviewPage";
 import CategoryPage from "./pages/CategoryPage";
+import AddCategoryPage from "./pages/AddCategoryPage";
 import SubCategoryPage from "./pages/SubCategoryPage";
+import AddSubCategoryPage from "./pages/AddSubCategoryPage";
 import BrandsPage from "./pages/BrandsPage";
 import ProductsPage from "./pages/ProductsPage";
 import CountriesPage from "./pages/CountriesPage";
@@ -207,8 +212,11 @@ function App() {
             <Route path="/suppliers/details" element={<SuppliersDetailsPage />} />
             <Route path="/suppliers/edit-supplier" element={<EditSuppliersPage />} />
             <Route path="/pagination-table" element={<PaginationTablePage />} />
-            <Route path="/pending-bills" element={<PendingBillsPage />} />
-            <Route path="/settled-bills" element={<SettledBillsPage />} />
+            <Route path="/invoice-register" element={<InvoiceRegisterPage />} />
+            <Route path="/pending-invoices" element={<InvoicesPage />} />
+            <Route path="/pending-invoices/invoice" element={<InvoicesPreviewPage />} />
+            <Route path="/settled-invoices" element={<SettledInvoicesPage />} />
+            <Route path="/settled-invoices/invoice" element={<SettledInvoicesPreviewPage />} />
             <Route path="/deliveries" element={<DeliveriesPage />} />
             <Route path="/deliveries/edit-delivery" element={<EditDeliveryPage />} />
             <Route path="/deliveries/add-delivery" element={<AddDeliveryPage />} />
@@ -216,7 +224,9 @@ function App() {
             <Route path="/products/edit-product" element={<EditProductPage />} />
             <Route path="/supply-residence" element={<SupplyResidencePage />} />          
             <Route path="/category" element={<CategoryPage />} />
+            <Route path="/category/add-category" element={<AddCategoryPage/>} />
             <Route path="/sub-category" element={<SubCategoryPage />} />
+            <Route path="/sub-category/add-subcategory" element={<AddSubCategoryPage />} />
             <Route path="/brands" element={<BrandsPage />} />
             <Route path="/products" element={<ProductsPage />} />
             <Route path="/countries" element={<CountriesPage />} /> 

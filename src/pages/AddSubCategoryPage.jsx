@@ -1,20 +1,20 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import AddProduct from "../components/child/AddProduct";
+import AddSubCategoryLayer from "../components/AddSubCategoryLayer";
 
 
-const AddProductPage = () => {
+const AddSubCategoryPage = () => {
   return (
     <>
       {/* MasterLayout */}
       <MasterLayout>
 
         {/* Breadcrumb */}
-        <Breadcrumb title="Add Product" />
+        <Breadcrumb title="Add Subcategory" />
 
-        {/* AddProduct */}
-        <AddProduct />
+        {/* AddSubCategoryLayer */}
+        <AddSubCategoryLayer />
 
 
       </MasterLayout>
@@ -22,4 +22,4 @@ const AddProductPage = () => {
   );
 };
 
-export default AddProductPage;
+export default AddSubCategoryPage;

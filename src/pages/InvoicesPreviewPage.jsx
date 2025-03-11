@@ -1,9 +1,9 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import SettledBillsLayer from "../components/SettledBillsLayer";
+import InvoicesPreviewLayer from "../components/InvoicesPreviewLayer";
 
-const SettledBillsPage= () => {
+const InvoicesPreviewPage= () => {
   return (
     <>
 
@@ -11,14 +11,14 @@ const SettledBillsPage= () => {
         <MasterLayout>
 
           {/* Breadcrumb */}
-          <Breadcrumb title="Settled Bills" />
+          <Breadcrumb title="Invoices Preview" />
 
-            {/* SettledBillsLayer */}
-          <SettledBillsLayer/>
+            {/* InvoicesPreviewLayer */}
+          <InvoicesPreviewLayer/>
 
         </MasterLayout>
     </>
   );
 };
 
-export default SettledBillsPage; 
+export default InvoicesPreviewPage; 

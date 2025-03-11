@@ -19,6 +19,8 @@ const DeliveriesLayer = () => {
   const navigate = useNavigate();
   const [deliveries, setDeliveries] = useState([]);
   const [query, setQuery] = useState("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [deliveryToDelete, setDeliveryToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -28,18 +30,22 @@ const DeliveriesLayer = () => {
   const debouncedQuery = useDebounce(query, 300);
 
   const fetchDeliveries = useCallback(
-    async (page = 1, searchQuery = "") => {
+    async (page = 1, searchQuery = "", start = "", end = "") => {
       setIsLoading(true);
       setError(null);
       try {
         const token = localStorage.getItem("token");
+        const params = {
+          page: page - 1,
+          size: itemsPerPage,
+          searchValue: searchQuery,
+        };
+        if (start) params.startDate = start;
+        if (end) params.endDate = end;
+
         const response = await axios.get(API_URL, {
           headers: { Authorization: `Bearer ${token}` },
-          params: {
-            page: page - 1,
-            size: itemsPerPage,
-            searchValue: searchQuery,
-          },
+          params,
         });
 
         const data = response.data.data || [];
@@ -60,8 +66,8 @@ const DeliveriesLayer = () => {
   );
 
   useEffect(() => {
-    fetchDeliveries(currentPage, debouncedQuery);
-  }, [currentPage, debouncedQuery, fetchDeliveries]);
+    fetchDeliveries(currentPage, debouncedQuery, startDate, endDate);
+  }, [currentPage, debouncedQuery, startDate, endDate, fetchDeliveries]);
 
   const handleDeleteClick = (delivery) => {
     setDeliveryToDelete(delivery);
@@ -77,7 +83,7 @@ const DeliveriesLayer = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setDeliveryToDelete(null);
-      fetchDeliveries(currentPage, debouncedQuery);
+      fetchDeliveries(currentPage, debouncedQuery, startDate, endDate);
       toast.success("Delivery deleted successfully!");
     } catch (error) {
       console.error("Error deleting delivery:", error);
@@ -90,6 +96,16 @@ const DeliveriesLayer = () => {
 
   const handleSearchInputChange = (e) => {
     setQuery(e.target.value);
+    setCurrentPage(1);
+  };
+
+  const handleDateChange = (e, type) => {
+    const value = e.target.value;
+    if (type === "start") {
+      setStartDate(value);
+    } else {
+      setEndDate(value);
+    }
     setCurrentPage(1);
   };
 
@@ -140,12 +156,27 @@ const DeliveriesLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search"
+              placeholder="Search Supplier"
               value={query}
               onChange={handleSearchInputChange}
             />
             <Icon icon="ion:search-outline" className="icon" />
           </form>
+          <div className="d-flex align-items-center gap-2">
+            <input
+              type="date"
+              className="form-control h-40-px"
+              value={startDate}
+              onChange={(e) => handleDateChange(e, "start")}
+            />
+            <span>to</span>
+            <input
+              type="date"
+              className="form-control h-40-px"
+              value={endDate}
+              onChange={(e) => handleDateChange(e, "end")}
+            />
+          </div>
         </div>
         <button
           type="button"
@@ -164,7 +195,7 @@ const DeliveriesLayer = () => {
             <thead>
               <tr>
                 <th scope="col" className="text-center py-3 px-6">#</th>
-                <th scope="col" className="text-start py-3 px-4">Name of Supplier</th>
+                <th scope="col" className="text-start py-3 px-4">Supplier</th>
                 <th scope="col" className="text-start py-3 px-4">Volume (L)</th>
                 <th scope="col" className="text-start py-3 px-4">Price/Litre</th>
                 <th scope="col" className="text-start py-3 px-4">Storage Facility</th>
@@ -195,7 +226,17 @@ const DeliveriesLayer = () => {
                     <td className="text-start small-text py-3 px-4">{formatCurrency(delivery.pricePerLitre.toFixed(2))}</td>
                     <td className="text-start small-text py-3 px-4">{delivery?.storageFacility?.name || "N/A"}</td>
                     <td className="text-start small-text py-3 px-4">{formatCurrency(delivery.totalAmount.toFixed(2))}</td>
-                    <td className="text-start small-text py-3 px-4">{delivery.status.name}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      <span
+                        className={`bg-${
+                          delivery.status.name === "Not Billed" ? "warning-focus" : "success-focus"
+                        } text-${
+                          delivery.status.name === "Not Billed" ? "warning-600" : "success-600"
+                        } px-24 py-4 radius-8 fw-medium text-sm`}
+                      >
+                        {delivery.status.name}
+                      </span>
+                    </td>
                     <td className="text-start small-text py-3 px-4">{delivery.createdBy.name}</td>
                     <td className="text-start small-text py-3 px-4">{formatDate(delivery.dateCreated)}</td>
                     <td className="text-start small-text py-3 px-4">
