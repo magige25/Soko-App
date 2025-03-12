@@ -157,15 +157,13 @@ const ProductsLayer = () => {
             <thead>
               <tr>
                 <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-start py-3 px-4">Image</th>
                 <th scope="col" className="text-start py-3 px-4">Name</th>
-                <th scope="col" className="text-start py-3 px-4">SKU</th>
-                <th scope="col" className="text-start py-3 px-4">Description</th>
+                <th scope="col" className="text-start py-3 px-4">SKU</th>                
                 <th scope="col" className="text-start py-3 px-4">Category</th>
                 <th scope="col" className="text-start py-3 px-4">Sub-Category</th>
-                <th scope="col" className="text-start py-3 px-4">UoM</th>
-                <th scope="col" className="text-start py-3 px-4">Price/Piece</th>
-                <th scope="col" className="text-start py-3 px-4">Pieces/UoM</th>
-                <th scope="col" className="text-start py-3 px-4">Price/UoM</th>
+                <th scope="col" className="text-start py-3 px-4">Brand</th>
+                <th scope="col" className="text-start py-3 px-4">Discount Price</th>
                 <th scope="col" className="text-start py-3 px-4">Wholesale Price</th>
                 <th scope="col" className="text-start py-3 px-4">Distributor Price</th>
                 <th scope="col" className="text-start py-3 px-4">Retail Price</th>
@@ -189,23 +187,20 @@ const ProductsLayer = () => {
                     </td>
                     <td className="text-start small-text py-3 px-4 d-flex align-items-center">
                       <img
-                        src={product.imgUrl || "https://via.placeholder.com/40"}
-                        alt={`${product.pdName}`}
+                        src={product.photo || "https://cdn.mafrservices.com/sys-master-root/h1f/h18/27062188474398/43281_main.jpg?im=Resize=480"}
+                        alt={`${product.name}`}
                         className="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden"
                       />
-                      <span>{product.pdName}</span>
-                    </td>
-                    <td className="text-start small-text py-3 px-4">{product.sku}</td>
-                    <td className="text-start small-text py-3 px-4">{product.description}</td>
-                    <td className="text-start small-text py-3 px-4">{product.category}</td>
-                    <td className="text-start small-text py-3 px-4">{product.subCategory}</td>
-                    <td className="text-start small-text py-3 px-4">{product.uom}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.pricePerPiece)}</td>
-                    <td className="text-start small-text py-3 px-4">{product.piecesPerUoM}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.pricePerUoM)}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.wPrice || 0)}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.dPrice || 0)}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.rPrice || 0)}</td>
+                    </td>                    
+                    <td className="text-start small-text py-3 px-4">{product.name}</td>                    
+                    <td className="text-start small-text py-3 px-4">{product.sku}</td>                    
+                    <td className="text-start small-text py-3 px-4">{product.category.name}</td>
+                    <td className="text-start small-text py-3 px-4">{product.subCategory.name}</td>
+                    <td className="text-start small-text py-3 px-4">{product.brand.name}</td>
+                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.discountPrice)}</td>
+                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.wholesalePrice || 0)}</td>
+                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.distributorPrice || 0)}</td>
+                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.retailPrice || 0)}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">
@@ -217,6 +212,14 @@ const ProductsLayer = () => {
                             Actions
                           </button>
                           <ul className="dropdown-menu">
+                          <li>
+                              <button
+                                className="dropdown-item"//+ product.id, { state: { productId: product.id } }
+                                onClick={() => navigate("/products/view", { state: { productId: product.id } })}
+                              >
+                                Details
+                              </button>
+                            </li>
                             <li>
                               <button
                                 className="dropdown-item"
@@ -317,7 +320,7 @@ const ProductsLayer = () => {
               </div>
               <p className="pb-3 mb-0">
                 Are you sure you want to delete the product{" "}
-                <strong>{productToDelete?.pdName}</strong> permanently? This action cannot be undone.
+                <strong>{productToDelete?.name}</strong> permanently? This action cannot be undone.
               </p>
             </div>
             <div className="d-flex justify-content-end gap-2 px-12 pb-3">
