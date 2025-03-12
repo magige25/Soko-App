@@ -106,6 +106,7 @@ import CategoryPage from "./pages/CategoryPage";
 import SubCategoryPage from "./pages/SubCategoryPage";
 import BrandsPage from "./pages/BrandsPage";
 import ProductsPage from "./pages/ProductsPage";
+import ProductDetailsPage from "./pages/ProductDetailsPage";
 import CountriesPage from "./pages/CountriesPage";
 import SalespersonsPage from "./pages/SalespersonsPage";
 import AddSalespersonsPage from "./pages/AddSalespersonsPage";
@@ -140,6 +141,10 @@ import BatchPage from "./pages/BatchPage";
 import EditProductPage from "./pages/EditProductPage";
 import AddProductPage from "./pages/AddProductPage";
 import AddImagePage from "./pages/AddImagePage";
+import AddBrandPage from "./pages/AddBrandPage";
+import EditBrandPage from "./pages/EditBrandPage";
+import EditCustomerPage from "./pages/EditCustomerPage";
+import CustomerDetailsPage from "./pages/CustomerDetailsPage";
 
 function App() {
   return (
@@ -214,6 +219,9 @@ function App() {
             <Route path="/deliveries/add-delivery" element={<AddDeliveryPage />} />
             <Route path="/products/add-product" element={<AddProductPage />} />
             <Route path="/products/edit-product" element={<EditProductPage />} />
+            <Route path="/products/view" element={<ProductDetailsPage />} />
+            <Route path="/brands/edit" element={<EditBrandPage />} />
+            <Route path="/brands/add" element={<AddBrandPage />} />
             <Route path="/supply-residence" element={<SupplyResidencePage />} />          
             <Route path="/category" element={<CategoryPage />} />
             <Route path="/sub-category" element={<SubCategoryPage />} />
@@ -225,6 +233,8 @@ function App() {
             <Route path="/salespersons/edit-salesperson" element={<EditSalespersonsPage />} />
             <Route path="/salespersons/details" element={<SalespersonsDetailsPage />} />
             <Route path="/customers" element={<CustomersPage />} />
+            <Route path="/customers/edit" element={<EditCustomerPage />} />
+            <Route path="/customers/details" element={<CustomerDetailsPage />} />
             <Route path="/customer-type" element={<CustomerTypePage />} />
             <Route path="/pricing-categories" element={<PricingCategoriesPage />} />
             <Route path="/creditors-request" element={<CreditorsRequestPage />} />

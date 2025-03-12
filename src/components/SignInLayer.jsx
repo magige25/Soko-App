@@ -192,7 +192,7 @@ const SignInLayer = () => {
                 <p style={{ color: "red", fontSize: "12px", marginTop: "2px" }}>{emailError}</p>
               )}
             </div>
-            <div className="position-relative mb-20">
+            <div className="mb-20" style={{ position: "relative" }}>
               <div
                 className="icon-field mb-16"
                 style={{

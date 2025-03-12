@@ -4,6 +4,7 @@ import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 
 const API_URL = "https://api.bizchain.co.ke/v1/customer-types";
+const STATUS_API = "https://api.bizchain.co.ke/v1/customer-types/update-status";
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -165,6 +166,38 @@ const CustomerTypeLayer = () => {
     }
   };
 
+  const handleToggleStatus = async (customerType) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem("token");
+      const newStatusCode = customerType.status.name === "Active" ? "INACTV" : "ACTV";
+
+      console.log(`Toggling Status for category ${customerType.id} to ${newStatusCode}`);
+
+      const response = await axios.put(
+        STATUS_API,
+        null,
+        {
+          headers: {Authorization: `Bearer ${token}`},
+          params: {
+            id: customerType.id,
+            status: newStatusCode,
+          },
+        }
+      );
+      console.log("Status update response:", response.data);
+      await fetchCustomerTypes(currentPage, query);
+    } catch (error) {
+      console.error("Error toggling status:", error);
+      console.error("Error response:", error.response?.data);
+      setError(error.response?.data?.status?.message || error.response?.data?.message || "Failed toggling, try again!");
+
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleViewClick = (customerType) => {
     setCustomerTypeToView(customerType);
   };
@@ -276,6 +309,14 @@ const CustomerTypeLayer = () => {
                                 onClick={() => handleEditClick(customerType)}
                               >
                                 Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item"
+                                onClick={() => handleToggleStatus(customerType)}
+                              >
+                                {customerType.status.name === "Active" ? "Deactivate" : "Activate"}
                               </button>
                             </li>
                             <li>
