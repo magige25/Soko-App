@@ -145,6 +145,7 @@ import BatchPage from "./pages/BatchPage";
 import EditProductPage from "./pages/EditProductPage";
 import AddProductPage from "./pages/AddProductPage";
 import AddImagePage from "./pages/AddImagePage";
+import AddDrawPage from "./pages/AddDrawPage";
 
 function App() {
   return (
@@ -242,6 +243,7 @@ function App() {
             <Route path="/pending-deliveries" element={<PendingDeliveriesPage />} />
             <Route path="/settled-orders" element={<SettledOrdersPage />} />
             <Route path="/units-of-measure" element={<UnitsOfMeasurePage />} />
+            <Route path="/add-draw" element={<AddDrawPage />} />
             <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
             <Route path="/colors" element={<ColorsPage />} />
             <Route path="/column-chart" element={<ColumnChartPage />} />

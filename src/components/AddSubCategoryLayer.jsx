@@ -10,7 +10,7 @@ const CATEGORY_API_URL = "https://api.bizchain.co.ke/v1/categories";
 
 const AddSubCategoryLayer = () => {
   const navigate = useNavigate();
-  const [subCategories, setSubCategories] = useState([{ name: "", categoryId: "" }]);
+  const [subCategories, setSubCategories] = useState([{ categoryId: "", name: "" }]);
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -53,7 +53,7 @@ const AddSubCategoryLayer = () => {
   };
 
   const handleAddSubCategoryField = () => {
-    setSubCategories([...subCategories, { name: "", categoryId: "" }]);
+    setSubCategories([...subCategories, { categoryId: "", name: "" }]);
   };
 
   const handleRemoveSubCategoryField = (index) => {
@@ -89,11 +89,11 @@ const AddSubCategoryLayer = () => {
   const validateForm = () => {
     const newErrors = {};
     subCategories.forEach((subCategory, index) => {
-      if (!subCategory.name.trim()) {
-        newErrors[`name${index}`] = "Subcategory Name is required";
-      }
       if (!subCategory.categoryId) {
         newErrors[`categoryId${index}`] = "Category is required";
+      }
+      if (!subCategory.name.trim()) {
+        newErrors[`name${index}`] = "Subcategory Name is required";
       }
     });
     return newErrors;
@@ -151,7 +151,7 @@ const AddSubCategoryLayer = () => {
           pauseOnHover: true,
           draggable: true,
         });
-        setSubCategories([{ name: "", categoryId: "" }]);
+        setSubCategories([{ categoryId: "", name: "" }]);
         navigate("/sub-category");
       } else {
         toast.error(`Failed to save subcategories: ${response.data.status.message}`);
@@ -174,7 +174,7 @@ const AddSubCategoryLayer = () => {
               <div className="col-3">
                 <div className="d-flex align-items-center gap-2">
                   <label className="form-label fw-semibold text-primary-light text-sm mb-0">
-                    Subcategory Name <span className="text-danger">*</span>
+                    Category <span className="text-danger">*</span>
                   </label>
                   {index > 0 && (
                     <button
@@ -184,25 +184,8 @@ const AddSubCategoryLayer = () => {
                     ></button>
                   )}
                 </div>
-                <input
-                  type="text"
-                  className="form-control radius-8 category-input"
-                  placeholder="Enter Subcategory Name"
-                  value={subCategory.name}
-                  onChange={(e) => handleSubCategoryChange(index, "name", e.target.value)}
-                />
-                {errors[`name${index}`] && (
-                  <div className="invalid-feedback d-block">{errors[`name${index}`]}</div>
-                )}
-              </div>
-              <div className="col-3">
-                <div className="d-flex align-items-center gap-2">
-                  <label className="form-label fw-semibold text-primary-light text-sm mb-0">
-                    Category <span className="text-danger">*</span>
-                  </label>
-                </div>
                 <select
-                  className="form-control radius-8"
+                  className={`form-control radius-8 ${errors[`categoryId${index}`] ? "is-invalid" : ""}`}
                   value={subCategory.categoryId}
                   onChange={(e) => handleSubCategoryChange(index, "categoryId", e.target.value)}
                 >
@@ -217,6 +200,27 @@ const AddSubCategoryLayer = () => {
                   <div className="invalid-feedback d-block">{errors[`categoryId${index}`]}</div>
                 )}
               </div>
+
+              {/* Show Subcategory Name only if a category is selected */}
+              {subCategory.categoryId && (
+                <div className="col-3">
+                  <div className="d-flex align-items-center gap-2">
+                    <label className="form-label fw-semibold text-primary-light text-sm mb-0">
+                      Subcategory Name <span className="text-danger">*</span>
+                    </label>
+                  </div>
+                  <input
+                    type="text"
+                    className={`form-control radius-8 ${errors[`name${index}`] ? "is-invalid" : ""}`}
+                    placeholder="Enter Subcategory Name"
+                    value={subCategory.name}
+                    onChange={(e) => handleSubCategoryChange(index, "name", e.target.value)}
+                  />
+                  {errors[`name${index}`] && (
+                    <div className="invalid-feedback d-block">{errors[`name${index}`]}</div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
 

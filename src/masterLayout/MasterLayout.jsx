@@ -124,7 +124,9 @@ const MasterLayout = ({ children }) => {
     paymentManagement: ["/payments", "/creditors-payment"],
     regions: ["/regions", "/sub-regions", "/routes"],
     productCatalogue: ["/category", "/sub-category", "/brands", "/products"],
-    supplierManagement: ["/suppliers", "/deliveries", "/pending-bills", "/settled-bills", "/supply-residence"],
+    farmerManagement: ["/suppliers", "/deliveries", "/pending-bills", "/settled-bills", "/supply-residence"],
+    invoices: ["/invoice-register", "/pending-invoices", "settled-invoices"],
+    deportManagement: ["/deports"],
     warehouseManagement: ["/warehouses"],
     stockManagement: ["/stock", "/reconciled"],
     storageFacility: ["/storage-facility"],
@@ -392,8 +394,8 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Supplier Management */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.supplierManagement) ? "submenu-active" : ""}`}>
+              {/* Farmer Management */}
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.farmerManagement) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:clipboard-line" className="menu-icon" />
                   <span>Farmer Management</span>
@@ -426,7 +428,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Invoices */}
-              <li className="dropdown">
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.invoices) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="hugeicons:invoice-03" className="menu-icon" />
                   <span>Invoices</span>
@@ -463,7 +465,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Deport Management */}
-              <li className="dropdown">
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.deportManagement) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:store-3-line" className="menu-icon" />
                   <span>Deport Management</span>
