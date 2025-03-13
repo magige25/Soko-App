@@ -171,7 +171,7 @@ const AddSubCategoryLayer = () => {
         <form onSubmit={handleSaveSubCategories}>
           {subCategories.map((subCategory, index) => (
             <div key={index} className="row gx-3 mb-3">
-              <div className="col-3">
+              <div className="col-4">
                 <div className="d-flex align-items-center gap-2">
                   <label className="form-label fw-semibold text-primary-light text-sm mb-0">
                     Category <span className="text-danger">*</span>
@@ -203,7 +203,7 @@ const AddSubCategoryLayer = () => {
 
               {/* Show Subcategory Name only if a category is selected */}
               {subCategory.categoryId && (
-                <div className="col-3">
+                <div className="col-4">
                   <div className="d-flex align-items-center gap-2">
                     <label className="form-label fw-semibold text-primary-light text-sm mb-0">
                       Subcategory Name <span className="text-danger">*</span>

@@ -146,7 +146,9 @@ import BatchPage from "./pages/BatchPage";
 import EditProductPage from "./pages/EditProductPage";
 import AddProductPage from "./pages/AddProductPage";
 import AddImagePage from "./pages/AddImagePage";
-import AddDrawPage from "./pages/AddDrawPage";
+import DrawingPage from "./pages/DrawingPage";
+import DrawRequestPage from "./pages/DrawRequestPage";
+import DrawingDetailsPage from "./pages/DrawingDetailsPage";
 import AddBrandPage from "./pages/AddBrandPage";
 import EditBrandPage from "./pages/EditBrandPage";
 import EditCustomerPage from "./pages/EditCustomerPage";
@@ -253,7 +255,9 @@ function App() {
             <Route path="/pending-deliveries" element={<PendingDeliveriesPage />} />
             <Route path="/settled-orders" element={<SettledOrdersPage />} />
             <Route path="/units-of-measure" element={<UnitsOfMeasurePage />} />
-            <Route path="/add-draw" element={<AddDrawPage />} />
+            <Route path="/drawing" element={<DrawingPage />} />
+            <Route path="/drawing/draw-request" element={<DrawRequestPage />} />
+            <Route path="/drawing/draw-details" element={<DrawingDetailsPage />} />
             <Route path="/code-generator-new" element={<CodeGeneratorNewPage />} />
             <Route path="/colors" element={<ColorsPage />} />
             <Route path="/column-chart" element={<ColumnChartPage />} />

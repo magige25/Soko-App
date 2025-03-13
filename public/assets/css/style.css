@@ -15329,6 +15329,12 @@ td.fc-header-center {
   z-index: 2;
 }
 
+[data-theme="dark"] .navbar-header {
+  background-color: var(--neutral-100);
+  color: var(--neutral-600);
+  box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.1);
+}
+
 .sidebar-toggle,
 .sidebar-mobile-toggle {
   line-height: 1.2;
@@ -15623,6 +15629,7 @@ td.fc-header-center {
   background-color: var(--neutral-500);
 }
 
+
 .sidebar-menu-area::-webkit-scrollbar {
   width: 8px;
   background-color: var(--cyan-10);
@@ -15632,6 +15639,21 @@ td.fc-header-center {
   background-color: var(--cyan-10);
   border-radius: 4px;
   transition: background-color 0.2s ease; 
+}
+
+[data-theme="dark"] .sidebar-menu-area::-webkit-scrollbar {
+  background-color: var(--neutral-100);
+  box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .sidebar-menu-area::-webkit-scrollbar-thumb {
+  background-color: var(--neutral-100);
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+[data-theme="dark"] .sidebar-menu-area:hover::-webkit-scrollbar-thumb {
+  background-color: var(--neutral-600);
 }
 
 [data-theme="dark"] .sidebar.active:hover .sidebar-logo img.light-logo {

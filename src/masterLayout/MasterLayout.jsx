@@ -120,7 +120,7 @@ const MasterLayout = ({ children }) => {
     systemUsers: ["/users"],
     customerManagement: ["/customers", "/creditors-request"],
     orderManagement: ["/pending-orders", "/pending-deliveries", "/settled-orders"],
-    salespersonOperation: ["/salespersons"],
+    salespersonOperation: ["/salespersons", "/targets"],
     paymentManagement: ["/payments", "/creditors-payment"],
     regions: ["/regions", "/sub-regions", "/routes"],
     productCatalogue: ["/category", "/sub-category", "/brands", "/products"],
@@ -129,12 +129,11 @@ const MasterLayout = ({ children }) => {
     deportManagement: ["/deports"],
     warehouseManagement: ["/warehouses"],
     stockManagement: ["/stock", "/reconciled"],
-    storageFacility: ["/storage-facility"],
+    storageFacility: ["/storage-facility", "/batch", "/drawing"],
     authentication: ["/sign-in", "/forgot-password", "/reset-password"],
     roles: ["/roles-list"],
     settings: ["/customer-type", "/pricing-categories", "/currencies", "/units-of-measure", "/countries"],
     invoice: ["/invoice-list", "/invoice-preview", "/invoice-add", "/invoice-edit"],
-    aiApplication: ["/text-generator", "/code-generator", "/image-generator", "/voice-generator", "/video-generator"],
     components: [
       "/typography", "/colors", "/button", "/dropdown", "/alert", "/card", "/carousel", "/avatar",
       "/progress", "/tabs", "/pagination", "/badges", "/tooltip", "/videos", "/star-rating", "/tags",
@@ -531,6 +530,14 @@ const MasterLayout = ({ children }) => {
                       Batch
                     </NavLink>
                   </li>
+                  <li>
+                    <NavLink
+                      to="/drawing"
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
+                    >
+                      Drawing
+                    </NavLink>
+                  </li>
                 </ul>
               </li>
               {/* Authentication */}
@@ -697,55 +704,6 @@ const MasterLayout = ({ children }) => {
                       className={(navData) => (navData.isActive ? "active-page" : "")}
                     >
                       Edit
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-              {/* Ai Application */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.aiApplication) ? "submenu-active" : ""}`}>
-                <Link to="#">
-                  <Icon icon="ri:robot-2-line" className="menu-icon" />
-                  <span>Ai Application</span>
-                </Link>
-                <ul className="sidebar-submenu">
-                  <li>
-                    <NavLink
-                      to="/text-generator"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Text Generator
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/code-generator"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Code Generator
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/image-generator"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Image Generator
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/voice-generator"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Voice Generator
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/video-generator"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Video Generator
                     </NavLink>
                   </li>
                 </ul>

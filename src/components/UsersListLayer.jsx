@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = "https://api.bizchain.co.ke/v1/user";
-const STATUS_API = "https://api.bizchain.co.ke/v1/user/update-status";
+// const STATUS_API = "https://api.bizchain.co.ke/v1/user/update-status";
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -101,36 +101,36 @@ const UsersListLayer = () => {
     setCurrentPage(pageNumber);
   };
 
-  const handleToggleStatus = async (users) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const token = localStorage.getItem("token");
-      const newStatusCode = users.status.blocked === "Active" ? "INACTV" : "ACTV";
+  // const handleToggleStatus = async (users) => {
+  //   setIsLoading(true);
+  //   setError(null);
+  //   try {
+  //     const token = localStorage.getItem("token");
+  //     const newStatusCode = users.status.blocked === "Active" ? "INACTV" : "ACTV";
 
-      console.log(`Toggling status for category ${users.id} to ${newStatusCode}`);
+  //     console.log(`Toggling status for category ${users.id} to ${newStatusCode}`);
 
-      const response = await axios.put(
-        STATUS_API,
-        null,
-        {
-          headers: {Authorization: `Bearer ${token}`},
-          params: {
-            id: users.id,
-            status: newStatusCode,
-          },
-        }
-      );
-      console.log("Status update response:", response.data);
-      await fetchUsers(currentPage, query);
-    } catch (error) {
-      console.error("Error toggling status:", error);
-      console.error("Error response:", error.response?.data);
-      setError(error.response?.data?.status?.message || error.response?.data?.message || "Failed to toggle.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     const response = await axios.put(
+  //       STATUS_API,
+  //       null,
+  //       {
+  //         headers: {Authorization: `Bearer ${token}`},
+  //         params: {
+  //           id: users.id,
+  //           status: newStatusCode,
+  //         },
+  //       }
+  //     );
+  //     console.log("Status update response:", response.data);
+  //     await fetchUsers(currentPage, query);
+  //   } catch (error) {
+  //     console.error("Error toggling status:", error);
+  //     console.error("Error response:", error.response?.data);
+  //     setError(error.response?.data?.status?.message || error.response?.data?.message || "Failed to toggle.");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
 
   return (
     <div className="card h-100 p-0 radius-12">
