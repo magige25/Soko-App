@@ -188,7 +188,7 @@ const CodeGeneratorNewLayer = () => {
             <input
               type='text'
               name='chatMessage'
-              placeholder='Message wowdash...'
+              placeholder='Message Bizchain...'
             />
             <button
               type='submit'

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
@@ -7,41 +7,61 @@ const API_URL = "https://api.bizchain.co.ke/v1/invoice";
 
 const InvoicesLayer = () => {
   const [invoices, setInvoices] = useState([]);
-  const [searchItem, setSearchItem] = useState("");
+  const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const [itemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchInvoices();
-  }, []);
-
-  const fetchInvoices = async () => {
+  const fetchInvoices = useCallback(async (page = 1, searchQuery = '') => {
+    setIsLoading(true);
+    setError(null);
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          page: page - 1,
+          size: itemsPerPage,
+          searchValue: searchQuery,
+          _t: new Date().getTime(),
         },
       });
-      
-      const invoicedOnly = response.data.data
-        .filter(invoice => invoice.status.code === "INV")
-        .map(invoice => ({
-          ...invoice,
-          totalLitres: invoice.deliveries.reduce((sum, delivery) => sum + (delivery.litres || 0), 0),
-        }));
+
+      console.log('Full API Response:', response.data);
+      const responseData = response.data;
+      if (responseData.status.code === 0) {
+        const invoicedOnly = (responseData.data || [])
+          .filter(invoice => invoice.status.code === "INV")
+          .map(invoice => ({
+            ...invoice,
+            totalLitres: invoice.deliveries.reduce((sum, delivery) => sum + (delivery.litres || 0), 0),
+          }));
         console.log("Invoiced Data with Total Litres:", invoicedOnly);
-      setInvoices(invoicedOnly);
+        setInvoices(invoicedOnly);
+        setTotalItems(responseData.totalElements || invoicedOnly.length);
+      } else {
+        throw new Error(responseData.status.message);
+      }
     } catch (error) {
       console.error("Error fetching Invoices:", error);
+      setError("Failed to fetch invoices. Please try again.");
+      setInvoices([]);
+      setTotalItems(0);
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [itemsPerPage]);
 
-  const filteredItems = invoices.filter((invoice) =>
-    Object.values(invoice).some((value) =>
-      String(value).toLowerCase().includes(searchItem.toLowerCase())
-    )
-  );
+  useEffect(() => {
+    fetchInvoices(currentPage, query);
+  }, [currentPage, query, fetchInvoices]);
+
+  const handleSearchInputChange = (e) => {
+    setQuery(e.target.value);
+    setCurrentPage(1);
+  };
 
   const formatCurrency = (amount) =>
     new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
@@ -63,11 +83,7 @@ const InvoicesLayer = () => {
     return `${day}${suffix} ${month} ${year}`;
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredItems.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
-
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -76,15 +92,14 @@ const InvoicesLayer = () => {
     <div className="card h-100 p-0 radius-12">
       <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
         <div className="d-flex align-items-center flex-wrap gap-3">
-          {/* <h5 className="mb-0">Pending Invoices</h5> */}
           <form className="navbar-search">
             <input
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search"
-              value={searchItem}
-              onChange={(e) => setSearchItem(e.target.value)}
+              placeholder="Search by supplier, invoice number, etc."
+              value={query}
+              onChange={handleSearchInputChange}
             />
             <Icon icon="ion:search-outline" className="icon" />
           </form>
@@ -92,6 +107,7 @@ const InvoicesLayer = () => {
       </div>
 
       <div className="card-body p-24">
+        {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
@@ -110,8 +126,16 @@ const InvoicesLayer = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.length > 0 ? (
-                currentItems.map((invoice, index) => (
+              {isLoading ? (
+                <tr>
+                  <td colSpan="11" className="text-center py-3">
+                    <div>
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </td>
+                </tr>
+              ) : invoices.length > 0 ? (
+                invoices.map((invoice, index) => (
                   <tr key={invoice.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
@@ -155,7 +179,7 @@ const InvoicesLayer = () => {
                               <Link
                                 className="dropdown-item"
                                 to="/pending-invoices/invoice"
-                                state={{ invoiceId: invoice.id}}
+                                state={{ invoiceId: invoice.id }}
                               >
                                 View
                               </Link>
@@ -177,60 +201,62 @@ const InvoicesLayer = () => {
           </table>
         </div>
 
-        <div className="d-flex justify-content-between align-items-center mt-3">
-          <div className="text-muted" style={{ fontSize: "13px" }}>
-            <span>
-              Showing {filteredItems.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0} to{" "}
-              {Math.min(currentPage * itemsPerPage, filteredItems.length)} of {filteredItems.length} entries
-            </span>
-          </div>
-          <nav aria-label="Page navigation">
-            <ul className="pagination mb-0" style={{ gap: "6px" }}>
-              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <button
-                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  aria-label="Previous page"
-                >
-                  <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
-                </button>
-              </li>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+        {!isLoading && (
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <div className="text-muted" style={{ fontSize: "13px" }}>
+              <span>
+                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+                {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+              </span>
+            </div>
+            <nav aria-label="Page navigation">
+              <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
-                    className={`page-link btn ${
-                      currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
-                    } rounded-circle d-flex align-items-center justify-content-center`}
-                    style={{
-                      width: "30px",
-                      height: "30px",
-                      padding: "0",
-                      transition: "all 0.2s",
-                      fontSize: "10px",
-                      color: currentPage === i + 1 ? "#fff" : "",
-                    }}
-                    onClick={() => handlePageChange(i + 1)}
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    aria-label="Previous page"
                   >
-                    {i + 1}
+                    <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
                   </button>
                 </li>
-              ))}
-              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <button
-                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  aria-label="Next page"
-                >
-                  <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                    <button
+                      className={`page-link btn ${
+                        currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
+                      } rounded-circle d-flex align-items-center justify-content-center`}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        padding: "0",
+                        transition: "all 0.2s",
+                        fontSize: "10px",
+                        color: currentPage === i + 1 ? "#fff" : "",
+                      }}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    aria-label="Next page"
+                  >
+                    <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
     </div>
   );

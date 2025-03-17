@@ -15730,7 +15730,6 @@ td.fc-header-center {
 
 [data-theme="dark"] .sidebar-menu-area::-webkit-scrollbar {
   background-color: var(--neutral-100);
-  box-shadow: 2px 2px 10px rgba(255, 255, 255, 0.1);
 }
 
 [data-theme="dark"] .sidebar-menu-area::-webkit-scrollbar-thumb {
@@ -15791,10 +15790,14 @@ td.fc-header-center {
   color: var(--white);
 }
 
+[data-theme="dark"] .sidebar-menu li.dropdown.submenu-active > a {
+  background-color: var(--brand);
+  color: var(--dark-white); 
+}
+
 .sidebar-menu li.dropdown.submenu-active > a:hover {
   color: var(--white);
 }
-
 
 .sidebar-menu li.dropdown.open > a::after,
 .sidebar-menu li.dropdown.dropdown-open > a::after {

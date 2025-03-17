@@ -17,22 +17,21 @@ const useDebounce = (value, delay) => {
 };
 
 const DrawingLayer = () => {
-  const [allDrawings, setAllDrawings] = useState([]); // Store all drawings from the API
-  const [drawings, setDrawings] = useState([]); // Store the drawings for the current page
+  const [drawings, setDrawings] = useState([]);
+  const [allDrawings, setAllDrawings] = useState([]); 
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [isClientSidePagination, setIsClientSidePagination] = useState(false); 
   const debouncedQuery = useDebounce(query, 300);
 
-  const fetchDrawings = useCallback(async (searchQuery = "") => {
+  const fetchDrawings = useCallback(async (page = 1, searchQuery = "") => {
     setIsLoading(true);
     setError(null);
-    setAllDrawings([]); 
-    setDrawings([]); 
-    setTotalItems(0); 
+    setDrawings([]);
 
     const token = sessionStorage.getItem("token");
     if (!token || token.trim() === "") {
@@ -45,17 +44,18 @@ const DrawingLayer = () => {
       const response = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
-          page: 1, 
-          limit: 1000, 
+          page: page - 1,
+          limit: itemsPerPage,
           searchValue: searchQuery,
+          _t: new Date().getTime(),
         },
       });
 
       const result = response.data;
-      console.log("API Response:", result); 
+      console.log("Full API Response:", result);
 
       if (result.status.code === 0) {
-        const mappedDrawings = result.data.map((drawing) => ({
+        const mappedDrawings = (result.data || []).map((drawing) => ({
           id: drawing.id,
           drawCode: drawing.drawCode || "N/A",
           totalLitres: drawing.totalLitres || 0,
@@ -65,40 +65,41 @@ const DrawingLayer = () => {
           createdBy: drawing.createdBy || "-",
         }));
 
-        setAllDrawings(mappedDrawings);
-        setTotalItems(result.totalElements);
+        if (mappedDrawings.length > itemsPerPage || !result.totalElements) {
+          setAllDrawings(mappedDrawings);
+          setIsClientSidePagination(true);
+          const startIndex = (page - 1) * itemsPerPage;
+          const endIndex = startIndex + itemsPerPage;
+          setDrawings(mappedDrawings.slice(startIndex, endIndex));
+          setTotalItems(mappedDrawings.length);
+        } else {
+          setDrawings(mappedDrawings);
+          setIsClientSidePagination(false);
+          setTotalItems(result.totalElements || mappedDrawings.length);
+        }
       } else {
         setError(`Failed to fetch drawings: ${result.status.message}`);
-        setAllDrawings([]);
         setDrawings([]);
         setTotalItems(0);
       }
     } catch (error) {
       console.error("Error fetching drawings:", error);
       setError(`Error fetching drawings: ${error.response?.data?.message || error.message}`);
-      setAllDrawings([]);
       setDrawings([]);
       setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [itemsPerPage]);
 
   useEffect(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentPageDrawings = allDrawings.slice(startIndex, endIndex);
-    setDrawings(currentPageDrawings);
-  }, [allDrawings, currentPage, itemsPerPage]);
-
-  useEffect(() => {
-    fetchDrawings(debouncedQuery);
-    setCurrentPage(1);
-  }, [debouncedQuery, fetchDrawings]);
+    fetchDrawings(currentPage, debouncedQuery);
+  }, [currentPage, debouncedQuery, fetchDrawings]);
 
   const handleSearchInputChange = (e) => {
     const searchQuery = e.target.value;
     setQuery(searchQuery);
+    setCurrentPage(1);
   };
 
   const formatDate = (dateString) => {
@@ -122,6 +123,11 @@ const DrawingLayer = () => {
   const handlePageChange = (pageNumber) => {
     if (pageNumber >= 1 && pageNumber <= totalPages) {
       setCurrentPage(pageNumber);
+      if (isClientSidePagination) {
+        const startIndex = (pageNumber - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        setDrawings(allDrawings.slice(startIndex, endIndex));
+      }
     }
   };
 

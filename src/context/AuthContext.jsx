@@ -7,7 +7,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(!!sessionStorage.getItem("token"));
   const navigate = useNavigate();
   const idleTimeoutRef = React.useRef(null);
-  const IDLE_TIMEOUT = 300000;
+  const IDLE_TIMEOUT = 600000;
 
   const resetIdleTimer = () => {
     if (idleTimeoutRef.current) {

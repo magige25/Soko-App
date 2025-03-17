@@ -4,7 +4,7 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
 import { useAuth } from "../context/AuthContext";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
-import GroupAddOutlinedIcon from '@mui/icons-material/GroupAddOutlined';
+import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
 
 const MasterLayout = ({ children }) => {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -22,6 +22,7 @@ const MasterLayout = ({ children }) => {
     setMobileMenu((prev) => !prev);
   };
 
+  // Handle clicks outside the sidebar to close mobile menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -44,6 +45,7 @@ const MasterLayout = ({ children }) => {
     };
   }, [mobileMenu]);
 
+  // Handle dropdown menu toggling
   useEffect(() => {
     const handleDropdownClick = (index) => (event) => {
       event.preventDefault();
@@ -110,12 +112,32 @@ const MasterLayout = ({ children }) => {
     };
   }, [location.pathname]);
 
-  // Function to check if a submenu item is active
+  // Scroll to the active menu or submenu item
+  useEffect(() => {
+    if (sidebarRef.current) {
+      const activeElement = sidebarRef.current.querySelector(".active-page");
+      if (activeElement) {
+        activeElement.scrollIntoView({
+          behavior: "smooth", // Smooth scrolling
+          block: "center", // Center the active item in the sidebar
+        });
+      } else {
+        // If no submenu item is active, check for an active parent dropdown
+        const activeDropdown = sidebarRef.current.querySelector(".submenu-active");
+        if (activeDropdown) {
+          activeDropdown.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+        }
+      }
+    }
+  }, [location.pathname]); // Run when the route changes
+
   const isSubmenuActive = (paths) => {
     return paths.some((path) => location.pathname === path);
   };
 
-  // Define submenu paths for each dropdown
   const submenuPaths = {
     systemUsers: ["/users"],
     customerManagement: ["/customers", "/creditors-request"],
@@ -126,9 +148,9 @@ const MasterLayout = ({ children }) => {
     productCatalogue: ["/category", "/sub-category", "/brands", "/products"],
     farmerManagement: ["/suppliers", "/deliveries", "/pending-bills", "/settled-bills", "/supply-residence"],
     invoices: ["/invoice-register", "/pending-invoices", "settled-invoices"],
-    deportManagement: ["/deports"],
+    depotManagement: ["/depots"],
     warehouseManagement: ["/warehouses"],
-    stockManagement: ["/stock", "/reconciled"],
+    stockManagement: ["/stock", "/depot-reconciliation", "/salesperson-reconciliation"],
     storageFacility: ["/storage-facility", "/batch", "/drawing"],
     authentication: ["/sign-in", "/forgot-password", "/reset-password"],
     roles: ["/roles-list"],
@@ -197,7 +219,7 @@ const MasterLayout = ({ children }) => {
               {/* System Users */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.systemUsers) ? "submenu-active" : ""}`}>
                 <Link to="#">
-                <GroupAddOutlinedIcon className="menu-icon" />
+                  <GroupAddOutlinedIcon className="menu-icon" />
                   <span>System Users</span>
                 </Link>
                 <ul className="sidebar-submenu">
@@ -433,7 +455,7 @@ const MasterLayout = ({ children }) => {
                   <span>Invoices</span>
                 </Link>
                 <ul className="sidebar-submenu">
-                <li>
+                  <li>
                     <NavLink
                       to="/invoice-register"
                       className={(navData) => (navData.isActive ? "active-page" : "")}
@@ -444,9 +466,7 @@ const MasterLayout = ({ children }) => {
                   <li>
                     <NavLink
                       to="/pending-invoices"
-                      className={(navData) =>
-                        navData.isActive ? "active-page" : ""
-                      }
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
                     >
                       Pending Invoices
                     </NavLink>
@@ -454,30 +474,26 @@ const MasterLayout = ({ children }) => {
                   <li>
                     <NavLink
                       to="/settled-invoices"
-                      className={(navData) =>
-                        navData.isActive ? "active-page" : ""
-                      }
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
                     >
                       Settled Invoices
                     </NavLink>
                   </li>
                 </ul>
               </li>
-              {/* Deport Management */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.deportManagement) ? "submenu-active" : ""}`}>
+              {/* Depot Management */}
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.depotManagement) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:store-3-line" className="menu-icon" />
-                  <span>Deport Management</span>
+                  <span>Depot Management</span>
                 </Link>
                 <ul className="sidebar-submenu">
                   <li>
                     <NavLink
-                      to="/deports"
-                      className={(navData) =>
-                        navData.isActive ? "active-page" : ""
-                      }
+                      to="/depots"
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
                     >
-                      Deports
+                      Depots
                     </NavLink>
                   </li>
                 </ul>
@@ -499,10 +515,18 @@ const MasterLayout = ({ children }) => {
                   </li>
                   <li>
                     <NavLink
-                      to="/reconciled"
+                      to="/depot-reconciliation"
                       className={(navData) => (navData.isActive ? "active-page" : "")}
                     >
-                      Reconciled Stock
+                      Depot Stock Reconciliation
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/salesperson-reconciliation"
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
+                    >
+                      Salesperson Reconciliation
                     </NavLink>
                   </li>
                 </ul>
@@ -639,319 +663,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              <li className="sidebar-menu-group-title">Application</li>
-              <li>
-                <NavLink
-                  to="/email"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="mage:email" className="menu-icon" />
-                  <span>Email</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/chat-message"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="bi:chat-dots" className="menu-icon" />
-                  <span>Chat</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/calendar-main"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="solar:calendar-outline" className="menu-icon" />
-                  <span>Calendar</span>
-                </NavLink>
-              </li>
-              {/* Invoice */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.invoice) ? "submenu-active" : ""}`}>
-                <Link to="#">
-                  <Icon icon="hugeicons:invoice-03" className="menu-icon" />
-                  <span>Invoice</span>
-                </Link>
-                <ul className="sidebar-submenu">
-                  <li>
-                    <NavLink
-                      to="/invoice-list"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      List
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/invoice-preview"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Preview
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/invoice-add"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Add new
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/invoice-edit"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Edit
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-              <li className="sidebar-menu-group-title">UI Elements</li>
-              {/* Components */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.components) ? "submenu-active" : ""}`}>
-                <Link to="#">
-                  <Icon icon="solar:document-text-outline" className="menu-icon" />
-                  <span>Components</span>
-                </Link>
-                <ul className="sidebar-submenu">
-                  <li>
-                    <NavLink
-                      to="/typography"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Typography
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/colors"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Colors
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/button"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Button
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/dropdown"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Dropdown
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/alert"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Alerts
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/card"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Card
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/carousel"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Carousel
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/avatar"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Avatars
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/progress"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Progress bar
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/tabs"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Tab & Accordion
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/pagination"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Pagination
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/badges"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Badges
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/tooltip"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Tooltip & Popover
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/videos"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Videos
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/star-rating"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Star Ratings
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/tags"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Tags
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/list"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      List
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/calendar"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Calendar
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/radio"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Radio
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/switch"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Switch
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/image-upload"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Upload
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-              {/* Forms */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.forms) ? "submenu-active" : ""}`}>
-                <Link to="#">
-                  <Icon icon="heroicons:document" className="menu-icon" />
-                  <span>Forms</span>
-                </Link>
-                <ul className="sidebar-submenu">
-                  <li>
-                    <NavLink
-                      to="/form"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Input Forms
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/form-layout"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Input Layout
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/form-validation"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Form Validation
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/wizard"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Form Wizard
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-              {/* Table */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.table) ? "submenu-active" : ""}`}>
-                <Link to="#">
-                  <Icon icon="mingcute:storage-line" className="menu-icon" />
-                  <span>Table</span>
-                </Link>
-                <ul className="sidebar-submenu">
-                  <li>
-                    <NavLink
-                      to="/table-basic"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Basic Table
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/table-data"
-                      className={(navData) => (navData.isActive ? "active-page" : "")}
-                    >
-                      Data Table
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
               {/* Chart */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.chart) ? "submenu-active" : ""}`}>
                 <Link to="#">
@@ -985,82 +696,9 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              <li>
-                <NavLink
-                  to="/testimonials"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="mage:message-question-mark-round" className="menu-icon" />
-                  <span>Testimonials</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/faq"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="mage:message-question-mark-round" className="menu-icon" />
-                  <span>FAQs.</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/error"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="streamline:straight-face" className="menu-icon" />
-                  <span>404</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/terms-condition"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="octicon:info-24" className="menu-icon" />
-                  <span>Terms & Conditions</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/coming-soon"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="ri:rocket-line" className="menu-icon" />
-                  <span>Coming Soon</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/access-denied"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="ri:folder-lock-line" className="menu-icon" />
-                  <span>Access Denied</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/maintenance"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="ri:hammer-line" className="menu-icon" />
-                  <span>Maintenance</span>
-                </NavLink>
-              </li>
-              <li>
-                <NavLink
-                  to="/blank-page"
-                  className={(navData) => (navData.isActive ? "active-page" : "")}
-                >
-                  <Icon icon="ri:checkbox-multiple-blank-line" className="menu-icon" />
-                  <span>Blank Page</span>
-                </NavLink>
-              </li>
             </ul>
           </div>
         </aside>
-
         <main
           className={sidebarActive ? "dashboard-main active" : "dashboard-main"}
         >
