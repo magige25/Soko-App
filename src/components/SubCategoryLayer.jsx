@@ -52,7 +52,7 @@ const SubCategoryLayer = () => {
   };
 
   const fetchCategories = useCallback(async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       setError("Authentication token not found");
       return;
@@ -76,7 +76,7 @@ const SubCategoryLayer = () => {
   const fetchSubCategories = useCallback(async (page = 1, searchQuery = "") => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       setError("No authentication token found. Please log in.");
       setIsLoading(false);
@@ -140,7 +140,7 @@ const SubCategoryLayer = () => {
     }
     
     setIsLoading(true);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     try {
       const response = await axios.put(
         `${SUBCATEGORY_API_URL}/${editSubCategory.id}`,
@@ -179,7 +179,7 @@ const SubCategoryLayer = () => {
 
   const handleDeleteConfirm = async () => {
     setIsLoading(true);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     try {
       const response = await axios.delete(
         `${SUBCATEGORY_API_URL}/${subCategoryToDelete.id}`,

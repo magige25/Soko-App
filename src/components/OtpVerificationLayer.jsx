@@ -93,6 +93,15 @@ const OtpVerificationLayer = () => {
       return;
     }
 
+    if (!navigator.onLine) {
+      toast.error("No network connection. Please check your internet.", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
       console.log("Submitting OTP with payload:", {
         email: formData.email,
@@ -112,6 +121,7 @@ const OtpVerificationLayer = () => {
           headers: {
             "APP-KEY": "BCM8WTL9MQU4MJLE",
           },
+          timeout: 10000,
         }
       );
 
@@ -142,10 +152,50 @@ const OtpVerificationLayer = () => {
       }
     } catch (error) {
       console.error("OTP Validation Error:", error.message, error.response?.data);
-      toast.error("Failed to validate OTP. Please try again.", {
-        position: "top-right",
-        autoClose: 2000,
-      });
+      
+      if (!navigator.onLine) {
+        toast.error("Network disconnected. Please check your connection.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else if (error.code === "ECONNABORTED") {
+        toast.error("Request timed out. Please check your network.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else if (error.response) {
+        if (error.response.status === 401) {
+          toast.error("Invalid OTP. Please try again.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else if (error.response.status === 403) {
+          toast.error("Access forbidden. Contact support.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else if (error.response.status >= 500) {
+          toast.error("Server error. Please try again later.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else {
+          toast.error("An error occurred. Please try again.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        }
+      } else if (error.request) {
+        toast.error("Network error. Unable to reach server.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else {
+        toast.error("An unexpected error occurred.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -155,6 +205,14 @@ const OtpVerificationLayer = () => {
     if (!formData.email?.trim()) {
       console.log("Error: Email is missing!");
       toast.error("Email is required to resend OTP.", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      return;
+    }
+
+    if (!navigator.onLine) {
+      toast.error("No network connection. Please check your internet.", {
         position: "top-right",
         autoClose: 2000,
       });
@@ -176,7 +234,10 @@ const OtpVerificationLayer = () => {
           authMethod: formData.authMethod,
           password: formData.password,
         },
-        { headers: { "APP-KEY": "BCM8WTL9MQU4MJLE" } }
+        { 
+          headers: { "APP-KEY": "BCM8WTL9MQU4MJLE" },
+          timeout: 10000,
+        }
       );
 
       console.log("Resend OTP Full Response:", response);
@@ -214,10 +275,50 @@ const OtpVerificationLayer = () => {
       }
     } catch (error) {
       console.error("Resend OTP Error:", error.message, error.response?.data);
-      toast.error("Failed to resend OTP. Please try again.", {
-        position: "top-right",
-        autoClose: 2000,
-      });
+      
+      if (!navigator.onLine) {
+        toast.error("Network disconnected. Please check your connection.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else if (error.code === "ECONNABORTED") {
+        toast.error("Request timed out. Please check your network.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else if (error.response) {
+        if (error.response.status === 401) {
+          toast.error("Authentication failed. Please sign in again.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else if (error.response.status === 403) {
+          toast.error("Access forbidden. Contact support.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else if (error.response.status >= 500) {
+          toast.error("Server error. Please try again later.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else {
+          toast.error("Failed to resend OTP. Please try again.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        }
+      } else if (error.request) {
+        toast.error("Network error. Unable to reach server.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else {
+        toast.error("An unexpected error occurred.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
     } finally {
       setLoading(false);
     }

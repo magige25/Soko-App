@@ -26,7 +26,7 @@ const AddDelivery = () => {
   useEffect(() => {
     const fetchSuppliers = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const response = await axios.get(SUPPLIERS_API_URL, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -52,7 +52,7 @@ const AddDelivery = () => {
     };
     const fetchStorageFacilities = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const response = await axios.get(STG_FACILITY_API, {
           headers: {
             Authorization:`Bearer ${token}`,
@@ -98,7 +98,7 @@ const AddDelivery = () => {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.post(API_URL, newDeliveryData, {
         headers: {
           Authorization: `Bearer ${token}`,

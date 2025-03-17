@@ -16,7 +16,7 @@ const AddSubCategoryLayer = () => {
   const [errors, setErrors] = useState({});
 
   const fetchCategories = useCallback(async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       toast.error("No authentication token found. Please log in.");
       return;
@@ -111,7 +111,7 @@ const AddSubCategoryLayer = () => {
       return;
     }
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token || token.trim() === "") {
       toast.error("No authentication token found. Please log in.");
       setIsLoading(false);

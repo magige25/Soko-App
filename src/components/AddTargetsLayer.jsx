@@ -23,7 +23,7 @@ const AddTargetsLayer = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         setErrors({ submit: "No authentication token found. Please log in." });
         return;
@@ -100,7 +100,7 @@ const AddTargetsLayer = () => {
       setIsLoading(true);
       setErrors({});
       setSuccessMessage(""); // Reset success message
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         throw new Error("No authentication token found");
       }

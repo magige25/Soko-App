@@ -41,7 +41,7 @@ const RolesLayer = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const response = await axios.get(ROLES_API_URL, {
           headers: { Authorization: `Bearer ${token}` },
           params: { page, limit: itemsPerPage, searchValue: searchQuery },
@@ -73,7 +73,7 @@ const RolesLayer = () => {
   useEffect(() => {
     const fetchEntityTypes = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const response = await axios.get("https://api.bizchain.co.ke/v1/entity-types", {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -92,7 +92,7 @@ const RolesLayer = () => {
         return;
       }
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const response = await axios.get(`${MODULES_API_URL}?entityType=${newRole.entityType}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -116,7 +116,7 @@ const RolesLayer = () => {
         return;
       }
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const response = await axios.get(`${MODULES_API_URL}?entityType=${editRole.entityType}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -161,7 +161,7 @@ const RolesLayer = () => {
       modulePermissions: buildModulePermissionsPayload(newRole.modulePermissions),
     };
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.post(ROLES_API_URL, payload, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
@@ -188,7 +188,7 @@ const RolesLayer = () => {
       modulePermissions: buildModulePermissionsPayload(editRole.modulePermissions),
     };
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.put(`${ROLES_API_URL}/${editRole.roleId}`, payload, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
@@ -223,7 +223,7 @@ const RolesLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`${ROLES_API_URL}/${roleToDelete.roleId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

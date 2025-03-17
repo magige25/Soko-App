@@ -38,7 +38,7 @@ const CurrenciesLayer = () => {
 
   const fetchCurrencies = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -79,7 +79,7 @@ const CurrenciesLayer = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.post(API_URL, newCurrency, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -118,7 +118,7 @@ const CurrenciesLayer = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.put(`${API_URL}/${editCurrency.code}`, editCurrency, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -145,7 +145,7 @@ const CurrenciesLayer = () => {
   const handleDeleteConfirm = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`${API_URL}/${currencyToDelete.code}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

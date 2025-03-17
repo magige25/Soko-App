@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = "https://api.bizchain.co.ke/v1/user";
-// const STATUS_API = "https://api.bizchain.co.ke/v1/user/update-status";
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -18,7 +17,8 @@ const useDebounce = (value, delay) => {
 };
 
 const UsersListLayer = () => {
-  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [displayedUsers, setDisplayedUsers] = useState([]);
   const [query, setQuery] = useState('');
   const [userToDelete, setUserToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,16 +28,14 @@ const UsersListLayer = () => {
   const [error, setError] = useState(null);
   const debouncedQuery = useDebounce(query, 300);
 
-  const fetchUsers = useCallback(async (page = 1, searchQuery = '') => {
+  const fetchUsers = useCallback(async (searchQuery = '') => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await axios.get(`${API_URL}/system`, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
-          page: page,
-          limit: itemsPerPage,
           searchValue: searchQuery
         }
       });
@@ -45,28 +43,29 @@ const UsersListLayer = () => {
       const data = response.data.data || [];
       const total = response.data.totalElements || 0;
       
-      // Add client-side validation to ensure only itemsPerPage items are displayed
-      const paginatedData = data.slice(0, itemsPerPage);
-      setUsers(paginatedData);
+      setAllUsers(data);
       setTotalItems(total);
       
-      // Optional: Log if API returns more items than expected
-      if (data.length > itemsPerPage) {
-        console.warn(`API returned ${data.length} items, but limited to ${itemsPerPage} on client-side`);
-      }
     } catch (error) {
       console.error('Error fetching users:', error);
       setError("Failed to fetch users. Please try again.");
-      setUsers([]);
+      setAllUsers([]);
       setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
-  }, [itemsPerPage]);
+  }, []);
 
   useEffect(() => {
-    fetchUsers(currentPage, debouncedQuery);
-  }, [currentPage, debouncedQuery, fetchUsers]);
+    fetchUsers(debouncedQuery);
+  }, [debouncedQuery, fetchUsers]);
+
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedUsers = allUsers.slice(startIndex, endIndex);
+    setDisplayedUsers(paginatedUsers);
+  }, [currentPage, allUsers, itemsPerPage]);
 
   const handleDeleteClick = (user) => {
     setUserToDelete(user);
@@ -76,12 +75,12 @@ const UsersListLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       await axios.delete(`${API_URL}/system/${userToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserToDelete(null);
-      fetchUsers(currentPage, debouncedQuery);
+      fetchUsers(debouncedQuery);
     } catch (error) {
       console.error('Error deleting user:', error);
       setError(error.response?.data?.message || "Failed to delete user.");
@@ -101,36 +100,8 @@ const UsersListLayer = () => {
     setCurrentPage(pageNumber);
   };
 
-  // const handleToggleStatus = async (users) => {
-  //   setIsLoading(true);
-  //   setError(null);
-  //   try {
-  //     const token = localStorage.getItem("token");
-  //     const newStatusCode = users.status.blocked === "Active" ? "INACTV" : "ACTV";
-
-  //     console.log(`Toggling status for category ${users.id} to ${newStatusCode}`);
-
-  //     const response = await axios.put(
-  //       STATUS_API,
-  //       null,
-  //       {
-  //         headers: {Authorization: `Bearer ${token}`},
-  //         params: {
-  //           id: users.id,
-  //           status: newStatusCode,
-  //         },
-  //       }
-  //     );
-  //     console.log("Status update response:", response.data);
-  //     await fetchUsers(currentPage, query);
-  //   } catch (error) {
-  //     console.error("Error toggling status:", error);
-  //     console.error("Error response:", error.response?.data);
-  //     setError(error.response?.data?.status?.message || error.response?.data?.message || "Failed to toggle.");
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
+  const startIndex = (currentPage - 1) * itemsPerPage + 1;
+  const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
     <div className="card h-100 p-0 radius-12">
@@ -182,8 +153,8 @@ const UsersListLayer = () => {
                     </div>
                   </td>
                 </tr>
-              ) : users.length > 0 ? (
-                users.map((user, index) => (
+              ) : displayedUsers.length > 0 ? (
+                displayedUsers.map((user, index) => (
                   <tr key={user.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
@@ -227,14 +198,6 @@ const UsersListLayer = () => {
                                 Edit
                               </Link>
                             </li>
-                            {/* <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => handleToggleStatus(users)}
-                              >
-                                {users.status.blocked === "Active" ? "Deactivate" : "Activate"}
-                              </button>
-                            </li> */}
                             <li>
                               <button
                                 className="dropdown-item text-danger"
@@ -266,8 +229,7 @@ const UsersListLayer = () => {
           <div className="d-flex justify-content-between align-items-center mt-3">
             <div className="text-muted" style={{ fontSize: "13px" }}>
               <span>
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+                Showing {startIndex} to {endIndex} of {totalItems} entries
               </span>
             </div>
             <nav aria-label="Page navigation">

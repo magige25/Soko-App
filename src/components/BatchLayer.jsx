@@ -19,7 +19,7 @@ const BatchLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         throw new Error("No authentication token found. Please log in.");
       }
@@ -65,7 +65,7 @@ const BatchLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`${API_URL}/${batchToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

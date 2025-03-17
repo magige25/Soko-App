@@ -39,7 +39,7 @@ const RegionsLayer = () => {
 
   const fetchRegions = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -65,7 +65,7 @@ const RegionsLayer = () => {
 
   const fetchCountries = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.get(COUNTRIES_API_URL, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -85,7 +85,7 @@ const RegionsLayer = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const payload = {
         name: newRegion.name,
         countryCode: newRegion.countryCode,
@@ -134,7 +134,7 @@ const RegionsLayer = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const payload = {
         name: editRegion.name,
         countryCode: editRegion.countryCode,
@@ -165,7 +165,7 @@ const RegionsLayer = () => {
   const handleDeleteConfirm = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`${API_URL}/${regionToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

@@ -60,6 +60,15 @@ const SignInLayer = () => {
       return;
     }
 
+    // Check network availability before making request
+    if (!navigator.onLine) {
+      toast.error("No network connection. Please check your internet.", {
+        position: "top-right",
+        autoClose: 2000,
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -70,6 +79,7 @@ const SignInLayer = () => {
           headers: {
             "APP-KEY": "BCM8WTL9MQU4MJLE",
           },
+          timeout: 10000, // Set a timeout of 10 seconds
         }
       );
 
@@ -103,10 +113,54 @@ const SignInLayer = () => {
       }
     } catch (error) {
       console.error("Login Error:", error.message, error.response?.data);
-      toast.error("Failed. Input correct details.", {
-        position: "top-right",
-        autoClose: 2000,
-      });
+      
+      // Handle different types of errors
+      if (!navigator.onLine) {
+        toast.error("Network disconnected. Please check your connection.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else if (error.code === "ECONNABORTED") {
+        toast.error("Request timed out. Please check your network.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else if (error.response) {
+        // Server responded with a status code
+        if (error.response.status === 401) {
+          toast.error("Invalid email or password.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else if (error.response.status === 403) {
+          toast.error("Access forbidden. Contact support.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else if (error.response.status >= 500) {
+          toast.error("Server error. Please try again later.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else {
+          toast.error("An error occurred. Please try again.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        }
+      } else if (error.request) {
+        // Request was made but no response received
+        toast.error("Network error. Unable to reach server.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else {
+        // Something else caused the error
+        toast.error("An unexpected error occurred.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
     } finally {
       setLoading(false);
     }

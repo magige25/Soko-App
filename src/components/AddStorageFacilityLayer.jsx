@@ -52,7 +52,7 @@ const AddFacilityLayer = ({ onFacilityAdded }) => {
     try {
       setIsLoading(true);
       setErrors({});
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       if (!token) {
         throw new Error('No authentication token found. Please log in.');
       }

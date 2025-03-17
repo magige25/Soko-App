@@ -23,7 +23,7 @@ const PricingCategoriesLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         throw new Error("No authentication token found. Please log in.");
       }
@@ -77,7 +77,7 @@ const PricingCategoriesLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const payload = {
         name: editPricingCategory.name,
       };
@@ -106,7 +106,7 @@ const PricingCategoriesLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`${API_URL}/${pricingCategoryToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -124,7 +124,7 @@ const PricingCategoriesLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const newStatusCode = pricingCategory.status.name === "Active" ? "INACTV" : "ACTV";
 
       console.log(`Toggling status for category ${pricingCategory.id} to ${newStatusCode}`);
@@ -161,7 +161,7 @@ const PricingCategoriesLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const payload = {
         name: newPricingCategory.name,
       };

@@ -32,7 +32,7 @@ const CustomersLayer = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) {
           throw new Error("Please login!");
         }
@@ -88,7 +88,7 @@ const CustomersLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         throw new Error("Please log in");
       }

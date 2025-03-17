@@ -28,7 +28,7 @@ const EditStorageFacilityLayer = () => {
 
     const fetchFacilityData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const response = await axios.get(`${API_URL}/${facilityId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -108,7 +108,7 @@ const EditStorageFacilityLayer = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       const payload = {
         name: formData.name,

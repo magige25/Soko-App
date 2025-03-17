@@ -24,7 +24,7 @@ const DrawRequestLayer = () => {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   const fetchData = useCallback(async () => {
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       toast.error("No authentication token found. Please log in.");
       navigate("/login");
@@ -191,7 +191,7 @@ const DrawRequestLayer = () => {
     setIsSubmitting(true);
     setShowConfirmModal(false);
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       toast.error("No authentication token found. Please log in.");
       setIsSubmitting(false);

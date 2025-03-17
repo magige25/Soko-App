@@ -30,7 +30,7 @@ const EditDelivery = () => {
   useEffect(() => {
     const fetchStorageFacilities = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const response = await axios.get(STG_FACILITY_API, {
           headers: {
             Authorization:`Bearer ${token}`,
@@ -69,7 +69,7 @@ const EditDelivery = () => {
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         toast.error("Please log in."); 
         

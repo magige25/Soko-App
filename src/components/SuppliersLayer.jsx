@@ -30,7 +30,7 @@ const SuppliersLayer = () => {
   const fetchSuppliers = useCallback(async (page = 1, searchQuery = "") => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token || token.trim() === "") {
       setError("No authentication token found. Please log in.");
       setIsLoading(false);
@@ -100,7 +100,7 @@ const SuppliersLayer = () => {
   const handleDeleteConfirm = async () => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token) {
       setError("No authentication token found. Please log in.");
       setIsLoading(false);

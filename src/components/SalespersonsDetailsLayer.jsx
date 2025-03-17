@@ -28,7 +28,7 @@ const SalespersonsDetailsLayer = () => {
     }
 
     const fetchSalespersonDetails = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token || token.trim() === "") {
         setError("No authentication token found. Please log in.");
         navigate("/login");

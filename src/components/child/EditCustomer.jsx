@@ -43,7 +43,7 @@ const EditCustomer = () => {
 
     const fetchData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) throw new Error("No authentication token found");
 
         const [salespeopleRes, pricingRes, customerTypeRes, routeRes] = await Promise.all([
@@ -107,7 +107,7 @@ const EditCustomer = () => {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("Please log in.");
 
       const response = await axios.put(`${API_URL}/${customer.id}`, customerData, {

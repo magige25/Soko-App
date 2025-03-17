@@ -53,7 +53,7 @@ const InvoiceRegisterLayer = () => {
   const fetchInvoices = useCallback(async (page = 1, searchQuery = "") => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token || token.trim() === "") {
       setError("No authentication token found. Please log in.");
       setIsLoading(false);
@@ -117,7 +117,7 @@ const InvoiceRegisterLayer = () => {
     }
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     try {
       const payload = {
         invoiceRequestList: [
@@ -167,7 +167,7 @@ const InvoiceRegisterLayer = () => {
   const handleDeleteConfirm = async () => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     try {
       await axios.delete(`${API_URL}/${invoiceToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -192,7 +192,7 @@ const InvoiceRegisterLayer = () => {
   const handlePayInvoice = async (invoiceId) => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     try {
       const payload = {
         invoiceRequestList: [{

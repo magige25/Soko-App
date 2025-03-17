@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ResetPasswordLayer = () => {
   const navigate = useNavigate();
@@ -58,7 +59,7 @@ const ResetPasswordLayer = () => {
     if (!formData.password || !formData.confirmPassword) {
       toast.error("Please fill in both password fields", {
         position: "top-right",
-        duration: 2000,
+        autoClose: 2000,
       });
       return;
     }
@@ -67,7 +68,15 @@ const ResetPasswordLayer = () => {
       console.log("Validation failed:", { passwordError, confirmPasswordError });
       toast.error("Please fix the errors before submitting", {
         position: "top-right",
-        duration: 2000,
+        autoClose: 2000,
+      });
+      return;
+    }
+
+    if (!navigator.onLine) {
+      toast.error("No network connection. Please check your internet.", {
+        position: "top-right",
+        autoClose: 2000,
       });
       return;
     }
@@ -86,6 +95,7 @@ const ResetPasswordLayer = () => {
           headers: {
             "APP-KEY": "BCM8WTL9MQU4MJLE",
           },
+          timeout: 10000, // 10-second timeout
         }
       );
 
@@ -95,25 +105,72 @@ const ResetPasswordLayer = () => {
       if (response.status === 200 && response.data.status?.code === 0) {
         toast.success("Password reset successful!", {
           position: "top-right",
-          duration: 1000,
-          icon: "✅",
+          autoClose: 2000,
         });
         setTimeout(() => navigate("/sign-in"), 2000);
       } else {
-        toast.error("Failed to reset password. Invalid reset token or server error.", {
-          position: "top-right",
-          duration: 2000,
-        });
+        toast.error(
+          response.data?.status?.message || "Failed to reset password. Invalid reset token or server error.",
+          {
+            position: "top-right",
+            autoClose: 2000,
+          }
+        );
       }
     } catch (error) {
       console.error("Reset Password Error:", error.message, error.response?.data);
-      toast.error(
-        error.response?.data?.message || "Failed to reset password. Please check your reset link.",
-        {
+      
+      if (!navigator.onLine) {
+        toast.error("Network disconnected. Please check your connection.", {
           position: "top-right",
-          duration: 2000,
+          autoClose: 2000,
+        });
+      } else if (error.code === "ECONNABORTED") {
+        toast.error("Request timed out. Please check your network.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else if (error.response) {
+        if (error.response.status === 400) {
+          toast.error("Invalid password format. Please try again.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else if (error.response.status === 404) {
+          toast.error("Reset token not found. Please request a new link.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else if (error.response.status === 403) {
+          toast.error("Access forbidden. Contact support.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else if (error.response.status >= 500) {
+          toast.error("Server error. Please try again later.", {
+            position: "top-right",
+            autoClose: 2000,
+          });
+        } else {
+          toast.error(
+            error.response?.data?.status?.message || "Failed to reset password. Please try again.",
+            {
+              position: "top-right",
+              autoClose: 2000,
+            }
+          );
         }
-      );
+      } else if (error.request) {
+        toast.error("Network error. Unable to reach server.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      } else {
+        toast.error("An unexpected error occurred.", {
+          position: "top-right",
+          autoClose: 2000,
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -121,7 +178,7 @@ const ResetPasswordLayer = () => {
 
   return (
     <section className="auth bg-base d-flex flex-wrap">
-      <Toaster />
+      <ToastContainer position="top-right" autoClose={2000} />
       <div className="auth-left d-lg-block d-none">
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img

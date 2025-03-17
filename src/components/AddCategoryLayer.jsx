@@ -79,7 +79,7 @@ const AddCategoryLayer = () => {
       return;
     }
 
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token || token.trim() === "") {
       toast.error("No authentication token found. Please log in.");
       setIsLoading(false);

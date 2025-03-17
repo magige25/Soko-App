@@ -56,7 +56,7 @@ const EditProduct = () => {
   // Memoized fetch functions
   const fetchBrands = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
       const response = await axios.get(BRAND_API, {
         headers: { Authorization: `Bearer ${token}` },
@@ -70,7 +70,7 @@ const EditProduct = () => {
 
   const fetchCategories = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
       const response = await axios.get(CAT_API, {
         headers: { Authorization: `Bearer ${token}` },
@@ -84,7 +84,7 @@ const EditProduct = () => {
 
   const fetchSubCategories = useCallback(async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
       const response = await axios.get(SUBCAT_API, {
         headers: { Authorization: `Bearer ${token}` },
@@ -159,7 +159,7 @@ const EditProduct = () => {
 
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("Please log in.");
 
       let response;

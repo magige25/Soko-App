@@ -19,7 +19,7 @@ const StorageFacilityLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
@@ -62,7 +62,7 @@ const StorageFacilityLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       await axios.delete(`${API_URL}/${facilityToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

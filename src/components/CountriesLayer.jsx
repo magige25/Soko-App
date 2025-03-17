@@ -42,7 +42,7 @@ const CountriesLayer = () => {
   const fetchCountries = async () => {
     try {
       setIsLoading(true);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
       const response = await axios.get(API_URL, {
         headers: { "Authorization": `Bearer ${token}` },
@@ -63,7 +63,7 @@ const CountriesLayer = () => {
 
   const fetchCurrencies = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
       const response = await axios.get(CURRENCY_API_URL, {
         headers: { Authorization: `Bearer ${token}` },
@@ -86,7 +86,7 @@ const CountriesLayer = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
       await axios.post(API_URL, newCountry, {
@@ -130,7 +130,7 @@ const CountriesLayer = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
       await axios.put(`${API_URL}/${editCountry.code}`, editCountry, {
@@ -158,7 +158,7 @@ const CountriesLayer = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
 
       await axios.delete(`${API_URL}/${countryToDelete.code}`, {

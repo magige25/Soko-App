@@ -18,7 +18,7 @@ const CustomerDetails = () => {
       const fetchCustomer = async () => {
         setLoading(true);
         try {
-          const token = localStorage.getItem("token");
+          const token = sessionStorage.getItem("token");
           if (!token) throw new Error("Please log in");
 
           const response = await axios.get(`${API_URL}/${id}`, {

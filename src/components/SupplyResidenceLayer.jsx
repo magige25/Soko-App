@@ -31,7 +31,7 @@ const SupplyResidenceLayer = () => {
   const fetchResidence = useCallback(async (page = 1, searchQuery = "") => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token || token.trim() === "") {
       setError("No authentication token found. Please log in.");
       setIsLoading(false);
@@ -81,7 +81,7 @@ const SupplyResidenceLayer = () => {
     }
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.post(API_URL, newResidence, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
       });
@@ -103,7 +103,7 @@ const SupplyResidenceLayer = () => {
     }
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const payload = {
         name: editResidence.name,
         tarmacked: editResidence.tarmacked,
@@ -125,7 +125,7 @@ const SupplyResidenceLayer = () => {
   const handleDeleteConfirm = async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`${API_URL}/${residenceToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

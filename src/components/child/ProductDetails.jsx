@@ -19,7 +19,7 @@ const ProductDetails = () => {
 
     const fetchProductData = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) {
           throw new Error("No authentication token found. Please log in.");
         }

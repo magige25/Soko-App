@@ -48,6 +48,14 @@ const ForgotPasswordLayer = () => {
             return;
         }
 
+        if (!navigator.onLine) {
+            toast.error("No network connection. Please check your internet.", {
+                position: "top-right",
+                autoClose: 2000,
+            });
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -61,6 +69,7 @@ const ForgotPasswordLayer = () => {
                     headers: {
                         "APP-KEY": "BCM8WTL9MQU4MJLE",
                     },
+                    timeout: 10000,
                 }
             );
 
@@ -95,13 +104,58 @@ const ForgotPasswordLayer = () => {
                 response: error.response?.data,
                 status: error.response?.status,
             });
-            toast.error(
-                error.response?.data?.status?.message || "Failed to send reset email. Server error occurred.",
-                {
+
+            if (!navigator.onLine) {
+                toast.error("Network disconnected. Please check your connection.", {
                     position: "top-right",
                     autoClose: 2000,
+                });
+            } else if (error.code === "ECONNABORTED") {
+                toast.error("Request timed out. Please check your network.", {
+                    position: "top-right",
+                    autoClose: 2000,
+                });
+            } else if (error.response) {
+                if (error.response.status === 400) {
+                    toast.error("Invalid email format. Please check your email.", {
+                        position: "top-right",
+                        autoClose: 2000,
+                    });
+                } else if (error.response.status === 404) {
+                    toast.error("Email not found. Please check your email.", {
+                        position: "top-right",
+                        autoClose: 2000,
+                    });
+                } else if (error.response.status === 403) {
+                    toast.error("Access forbidden. Contact support.", {
+                        position: "top-right",
+                        autoClose: 2000,
+                    });
+                } else if (error.response.status >= 500) {
+                    toast.error("Server error. Please try again later.", {
+                        position: "top-right",
+                        autoClose: 2000,
+                    });
+                } else {
+                    toast.error(
+                        error.response?.data?.status?.message || "Failed to send reset email. Please try again.",
+                        {
+                            position: "top-right",
+                            autoClose: 2000,
+                        }
+                    );
                 }
-            );
+            } else if (error.request) {
+                toast.error("Network error. Unable to reach server.", {
+                    position: "top-right",
+                    autoClose: 2000,
+                });
+            } else {
+                toast.error("An unexpected error occurred.", {
+                    position: "top-right",
+                    autoClose: 2000,
+                });
+            }
         } finally {
             console.log("Request finished, setting loading to false");
             setLoading(false);

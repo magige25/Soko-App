@@ -25,7 +25,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         setErrors({ submit: "No authentication token found. Please log in." });
         return;
@@ -202,7 +202,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
     try {
       setIsLoading(true);
       setErrors({});
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.post(API_URL, formData, {
         headers: {
           "Authorization": `Bearer ${token}`,

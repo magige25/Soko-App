@@ -17,15 +17,20 @@ const InvoicesLayer = () => {
 
   const fetchInvoices = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       
-      const invoicedOnly = response.data.data.filter(invoice => invoice.status.code === "INV");
-      console.log("Invoiced Data:", invoicedOnly);
+      const invoicedOnly = response.data.data
+        .filter(invoice => invoice.status.code === "INV")
+        .map(invoice => ({
+          ...invoice,
+          totalLitres: invoice.deliveries.reduce((sum, delivery) => sum + (delivery.litres || 0), 0),
+        }));
+        console.log("Invoiced Data with Total Litres:", invoicedOnly);
       setInvoices(invoicedOnly);
     } catch (error) {
       console.error("Error fetching Invoices:", error);
@@ -94,7 +99,7 @@ const InvoicesLayer = () => {
                 <th scope="col" className="text-center py-3 px-6">#</th>
                 <th scope="col" className="text-start py-3 px-4">Supplier</th>
                 <th scope="col" className="text-start py-3 px-4">Invoice Number</th>
-                <th scope="col" className="text-start py-3 px-4">Volume(L)</th>
+                <th scope="col" className="text-start py-3 px-4">Volume(Litres)</th>
                 <th scope="col" className="text-start py-3 px-4">Total Amount</th>
                 <th scope="col" className="text-start py-3 px-4">Status</th>
                 <th scope="col" className="text-start py-3 px-4">Disbursement Method</th>
@@ -121,7 +126,7 @@ const InvoicesLayer = () => {
                       </Link>
                     </td>
                     <td className="text-start small-text py-3 px-4">{invoice.invoiceNo}</td>
-                    <td className="text-start small-text py-3 px-4">{invoice.litres}</td>
+                    <td className="text-start small-text py-3 px-4">{invoice.totalLitres}</td>
                     <td className="text-start small-text py-3 px-4">{formatCurrency(invoice.amount)}</td>
                     <td className="text-start small-text py-3 px-4">
                       <span

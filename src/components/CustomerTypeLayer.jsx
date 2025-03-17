@@ -34,7 +34,7 @@ const CustomerTypeLayer = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) throw new Error("No authentication token found.");
         const response = await axios.get(API_URL, {
           headers: { Authorization: `Bearer ${token}` },
@@ -78,7 +78,7 @@ const CustomerTypeLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const payload = {
         name: editCustomerType.name,
       };
@@ -113,7 +113,7 @@ const CustomerTypeLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`${API_URL}/${customerTypeToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -138,7 +138,7 @@ const CustomerTypeLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const payload = {
         name: newCustomerType.name,
       };
@@ -170,7 +170,7 @@ const CustomerTypeLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const newStatusCode = customerType.status.name === "Active" ? "INACTV" : "ACTV";
 
       console.log(`Toggling Status for category ${customerType.id} to ${newStatusCode}`);

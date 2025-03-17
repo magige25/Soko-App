@@ -50,7 +50,7 @@ const CategoryLayer = () => {
   const fetchCategories = useCallback(async (page = 1, searchQuery = "") => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     if (!token || token.trim() === "") {
       setError("No authentication token found. Please log in.");
       setIsLoading(false);
@@ -109,7 +109,7 @@ const CategoryLayer = () => {
     }
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     try {
       const payload = {
         categoryRequestList: [
@@ -157,7 +157,7 @@ const CategoryLayer = () => {
   const handleDeleteConfirm = async () => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     try {
       await axios.delete(`${API_URL}/${categoryToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },

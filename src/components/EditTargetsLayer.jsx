@@ -24,10 +24,9 @@ const EditTargetsLayer = () => {
   const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Fetch target types, salespeople, and target data on mount
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         setErrors({ submit: "No authentication token found. Please log in." });
         return;
@@ -140,7 +139,7 @@ const EditTargetsLayer = () => {
       setIsLoading(true);
       setErrors({});
       setSuccessMessage("");
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         throw new Error("No authentication token found");
       }

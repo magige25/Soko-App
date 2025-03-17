@@ -27,7 +27,7 @@ const TargetsDetailsLayer = () => {
     }
 
     const fetchTargetDetails = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token || token.trim() === "") {
         setError("No authentication token found. Please log in.");
         navigate("/login");
@@ -89,7 +89,7 @@ const TargetsDetailsLayer = () => {
     if (targetType === "Sales") {
       return new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(value);
     }
-    return value; // Plain number for Leads and Orders
+    return value;
   };
 
   const formatDate = (dateString) => {

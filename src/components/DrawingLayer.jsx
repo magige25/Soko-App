@@ -17,7 +17,8 @@ const useDebounce = (value, delay) => {
 };
 
 const DrawingLayer = () => {
-  const [drawings, setDrawings] = useState([]);
+  const [allDrawings, setAllDrawings] = useState([]); // Store all drawings from the API
+  const [drawings, setDrawings] = useState([]); // Store the drawings for the current page
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -26,61 +27,78 @@ const DrawingLayer = () => {
   const [error, setError] = useState(null);
   const debouncedQuery = useDebounce(query, 300);
 
-  const fetchDrawings = useCallback(async (page = 1, searchQuery = "") => {
+  const fetchDrawings = useCallback(async (searchQuery = "") => {
     setIsLoading(true);
     setError(null);
-    const token = localStorage.getItem("token");
+    setAllDrawings([]); 
+    setDrawings([]); 
+    setTotalItems(0); 
+
+    const token = sessionStorage.getItem("token");
     if (!token || token.trim() === "") {
       setError("No authentication token found. Please log in.");
       setIsLoading(false);
       return;
     }
+
     try {
       const response = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
-          page: page,
-          limit: itemsPerPage,
+          page: 1, 
+          limit: 1000, 
           searchValue: searchQuery,
         },
       });
+
       const result = response.data;
+      console.log("API Response:", result); 
+
       if (result.status.code === 0) {
         const mappedDrawings = result.data.map((drawing) => ({
           id: drawing.id,
           drawCode: drawing.drawCode || "N/A",
           totalLitres: drawing.totalLitres || 0,
-          numberOfProducts: drawing.numberOfProducts || 0,
-          totalItems: drawing.totalItems || 0,
-          drawnDate: drawing.drawnDate?.split("T")[0] || "N/A",
-          drawnBy: drawing.drawnBy || "-",
+          productQty: drawing.productQty || 0,
+          itemQty: drawing.itemQty || 0,
+          dateCreated: drawing.dateCreated?.split("T")[0] || "N/A",
+          createdBy: drawing.createdBy || "-",
         }));
 
-        setDrawings(mappedDrawings.slice(0, itemsPerPage));
+        setAllDrawings(mappedDrawings);
         setTotalItems(result.totalElements);
       } else {
         setError(`Failed to fetch drawings: ${result.status.message}`);
+        setAllDrawings([]);
         setDrawings([]);
         setTotalItems(0);
       }
     } catch (error) {
       console.error("Error fetching drawings:", error);
       setError(`Error fetching drawings: ${error.response?.data?.message || error.message}`);
+      setAllDrawings([]);
       setDrawings([]);
       setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
-  }, [itemsPerPage]);
+  }, []);
 
   useEffect(() => {
-    fetchDrawings(currentPage, debouncedQuery);
-  }, [currentPage, debouncedQuery, fetchDrawings]);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentPageDrawings = allDrawings.slice(startIndex, endIndex);
+    setDrawings(currentPageDrawings);
+  }, [allDrawings, currentPage, itemsPerPage]);
+
+  useEffect(() => {
+    fetchDrawings(debouncedQuery);
+    setCurrentPage(1);
+  }, [debouncedQuery, fetchDrawings]);
 
   const handleSearchInputChange = (e) => {
     const searchQuery = e.target.value;
     setQuery(searchQuery);
-    setCurrentPage(1);
   };
 
   const formatDate = (dateString) => {
@@ -127,7 +145,6 @@ const DrawingLayer = () => {
           to="/drawing/draw-request"
           className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
         >
-          {/* <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" /> */}
           Draw Request
         </Link>
       </div>
@@ -158,43 +175,46 @@ const DrawingLayer = () => {
                   </td>
                 </tr>
               ) : drawings.length > 0 ? (
-                drawings.map((drawing, index) => (
-                  <tr key={drawing.id} style={{ transition: "background-color 0.2s" }}>
-                    <td className="text-center small-text py-3 px-6">
-                      {(currentPage - 1) * itemsPerPage + index + 1}
-                    </td>
-                    <td className="text-start small-text py-3 px-4">{drawing.drawCode}</td>
-                    <td className="text-start small-text py-3 px-4">{drawing.totalLitres}</td>
-                    <td className="text-start small-text py-3 px-4">{drawing.numberOfProducts}</td>
-                    <td className="text-start small-text py-3 px-4">{drawing.totalItems}</td>
-                    <td className="text-start small-text py-3 px-4">{formatDate(drawing.drawnDate)}</td>
-                    <td className="text-start small-text py-3 px-4">{drawing.drawnBy}</td>
-                    <td className="text-start small-text py-3 px-4">
-                      <div className="action-dropdown">
-                        <div className="dropdown">
-                          <button
-                            className="btn btn-outline-secondary btn-sm dropdown-toggle"
-                            type="button"
-                            data-bs-toggle="dropdown"
-                          >
-                            Actions
-                          </button>
-                          <ul className="dropdown-menu">
-                            <li>
-                              <Link
-                                className="dropdown-item"
-                                to="/drawing/draw-details"
-                                state={{ drawingId: drawing.id }}
-                              >
-                                View
-                              </Link>
-                            </li>
-                          </ul>
+                drawings.map((drawing, index) => {
+                  const itemNumber = (currentPage - 1) * itemsPerPage + index + 1;
+                  return (
+                    <tr key={drawing.id} style={{ transition: "background-color 0.2s" }}>
+                      <td className="text-center small-text py-3 px-6">{itemNumber}</td>
+                      <td className="text-start small-text py-3 px-4">{drawing.drawCode}</td>
+                      <td className="text-start small-text py-3 px-4">{drawing.totalLitres}</td>
+                      <td className="text-start small-text py-3 px-4">{drawing.productQty}</td>
+                      <td className="text-start small-text py-3 px-4">{drawing.itemQty}</td>
+                      <td className="text-start small-text py-3 px-4">{formatDate(drawing.dateCreated)}</td>
+                      <td className="text-start small-text py-3 px-4">
+                        {drawing.createdBy.name || drawing.createdBy}
+                      </td>
+                      <td className="text-start small-text py-3 px-4">
+                        <div className="action-dropdown">
+                          <div className="dropdown">
+                            <button
+                              className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                              type="button"
+                              data-bs-toggle="dropdown"
+                            >
+                              Actions
+                            </button>
+                            <ul className="dropdown-menu">
+                              <li>
+                                <Link
+                                  className="dropdown-item"
+                                  to="/drawing/draw-details"
+                                  state={{ drawingId: drawing.id }}
+                                >
+                                  View
+                                </Link>
+                              </li>
+                            </ul>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                ))
+                      </td>
+                    </tr>
+                  );
+                })
               ) : (
                 <tr>
                   <td colSpan="8" className="text-center py-3">

@@ -41,15 +41,15 @@ const RolesLayer = () => {
   const [selectedRole, setSelectedRole] = useState(null);
 
   // API endpoints (update with your actual endpoints)
-  const fetchRolesAPI = "https://biz-system-production.up.railway.app/v1/roles";
-  const createRoleAPI = "https://biz-system-production.up.railway.app/v1/roles";
-  const updateRoleAPI = (roleId) => `https://biz-system-production.up.railway.app/v1/roles/${roleId}`;
+  const fetchRolesAPI = "https://api.bizchain.co.ke/v1/roles";
+  const createRoleAPI = "https://api.bizchain.co.ke/v1/roles";
+  const updateRoleAPI = (roleId) => `https://api.bizchain.co.ke/v1/roles/${roleId}`;
 
   // Fetch roles from API when component mounts
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         const response = await axios.get(fetchRolesAPI, {
           headers: {
             "Authorization": `Bearer ${token}`
@@ -86,7 +86,7 @@ const RolesLayer = () => {
     };
     console.log("Creating role with payload", payload);
     
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
 
     axios.post(createRoleAPI, payload, {
       headers:{
@@ -117,7 +117,7 @@ const RolesLayer = () => {
       entityType: editRole.entityType,
       modulePermissions: buildModulePermissionsPayload(editRole.modulePermissions),
     };
-    const token = localStorage.getItem("token");
+    const token = sessionStorage.getItem("token");
     axios.put(updateRoleAPI(editRole.roleId), payload, {
       headers:{
         "Authorization": `Bearer ${token}`,
@@ -267,7 +267,7 @@ const RolesLayer = () => {
                                 onClick={() => {
                                   if (window.confirm("Are you sure you want to delete this role?")) {
                                     axios.delete(updateRoleAPI(role.roleId), {
-                                      headers: { "Authorization": `Bearer ${localStorage.getItem("token")}` }
+                                      headers: { "Authorization": `Bearer ${sessionStorage.getItem("token")}` }
                                     })
                                     .then(() => {
                                       const updatedRoles = roles.filter((r) => r.roleId !== role.roleId);

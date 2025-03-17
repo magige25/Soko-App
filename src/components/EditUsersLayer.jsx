@@ -32,7 +32,7 @@ const EditUsersLayer = () => {
     }
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const response = await axios.get(`${API_URL}/system/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -61,7 +61,7 @@ const EditUsersLayer = () => {
 
     const fetchRolesAndModules = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const response = await axios.get(ROL_URL, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -222,7 +222,7 @@ const EditUsersLayer = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
 
       const payload = {
         firstName: formData.firstName,

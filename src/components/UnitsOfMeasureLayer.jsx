@@ -34,7 +34,7 @@ const UnitsOfMeasureLayer = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) throw new Error("No authentication token found.");
         const response = await axios.get(API_URL, {
           headers: { Authorization: `Bearer ${token}` },
@@ -69,7 +69,7 @@ const UnitsOfMeasureLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const newStatusCode = unitOfMeasure.status.name === "Active" ? "INACTV" : "ACTV";
 
       const response = await axios.put(
@@ -110,7 +110,7 @@ const UnitsOfMeasureLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const payload = {
         name: editUnitOfMeasure.name,
         qty: parseInt(editUnitOfMeasure.qty),
@@ -146,7 +146,7 @@ const UnitsOfMeasureLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       await axios.delete(`${API_URL}/${unitOfMeasureToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -171,7 +171,7 @@ const UnitsOfMeasureLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const payload = {
         name: newUnitOfMeasure.name,
         qty: parseInt(newUnitOfMeasure.qty),

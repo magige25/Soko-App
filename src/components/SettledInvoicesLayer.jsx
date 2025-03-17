@@ -17,7 +17,7 @@ const SettledInvoicesLayer = () => {
 
   const fetchInvoices = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
         headers: {
           Authorization: `Bearer ${token}`,

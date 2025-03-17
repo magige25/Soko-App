@@ -31,7 +31,7 @@ const UsersListLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const response = await axios.get(`${API_URL}/system`, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
@@ -71,7 +71,7 @@ const UsersListLayer = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       await axios.delete(`${API_URL}/system/${userToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });

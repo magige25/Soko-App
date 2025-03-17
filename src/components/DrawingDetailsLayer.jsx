@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { Icon } from '@iconify/react/dist/iconify.js';
 
 const DRAWING_API_URL = "https://api.bizchain.co.ke/v1/drawing";
 const DRAWING_DETAILS_API_URL = "https://api.bizchain.co.ke/v1/drawing/details";
@@ -29,7 +32,7 @@ const DrawingDetailsLayer = () => {
     const fetchDrawingData = async () => {
       setIsLoading(true);
       setError(null);
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         setError("No authentication token found. Please log in.");
         toast.error("No authentication token found. Please log in.");
@@ -38,7 +41,6 @@ const DrawingDetailsLayer = () => {
       }
 
       try {
-        // Fetch basic drawing details
         const drawingResponse = await axios.get(DRAWING_API_URL, {
           headers: { Authorization: `Bearer ${token}` },
           params: { page: 1, limit: 100 },
@@ -57,7 +59,6 @@ const DrawingDetailsLayer = () => {
           throw new Error(`Failed to fetch drawings: ${drawingResponse.data.status.message}`);
         }
 
-        // Fetch detailed drawing information
         const detailsResponse = await axios.get(`${DRAWING_DETAILS_API_URL}/${drawingId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -99,9 +100,65 @@ const DrawingDetailsLayer = () => {
   const renderStockBatch = (stockBatch) => {
     if (!stockBatch) return "N/A";
     if (typeof stockBatch === "object" && stockBatch !== null) {
-      return stockBatch.name || stockBatch.code || "Unnamed Batch"; // Adjust based on actual object structure
+      return stockBatch.name || stockBatch.code || "Unnamed Batch";
     }
-    return stockBatch; // If it’s a string
+    return stockBatch;
+  };
+
+  const handleDownload = () => {
+    const drawingElement = document.getElementById('drawing-details');
+    html2canvas(drawingElement, { scale: 2, width: drawingElement.scrollWidth, height: drawingElement.scrollHeight }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const imgProps = pdf.getImageProperties(imgData);
+      const imgWidth = imgProps.width;
+      const imgHeight = imgProps.height; // Fixed: defined before use
+      const marginTop = 20;
+      const marginLeft = 5;
+      const availableWidth = pdfWidth - 2 * marginLeft;
+      const availableHeight = pdfHeight - marginTop;
+      const widthRatio = availableWidth / imgWidth;
+      const heightRatio = availableHeight / imgHeight;
+      const ratio = Math.min(widthRatio, heightRatio);
+      const scaledWidth = imgWidth * ratio;
+      const scaledHeight = imgHeight * ratio;
+      const xOffset = marginLeft;
+      const yOffset = marginTop;
+
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
+      pdf.save(`Drawing_${drawing?.drawCode || 'details'}.pdf`);
+    }).catch((error) => {
+      console.error('Error generating PDF:', error);
+      toast.error('Failed to generate PDF');
+    });
+  };
+
+  const handlePrint = () => {
+    const drawingElement = document.getElementById('drawing-details');
+    html2canvas(drawingElement, { scale: 2, width: drawingElement.scrollWidth, height: drawingElement.scrollHeight }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(`
+        <html>
+          <head>
+            <title>Print Drawing #${drawing?.drawCode || 'Details'}</title>
+            <style>
+              body { margin: 0; padding: 10mm; }
+              img { width: 190mm; height: auto; display: block; }
+            </style>
+          </head>
+          <body>
+            <img src="${imgData}" onload="window.print(); window.close();" />
+          </body>
+        </html>
+      `);
+      printWindow.document.close();
+    }).catch((error) => {
+      console.error('Error preparing print:', error);
+      toast.error('Failed to prepare print');
+    });
   };
 
   if (isLoading) {
@@ -126,22 +183,30 @@ const DrawingDetailsLayer = () => {
     <div className="card h-100 p-0 radius-12">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
-        <h6 className="mb-0">Drawing Details: {drawing?.drawCode || "N/A"}</h6>
-        <button
-          className="btn btn-secondary px-12"
-          onClick={() => navigate("/drawing")}
-        >
-          Back to Drawing
-        </button>
+        <h6 className="mb-0 fs-5">Drawing Details: {drawing?.drawCode || "N/A"}</h6>
+        <div className="d-flex gap-2">
+          <button
+            onClick={handleDownload}
+            className="btn btn-sm btn-success radius-8 d-flex align-items-center gap-1"
+          >
+            <Icon icon="solar:download-linear" className="text-xl" /> Download
+          </button>
+          <button
+            onClick={handlePrint}
+            className="btn btn-sm btn-danger radius-8 d-flex align-items-center gap-1"
+          >
+            <Icon icon="basil:printer-outline" className="text-xl" /> Print
+          </button>
+        </div>
       </div>
-      <div className="card-body p-24">
+      <div className="card-body p-24" id="drawing-details">
         {/* Basic Drawing Information */}
         <div className="mb-4">
           <h6 className="fw-semibold text-primary-light mb-3">Basic Information</h6>
           <div className="row">
             <div className="col-md-6">
               <p><strong>Draw Code:</strong> {drawing?.drawCode || "N/A"}</p>
-              <p><strong>Total Litres:</strong> {drawing?.totalLitres || 0} L</p>
+              <p><strong>Total Litres:</strong> {drawing?.totalLitres || 0} Litres</p>
               <p><strong>Number of Products:</strong> {drawing?.productQty || 0}</p>
             </div>
             <div className="col-md-6">
@@ -154,7 +219,7 @@ const DrawingDetailsLayer = () => {
 
         {/* Storage Facility Details */}
         <div className="mb-4">
-          <h6 className="fw-semibold text-primary-light mb-3 mt-3">Storage Facility Details</h6>
+          <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Storage Facility Details</h6>
           {drawingDetails?.storageFacilityDrawnModels?.length > 0 ? (
             <div className="table-responsive">
               <table className="table table-borderless sm-table mb-0">
@@ -188,8 +253,8 @@ const DrawingDetailsLayer = () => {
         </div>
 
         {/* Product Draw Records */}
-        <div>
-          <h6 className="fw-semibold text-primary-light mb-3 mt-3">Product Draw Records</h6>
+        <div className="mb-5">
+          <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Product Draw Records</h6>
           {drawingDetails?.productDrawRecordModels?.length > 0 ? (
             <div className="table-responsive">
               <table className="table table-borderless sm-table mb-0">

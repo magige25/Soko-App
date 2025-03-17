@@ -142,6 +142,8 @@ import TargetsPage from "./pages/TargetsPage";
 import AddTargetsPage from "./pages/AddTargetsPage";
 import EditTargetsPage from "./pages/EditTargetsPage";
 import TargetsDetailsPage from "./pages/TargetsDetailsPage";
+import StockPage from "./pages/StockPage";
+import AddStockPage from "./pages/AddStockPage";
 import BatchPage from "./pages/BatchPage";
 import EditProductPage from "./pages/EditProductPage";
 import AddProductPage from "./pages/AddProductPage";
@@ -212,6 +214,8 @@ function App() {
             <Route path="/targets/add-target" element={<AddTargetsPage />} />
             <Route path="/targets/edit-target" element={<EditTargetsPage />} />
             <Route path="/targets/details" element={<TargetsDetailsPage />} />
+            <Route path="/stock" element={<StockPage />} />
+            <Route path="/stock/add-stock" element={<AddStockPage />} />
             <Route path="/batch" element={<BatchPage />} />
             <Route path="/roles-list" element={<RolesListPage />} />
             <Route path="/create-role" element={<CreateRolePage />} />
@@ -322,10 +326,9 @@ function App() {
             <Route path="/widgets" element={<WidgetsPage />} />
             <Route path="/wizard" element={<WizardPage />} />
             <Route path="/add-image" element={<AddImagePage />} />
-          </Route>
-
-          {/* Catch-all route */}
-          <Route path="*" element={<ErrorPage />} />
+            {/* Catch-all route */}
+            <Route path="*" element={<ErrorPage />} />
+          </Route>          
         </Routes>
       </AuthProvider>
     </BrowserRouter>

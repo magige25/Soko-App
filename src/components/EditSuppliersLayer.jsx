@@ -52,7 +52,7 @@ const EditSuppliersLayer = () => {
     }
 
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         toast.error("No authentication token found. Please log in.");
         return;
@@ -207,7 +207,7 @@ const EditSuppliersLayer = () => {
     try {
       setIsLoading(true);
       setErrors({});
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         throw new Error("No authentication token found");
       }

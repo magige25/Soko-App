@@ -31,7 +31,7 @@ const EditSalespersonsLayer = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         setErrors({ submit: "No authentication token found. Please log in." });
         return;
@@ -52,7 +52,6 @@ const EditSalespersonsLayer = () => {
           const salesperson = salespersonRes.data.data;
           console.log("Fetched Salesperson Data:", salesperson);
 
-          // Fix: Derive countryCode from the salesperson's region by cross-referencing regions data
           let derivedCountryCode = "";
           if (salesperson.region?.id && regionsRes.data.status.code === 0) {
             const matchingRegion = regionsRes.data.data.find(
@@ -66,7 +65,7 @@ const EditSalespersonsLayer = () => {
             lastName: salesperson.lastName || "",
             email: salesperson.email || "",
             phoneNumber: salesperson.phoneNo || "",
-            countryCode: derivedCountryCode, // Fix: Use derived countryCode
+            countryCode: derivedCountryCode,
             routeId: salesperson.route?.id ? String(salesperson.route.id) : "",
             regionId: salesperson.region?.id ? String(salesperson.region.id) : "",
           });
@@ -125,7 +124,6 @@ const EditSalespersonsLayer = () => {
     }
   }, [salespersonId]);
 
-  // Filter regions when countryCode changes
   useEffect(() => {
     if (formData.countryCode) {
       const filtered = regions.filter(
@@ -137,7 +135,6 @@ const EditSalespersonsLayer = () => {
     }
   }, [formData.countryCode, regions]);
 
-  // Filter routes when regionId changes
   useEffect(() => {
     if (formData.regionId) {
       const filtered = routes.filter(
@@ -208,7 +205,7 @@ const EditSalespersonsLayer = () => {
     try {
       setIsLoading(true);
       setErrors({});
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
       if (!token) {
         throw new Error("No authentication token found");
       }
