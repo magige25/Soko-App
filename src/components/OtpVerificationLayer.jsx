@@ -125,7 +125,6 @@ const OtpVerificationLayer = () => {
         }
       );
 
-      console.log("Full API Response:", response);
       console.log("Response Data:", response.data);
 
       if (response.status === 200 && response.data.status?.code === 0) {
@@ -240,7 +239,6 @@ const OtpVerificationLayer = () => {
         }
       );
 
-      console.log("Resend OTP Full Response:", response);
       console.log("Resend OTP Response Data:", response.data);
 
       if (response.status === 200 && response.data.status?.code === 0) {

@@ -48,9 +48,6 @@ const SignInLayer = () => {
 
   const handleClick = async (e) => {
     e.preventDefault();
-    
-    console.log("Attempting sign-in with:", formData);
-
     if (emailError || passwordError) {
       console.log("Validation failed:", { emailError, passwordError });
       toast.error("Please fix the errors before submitting", {
@@ -83,11 +80,9 @@ const SignInLayer = () => {
         }
       );
 
-      console.log("Full API Response:", response);
       console.log("Response Data:", response.data);
 
       if (response.status === 200 && response.data.status?.code === 0) {
-        console.log("Sign-in successful! OTP should be here if returned by API:", response.data);
         toast.success("Sign In Successful", {
           position: "top-right",
           autoClose: 1000,

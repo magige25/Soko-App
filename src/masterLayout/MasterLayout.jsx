@@ -931,7 +931,7 @@ const MasterLayout = ({ children }) => {
                         <img
                           src="/assets/images/user-img.png"
                           alt="image_user"
-                          className="profile-image object-fit-cover rounded-circle"
+                          className="profile-image object-fit-cover"
                         />
                         <div className="headers bg-primary-50">
                           <h6 className="text-sm text-primary-light fw-semibold mb-2">
