@@ -155,12 +155,16 @@ import AddBrandPage from "./pages/AddBrandPage";
 import EditBrandPage from "./pages/EditBrandPage";
 import EditCustomerPage from "./pages/EditCustomerPage";
 import CustomerDetailsPage from "./pages/CustomerDetailsPage";
-import DepotPage from "./pages/DepotPage";
-import AddDepotPage from "./pages/AddDepotPage";
-import EditDepotPage from "./pages/EditDepotPage";
-import StockRequestPage from "./pages/StockRequestPage";
 import ApprovedStockPage from "./pages/ApprovedStockPage";
 import ApprovedStockDetailsPage from "./pages/ApprovedStockDetailsPage";
+import BrandDetailsPage from "./pages/BrandDetailsPage";
+import DepotsPage from "./pages/DepotsPage";
+import StockRequestPage from "./pages/StockRequestPage";
+import AddDepotPage from "./pages/AddDepotPage";
+import EditDepotPage from "./pages/EditDepotPage";
+import ViewDepotPage from "./pages/ViewDepotPage";
+import ViewStockRequestPage from "./pages/ViewStockRequestPage";
+import EditStockRequestPage from "./pages/EditStockRequestPage";
 
 function App() {
   return (
@@ -222,7 +226,7 @@ function App() {
             <Route path="/targets/details" element={<TargetsDetailsPage />} />
             <Route path="/stock" element={<StockPage />} />
             <Route path="/stock/add-stock" element={<AddStockPage />} />
-            <Route path="/depot" element={<DepotPage />} />
+            <Route path="/depot" element={<DepotsPage />} />
             <Route path="/depot/add-depot" element={<AddDepotPage />} />
             <Route path="/depot/edit-depot" element={<EditDepotPage />} />
             <Route path="/depot/request-stock" element={<StockRequestPage />} />
@@ -249,6 +253,7 @@ function App() {
             <Route path="/products/view" element={<ProductDetailsPage />} />
             <Route path="/brands/edit" element={<EditBrandPage />} />
             <Route path="/brands/add" element={<AddBrandPage />} />
+            <Route path="/brands/:id" element={<BrandDetailsPage />} />
             <Route path="/supply-residence" element={<SupplyResidencePage />} />          
             <Route path="/category" element={<CategoryPage />} />
             <Route path="/category/add-category" element={<AddCategoryPage/>} />
@@ -338,9 +343,18 @@ function App() {
             <Route path="/widgets" element={<WidgetsPage />} />
             <Route path="/wizard" element={<WizardPage />} />
             <Route path="/add-image" element={<AddImagePage />} />
-            {/* Catch-all route */}
-            <Route path="*" element={<ErrorPage />} />
-          </Route>          
+            <Route path="/depots" element={<DepotsPage />} />
+            <Route path="/depots/add" element={<AddDepotPage />} />
+            <Route path="/depots/edit/:id" element={<EditDepotPage />} />
+            <Route path="/depots/view/:id" element={<ViewDepotPage />} />
+            <Route path="/stock-request" element={<StockRequestPage />} />
+            <Route path="/stock-request/edit/:id" element={<EditStockRequestPage />} />
+            <Route path="/stock-request/view/:id" element={<ViewStockRequestPage />} />
+            <Route path="/approved-stock" element={<ApprovedStockPage />} />
+          </Route>
+
+          {/* Catch-all route */}
+          <Route path="*" element={<ErrorPage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>

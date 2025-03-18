@@ -50,7 +50,7 @@ const SupplyResidenceLayer = () => {
           tarmacked: item.tarmacked,
           storageFacility: item.storageFacility,
           dateCreated: item.dateCreated,
-          suppliers: item.suppliers, // Number of suppliers
+          suppliers: item.suppliers,
           createdBy: item.createdBy?.name || "Unknown",
         }));
         setResidence(cleanData);
@@ -213,9 +213,17 @@ const SupplyResidenceLayer = () => {
                     <td className="text-center small-text py-3 px-6">{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td className="text-start small-text py-3 px-4">{residence.name}</td>
                     <td className="text-start small-text py-3 px-4">{residence.tarmacked ? "Yes" : "No"}</td>
-                    <td className="text-start small-text py-3 px-4">{residence.storageFacility ? "Yes" : "No"}</td>
+                    <td className="text-start small-text py-3 px-4">{residence.storageFacility ? "Available" : "None"}</td>
                     <td className="text-start small-text py-3 px-4">{formatDate(residence.dateCreated)}</td>
-                    <td className="text-start small-text py-3 px-4">{residence.suppliers}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      <Link
+                        to ="/suppliers"
+                        className="hover-text-primary"
+                        state={{residenceId: residence.id}}
+                        >
+                          {residence.suppliers}
+                        </Link>
+                        </td>
                     <td className="text-start small-text py-3 px-4">{residence.createdBy}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">

@@ -15,14 +15,14 @@ const AddProduct = () => {
 
   const [productData, setProductData] = useState({
     imageFile: null,
-    imageURL: null, // Renamed from imagePreview for consistency
+    imageURL: null,
     sku: "",
     name: "",
     description: "",
     brand: "",
-    wholesalePrice: "", // Renamed from wPrice
-    distributorPrice: "", // Renamed from dPrice
-    retailPrice: "", // Renamed from rPrice
+    wholesalePrice: "",
+    distributorPrice: "", 
+    retailPrice: "", 
     category: "",
     subCategory: "",
   });

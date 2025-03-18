@@ -25,7 +25,7 @@ const SubCategoryLayer = () => {
   const [query, setQuery] = useState("");
   const [subCategoryToDelete, setSubCategoryToDelete] = useState(null);
   const [editSubCategory, setEditSubCategory] = useState({ id: null, name: "", categoryId: "" });
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1); // 1-based for UI
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);

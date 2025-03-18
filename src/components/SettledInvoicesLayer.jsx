@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { formatDate, formatCurrency } from "../hook/format-utils"; 
 
 const API_URL = "https://api.bizchain.co.ke/v1/invoice";
 
@@ -58,27 +59,11 @@ const SettledInvoicesLayer = () => {
     setCurrentPage(1);
   };
 
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
-  };
-
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = invoices.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(totalItems / itemsPerPage);
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -129,8 +114,8 @@ const SettledInvoicesLayer = () => {
                     </div>
                   </td>
                 </tr>
-              ) : invoices.length > 0 ? (
-                invoices.map((invoice, index) => (
+              ) : currentItems.length > 0 ? (
+                currentItems.map((invoice, index) => (
                   <tr key={invoice.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}

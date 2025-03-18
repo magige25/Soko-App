@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -163,7 +163,6 @@ const ProductsLayer = () => {
                 <th scope="col" className="text-start py-3 px-4">Category</th>
                 <th scope="col" className="text-start py-3 px-4">Sub-Category</th>
                 <th scope="col" className="text-start py-3 px-4">Brand</th>
-                <th scope="col" className="text-start py-3 px-4">Discount Price</th>
                 <th scope="col" className="text-start py-3 px-4">Wholesale Price</th>
                 <th scope="col" className="text-start py-3 px-4">Distributor Price</th>
                 <th scope="col" className="text-start py-3 px-4">Retail Price</th>
@@ -192,12 +191,19 @@ const ProductsLayer = () => {
                         className="w-40-px h-40-px rounded-circle flex-shrink-0 me-12 overflow-hidden"
                       />
                     </td>                    
-                    <td className="text-start small-text py-3 px-4">{product.name}</td>                    
+                    <td className="text-start small-text py-3 px-4">
+                      <Link
+                        to="/products/view"
+                        state={{productId: product.id}}
+                        className="hover-text-primary"
+                        >
+                        {product.name}
+                      </Link>
+                    </td>                    
                     <td className="text-start small-text py-3 px-4">{product.sku}</td>                    
                     <td className="text-start small-text py-3 px-4">{product.category.name}</td>
                     <td className="text-start small-text py-3 px-4">{product.subCategory.name}</td>
                     <td className="text-start small-text py-3 px-4">{product.brand.name}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.discountPrice)}</td>
                     <td className="text-start small-text py-3 px-4">{formatCurrency(product.wholesalePrice || 0)}</td>
                     <td className="text-start small-text py-3 px-4">{formatCurrency(product.distributorPrice || 0)}</td>
                     <td className="text-start small-text py-3 px-4">{formatCurrency(product.retailPrice || 0)}</td>

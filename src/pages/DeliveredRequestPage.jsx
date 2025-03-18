@@ -1,20 +1,20 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import EditDepot from "../components/child/EditDepot";
+import DeliveredRequestLayer from "../components/DeliveredRequestLayer";
 
 
-const EditDepotPage = () => {
+const DeliveredRequestPage = () => {
   return (
     <>
       {/* MasterLayout */}
       <MasterLayout>
 
         {/* Breadcrumb */}
-        <Breadcrumb title="Edit Depot" />
+        <Breadcrumb title="DeliveredRequest" />
 
-        {/* EditDepot */}
-        <EditDepot />
+        {/* DeliveredRequestLayer */}
+        <DeliveredRequestLayer />
 
 
       </MasterLayout>
@@ -22,4 +22,4 @@ const EditDepotPage = () => {
   );
 };
 
-export default EditDepotPage;
+export default DeliveredRequestPage;

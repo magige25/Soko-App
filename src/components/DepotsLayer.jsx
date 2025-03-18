@@ -1,115 +1,93 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import {Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { formatDate } from "../hook/format-utils";
 
-const API_URL = "https://api.bizchain.co.ke/v1/brands";
+const API_URL = "https://api.bizchain.co.ke/v1/depots";
+const REGION_API = "https://api.bizchain.co.ke/v1/regions";
+const SUB_REGION_API = "https://api.bizchain.co.ke/v1/sub-regions";
 
-const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-  return debouncedValue;
-};
-
-const BrandsLayer = () => {
-  const navigate = useNavigate();
-  const [brands, setBrands] = useState([]);
+const DepotsLayer = () => {
+  const [depots, setDepots] = useState([]);
   const [query, setQuery] = useState("");
-  const [brandToDelete, setBrandToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const debouncedQuery = useDebounce(query, 300);
+  const [regions, setRegions] = useState([]);
+  const [subRegions, setSubRegions] = useState([]);
+  const [depotToDelete, setDepotToDelete] = useState(null); // Added back
 
-  const fetchBrands = useCallback(
+  // Fetch depots
+  const fetchDepots = useCallback(
     async (page = 1, searchQuery = "") => {
       setIsLoading(true);
       setError(null);
       try {
-        const token = sessionStorage.getItem("token");
-        if (!token) {
-          toast.error("Please log in!");
-          navigate("/login");
-          return;
-        }
+        const token = localStorage.getItem("token");
+        const params = { page: page - 1, size: itemsPerPage, searchValue: searchQuery };
         const response = await axios.get(API_URL, {
           headers: { Authorization: `Bearer ${token}` },
-          params: {
-            page: page - 1,
-            size: itemsPerPage,
-            searchValue: searchQuery,
-          },
+          params,
         });
-        const data = Array.isArray(response.data.data) ? response.data.data : [];
+        const data = response.data.data || [];
         const total = response.data.totalElements || data.length;
-        setBrands(data);
+        setDepots(data);
         setTotalItems(total);
       } catch (error) {
-        console.error("Error fetching brands:", error);
-        const message = error.message || "Failed to fetch brands";
-        setError(message);
-        toast.error(message);
-        setBrands([]);
-        setTotalItems(0);
-        navigate("/login");
+        console.error("Error fetching depots:", error);
+        setError("Failed to fetch depots.");
+        toast.error("Failed to fetch depots.");
       } finally {
         setIsLoading(false);
       }
     },
-    [itemsPerPage, navigate]
+    [itemsPerPage]
   );
 
-  useEffect(() => {
-    fetchBrands(currentPage, debouncedQuery);
-  }, [currentPage, debouncedQuery, fetchBrands]);
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix = (day % 10 === 1 && day !== 11) ? "st" :
-                   (day % 10 === 2 && day !== 12) ? "nd" :
-                   (day % 10 === 3 && day !== 13) ? "rd" : "th";
-    return `${day}${suffix} ${month} ${year}`;
-  };
-
-  const handleDeleteClick = (brand) => {
-    setBrandToDelete(brand);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!brandToDelete) return;
-    setIsLoading(true);
-    setError(null);
+  // Fetch regions
+  const fetchRegions = async () => {
     try {
-      const token = sessionStorage.getItem("token");
-      if (!token) {
-        throw new Error("Please log in");
-      }
-      await axios.delete(`${API_URL}/${brandToDelete.id}`, {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(REGION_API, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setBrandToDelete(null);
-      fetchBrands(currentPage, debouncedQuery);
-      toast.success("Brand deleted successfully!");
+      setRegions(response.data.data || []);
     } catch (error) {
-      console.error("Error deleting", error);
-      const message = error.response?.data?.message || "Delete Failed";
-      setError(message);
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
+      console.error("Error fetching regions:", error);
+      toast.error("Failed to fetch regions.");
     }
   };
-  
+
+  // Fetch sub-regions
+  const fetchSubRegions = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(SUB_REGION_API, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const subRegionsData = (response.data.data || []).map((subRegion) => ({
+        ...subRegion,
+        regionId: subRegion.region.id,
+      }));
+      setSubRegions(subRegionsData);
+    } catch (error) {
+      console.error("Error fetching sub-regions:", error);
+      toast.error("Failed to fetch sub-regions.");
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      await Promise.all([fetchRegions(), fetchSubRegions()]);
+      fetchDepots(currentPage, query);
+    };
+    loadData();
+  }, [currentPage, query, fetchDepots]);
+
   const handleSearchInputChange = (e) => {
     setQuery(e.target.value);
     setCurrentPage(1);
@@ -119,11 +97,30 @@ const BrandsLayer = () => {
     setCurrentPage(pageNumber);
   };
 
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  const handleAddBrandClick = () => {
-    navigate("/brands/add");
+  const handleDeleteClick = (depot) => {
+    setDepotToDelete(depot);
   };
+
+  const handleDeleteConfirm = async () => {
+    if (!depotToDelete) return;
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/${depotToDelete.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setDepotToDelete(null);
+      fetchDepots(currentPage, query);
+      toast.success("Depot deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting depot:", error);
+      toast.error("Failed to delete depot.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <div className="card h-100 p-0 radius-12">
@@ -142,21 +139,20 @@ const BrandsLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search"
+              placeholder="Search Depot"
               value={query}
               onChange={handleSearchInputChange}
             />
             <Icon icon="ion:search-outline" className="icon" />
           </form>
         </div>
-        <button
-          type="button"
-          className="btn btn-primary text-sm btn-md px-12 py-12 radius-8 d-flex align-items-center gap-2"
-          onClick={handleAddBrandClick}
+        <Link
+          to="/depots/add"
+          className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
         >
           <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-          Create Brand
-        </button>
+          Add Depot
+        </Link>
       </div>
 
       <div className="card-body p-24">
@@ -167,31 +163,37 @@ const BrandsLayer = () => {
               <tr>
                 <th scope="col" className="text-center py-3 px-6">#</th>
                 <th scope="col" className="text-start py-3 px-4">Name</th>
-                {/* <th scope="col" className="text-start py-3 px-4">Products</th> */}
+                <th scope="col" className="text-start py-3 px-4">Region</th>
+                <th scope="col" className="text-start py-3 px-4">Sub-Region</th>
                 <th scope="col" className="text-start py-3 px-4">Date Created</th>
-                <th scope="col" className="text-start py-3 px-4">Action</th>
+                <th scope="col" className="text-start py-3 px-4">Actions</th>
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="5" className="text-center py-3">
+                  <td colSpan="6" className="text-center py-3">
                     <div className="spinner-border" role="status">
                       <span className="visually-hidden">Loading...</span>
                     </div>
                   </td>
                 </tr>
-              ) : brands.length > 0 ? (
-                brands.map((brand, index) => (
-                  <tr key={brand.id} style={{ transition: "background-color 0.2s" }}>
+              ) : depots.length > 0 ? (
+                depots.map((depot, index) => (
+                  <tr key={depot.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{brand.name}</td>
-                    {/* <td className="text-start small-text py-3 px-4">
-                      {brand.products != null ? brand.products : "N/A"}
-                    </td> */}
-                    <td className="text-start small-text py-3 px-4">{formatDate(brand.dateCreated)}</td>
+                    <td className="text-start small-text py-3 px-4">{depot.name}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      {depot.region.name || "N/A"}
+                    </td> 
+                    {/* regions.find((r) => r.id === depot.regionId)?.name */}
+                    <td className="text-start small-text py-3 px-4">
+                      {depot.subRegion.name || "N/A"}
+                    </td>
+                    {/* subRegions.find((sr) => sr.id === depot.subRegionId)?.name */}
+                    <td className="text-start small-text py-3 px-4">{formatDate(depot.dateCreated)}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">
@@ -204,25 +206,19 @@ const BrandsLayer = () => {
                           </button>
                           <ul className="dropdown-menu">
                             <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => navigate(`/brands/${brand.id}`, { state: { brand } })}
-                              >
-                                View
-                              </button>
+                              <Link className="dropdown-item" to={`/depots/view/${depot.id}`}>
+                                View Details
+                              </Link>
                             </li>
                             <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => navigate("/brands/edit", { state: { brand } })}
-                              >
+                              <Link className="dropdown-item" to={`/depots/edit/${depot.id}`}>
                                 Edit
-                              </button>
+                              </Link>
                             </li>
                             <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(brand)}
+                                onClick={() => handleDeleteClick(depot)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
@@ -237,14 +233,13 @@ const BrandsLayer = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="5" className="text-center py-3">
-                    No brands found
-                  </td>
+                  <td colSpan="6" className="text-center py-3">No depots found</td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
         {!isLoading && (
           <div className="d-flex justify-content-between align-items-center mt-3">
             <div className="text-muted" style={{ fontSize: "13px" }}>
@@ -300,29 +295,32 @@ const BrandsLayer = () => {
           </div>
         )}
       </div>
-      {/* Delete Confirmation Modal */}
+
+      {/* Delete Modal */}
       <div className="modal fade" id="deleteModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body pt-3 ps-18 pe-18">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="modal-title fs-6">Delete Brand</h6>
+                <h6 className="modal-title fs-6">Delete Depot</h6>
                 <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <p className="pb-3 mb-0">
-                Are you sure you want to delete the <strong>{brandToDelete?.name}</strong> brand permanently? This action cannot be undone.
+                Are you sure you want to delete the depot <strong>{depotToDelete?.name}</strong>{" "}
+                permanently? This action cannot be undone.
               </p>
             </div>
             <div className="d-flex justify-content-end gap-2 px-12 pb-3">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-              <button 
-                type="button" 
-                className="btn btn-danger" 
-                data-bs-dismiss="modal" 
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-danger"
+                data-bs-dismiss="modal"
                 onClick={handleDeleteConfirm}
-                disabled={isLoading}
               >
-                {isLoading ? "Deleting..." : "Delete"}
+                Delete
               </button>
             </div>
           </div>
@@ -332,4 +330,4 @@ const BrandsLayer = () => {
   );
 };
 
-export default BrandsLayer;
+export default DepotsLayer;

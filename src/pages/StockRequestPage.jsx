@@ -7,19 +7,19 @@ import StockRequestLayer from "../components/StockRequestLayer";
 const StockRequestPage = () => {
   return (
     <>
-
       {/* MasterLayout */}
       <MasterLayout>
 
         {/* Breadcrumb */}
         <Breadcrumb title="Stock Request" />
+
         {/* StockRequestLayer */}
         <StockRequestLayer />
 
-      </MasterLayout>
 
+      </MasterLayout>
     </>
   );
 };
 
-export default StockRequestPage; 
+export default StockRequestPage;

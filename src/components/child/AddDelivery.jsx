@@ -22,6 +22,7 @@ const AddDelivery = () => {
   const [fetchingStorageFacilities, setFetchingStorageFacilities] = useState(true);
   const [error, setError] = useState(null);
   const [formError, setFormError] = useState("");
+  const [showSaveConfirmation, setShowSaveConfirmation] = useState(false);
 
   useEffect(() => {
     const fetchSuppliers = async () => {
@@ -55,7 +56,7 @@ const AddDelivery = () => {
         const token = sessionStorage.getItem("token");
         const response = await axios.get(STG_FACILITY_API, {
           headers: {
-            Authorization:`Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
         });
@@ -65,7 +66,7 @@ const AddDelivery = () => {
         } else if (response.data.data && typeof response.data.data === "object") {
           setStorageFacilities([response.data.data]);
         } else {
-          throw new Error("Unexpected API response");      
+          throw new Error("Unexpected API response");
         }
       } catch (error) {
         console.error("Error fetching Storage Facilities:", error);
@@ -77,10 +78,9 @@ const AddDelivery = () => {
 
     fetchSuppliers();
     fetchStorageFacilities();
-    
   }, []);
 
-  const handleAddDelivery = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     setFormError("");
 
@@ -89,14 +89,21 @@ const AddDelivery = () => {
       return;
     }
 
+    // Show confirmation modal instead of saving immediately
+    setShowSaveConfirmation(true);
+  };
+
+  const handleSaveConfirm = async () => {
+    setLoading(true);
+    setFormError("");
+
     const newDeliveryData = {
       supplier: parseInt(newDelivery.supplier),
       litres: parseFloat(newDelivery.litres),
       pricePerLitre: parseFloat(newDelivery.pricePerLitre),
-      storageFacilityId: parseInt(newDelivery.storageFacilityId),
+      storageFacilityId: parseInt(newDelivery.storageFacilityId) || null,
     };
 
-    setLoading(true);
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.post(API_URL, newDeliveryData, {
@@ -106,38 +113,52 @@ const AddDelivery = () => {
         },
       });
 
-      if (response.status === 200) {
-        toast.success("Delivery added successfully!"); 
+      if (response.status === 200 || response.status === 201) {
+        toast.success("Delivery added successfully!");
         setNewDelivery({
           supplier: "",
           litres: "",
           pricePerLitre: "",
           storageFacilityId: "",
         });
+        setShowSaveConfirmation(false);
         navigate("/deliveries");
       }
     } catch (error) {
       console.error("Error adding delivery:", error);
       setFormError("Failed to add delivery. Please try again.");
+      setShowSaveConfirmation(false); // Close modal on error to allow retry
     } finally {
       setLoading(false);
     }
   };
 
+  const handleReviewClick = () => {
+    setShowSaveConfirmation(false);
+    // Form remains open with prefilled data for review
+  };
+
   const handleCancel = () => navigate("/deliveries");
+
+  const getSupplierName = (id) => {
+    const supplier = suppliers.find((s) => s.id === parseInt(id));
+    return supplier ? `${supplier.firstName} ${supplier.lastName}` : "N/A";
+  };
+
+  const getStorageFacilityName = (id) => {
+    const facility = storageFacilities.find((f) => f.id === parseInt(id));
+    return facility ? facility.name : "N/A";
+  };
 
   return (
     <div className="page-wrapper">
-      <Toaster 
-            position="top-center" 
-            reverseOrder={false}
-            />
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
             <h6 className="fs-6 mb-4">Add Delivery</h6>
             {error && <div className="alert alert-danger">{error}</div>}
-            <form onSubmit={handleAddDelivery}>
+            <form onSubmit={handleSubmit}>
               <div className="row mb-3">
                 <div className="col-md-6">
                   <label className="form-label">
@@ -172,7 +193,9 @@ const AddDelivery = () => {
                     type="number"
                     className="form-control"
                     value={newDelivery.litres}
-                    onChange={(e) => setNewDelivery({ ...newDelivery, litres: e.target.value })}
+                    onChange={(e) =>
+                      setNewDelivery({ ...newDelivery, litres: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -194,8 +217,8 @@ const AddDelivery = () => {
                   />
                 </div>
                 <div className="col-md-6">
-                <label className="form-label">
-                    Storage Facility <span className="text-danger">*</span>
+                  <label className="form-label">
+                    Storage Facility
                   </label>
                   <select
                     className="form-control"
@@ -203,20 +226,19 @@ const AddDelivery = () => {
                     onChange={(e) =>
                       setNewDelivery({ ...newDelivery, storageFacilityId: e.target.value })
                     }
-                    required
                     disabled={fetchingStorageFacilities}
                   >
                     <option value="">Select a Storage Facility</option>
                     {storageFacilities.length > 0 ? (
-                      storageFacilities.map((storageFacilities) => (
-                        <option key={storageFacilities.id} value={storageFacilities.id}>
-                          {`${storageFacilities.name}`}
+                      storageFacilities.map((storageFacility) => (
+                        <option key={storageFacility.id} value={storageFacility.id}>
+                          {`${storageFacility.name}`}
                         </option>
                       ))
                     ) : (
-                      <option value="">No storage Facilities available</option>
+                      <option value="">No storage facilities available</option>
                     )}
-                  </select>                  
+                  </select>
                 </div>
               </div>
               {formError && <div className="text-danger mb-3">{formError}</div>}
@@ -232,6 +254,53 @@ const AddDelivery = () => {
           </div>
         </div>
       </div>
+
+      {/* Save Confirmation Modal */}
+      {showSaveConfirmation && (
+        <div className="modal fade show custom-modal-backdrop" style={{ display: "block" }} tabIndex={-1} aria-hidden="true">
+          <div className="modal-dialog modal-md top-center-modal">
+            <div className="modal-content">
+              <div className="modal-body pt-3 ps-18 pe-18">
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                  <h6 className="modal-title fs-6">Confirm Save</h6>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    onClick={() => setShowSaveConfirmation(false)}
+                  ></button>
+                </div>
+                <p className="pb-3 mb-0">
+                  Please confirm the details before saving:
+                  <ul>
+                    <li>Supplier: <strong>{getSupplierName(newDelivery.supplier)}</strong></li>
+                    <li>Volume: <strong>{newDelivery.litres} L</strong></li>
+                    <li>Price/Litre: <strong>KES {parseFloat(newDelivery.pricePerLitre).toFixed(2)}</strong></li>
+                    <li>Storage Facility: <strong>{getStorageFacilityName(newDelivery.storageFacilityId) || "N/A"}</strong></li>
+                  </ul>
+                  Do you want to proceed?
+                </p>
+              </div>
+              <div className="d-flex justify-content-end gap-2 px-12 pb-3">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={handleReviewClick}
+                >
+                  Review
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleSaveConfirm}
+                  disabled={loading}
+                >
+                  {loading ? "Saving..." : "Continue"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

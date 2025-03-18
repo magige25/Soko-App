@@ -3,24 +3,30 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import AddImage from "./AddImage"; // Assuming this is in the same directory
 
 const API_URL = "https://api.bizchain.co.ke/v1/brands";
 
 const AddBrand = () => {
   const navigate = useNavigate();
-
-  // State now holds an array of brand objects
-  const [brands, setBrands] = useState([{ name: "" }]);
+  const [brands, setBrands] = useState([{ name: "", imageFile: null, imageURL: null }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleAddBrandField = () => {
-    setBrands([...brands, { name: "" }]);
+    setBrands([...brands, { name: "", imageFile: null, imageURL: null }]);
   };
 
-  const handleBrandChange = (index, value) => {
+  const handleBrandChange = (index, field, value) => {
     const updatedBrands = [...brands];
-    updatedBrands[index].name = value;
+    updatedBrands[index][field] = value;
+    setBrands(updatedBrands);
+  };
+
+  const handleImageSelect = (index, file, previewURL) => {
+    const updatedBrands = [...brands];
+    updatedBrands[index].imageFile = file;
+    updatedBrands[index].imageURL = previewURL;
     setBrands(updatedBrands);
   };
 
@@ -35,38 +41,68 @@ const AddBrand = () => {
     e.preventDefault();
     setError("");
 
-    // Check if any brand name is empty
     if (brands.some((brand) => !brand.name.trim())) {
       setError("Please fill in all brand names.");
       toast.error("Please fill in all brand names.");
       return;
     }
 
-    const brandData = {
-      brandRequests: brands.map((brand) => ({ name: brand.name })),
-    };
-
     setLoading(true);
     try {
       const token = sessionStorage.getItem("token");
       if (!token) throw new Error("Please log in.");
 
-      const response = await axios.post(API_URL, brandData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      // Check if any brand has an image
+      const hasImage = brands.some((brand) => brand.imageFile);
 
-      if (response.status === 200 || response.status === 201) {
-        toast.success("Brands added successfully!");
-        setBrands([{ name: "" }]); // Reset to single empty field
-        navigate("/brands");
+      if (hasImage) {
+        // Use FormData for multipart submission
+        const formData = new FormData();
+        brands.forEach((brand, index) => {
+          formData.append(`brandRequests[${index}].name`, brand.name);
+          if (brand.imageFile) {
+            formData.append(`brandRequests[${index}].photo`, brand.imageFile);
+          }
+        });
+
+        console.log("Submitting with image(s)...");
+        const response = await axios.post(API_URL, formData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        });
+
+        if (response.status === 200 || response.status === 201) {
+          toast.success("Brands added successfully!");
+          setBrands([{ name: "", imageFile: null, imageURL: null }]);
+          navigate("/brands");
+        }
+      } else {
+        // Use JSON for no-image submission
+        const brandData = {
+          brandRequests: brands.map((brand) => ({ name: brand.name })),
+        };
+
+        console.log("Submitting without images...");
+        const response = await axios.post(API_URL, brandData, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (response.status === 200 || response.status === 201) {
+          toast.success("Brands added successfully!");
+          setBrands([{ name: "", imageFile: null, imageURL: null }]);
+          navigate("/brands");
+        }
       }
     } catch (error) {
       console.error("Error adding brands:", error.response?.data || error.message);
-      setError(error.response?.data?.detail || "Failed to add brands. Please try again.");
-      toast.error("Failed to add brands.");
+      const errorMessage = error.response?.data?.detail || "Failed to add brands.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -85,8 +121,57 @@ const AddBrand = () => {
             <form onSubmit={handleAddBrands}>
               <div className="mb-3">
                 {brands.map((brand, index) => (
-                  <div key={index} className="row mb-2 align-items-center">
-                    <div className="col-md-8">
+                  <div key={index} className="row mb-4 align-items-center">
+                    <div className="col-md-2">
+                      <label className="form-label"></label>
+                      {!brand.imageURL ? (
+                        <div
+                          className="d-flex align-items-center justify-content-center border border-dashed border-gray-300 rounded"
+                          style={{ width: "100px", height: "100px", cursor: "pointer", background: "#f9f9f9" }}
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <AddImage onImageSelect={(file, previewURL) => handleImageSelect(index, file, previewURL)}>
+                            <div className="text-center">
+                              <Icon
+                                icon="ic:baseline-photo-camera"
+                                className="text-muted"
+                                style={{ fontSize: "24px", cursor: "pointer" }}
+                              />
+                              <span className="text-muted d-block mt-1">Upload</span>
+                            </div>
+                          </AddImage>
+                        </div>
+                      ) : (
+                        <div className="position-relative" style={{ width: "100px", height: "100px" }}>
+                          <img
+                            src={brand.imageURL}
+                            alt="Brand Preview"
+                            className="rounded"
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          />
+                          <button
+                            type="button"
+                            className="position-absolute d-flex align-items-center justify-content-center rounded-circle"
+                            style={{
+                              top: "5px",
+                              right: "5px",
+                              width: "20px",
+                              height: "20px",
+                              padding: "0",
+                              border: "none",
+                              background: "transparent",
+                              color: "#dc3545",
+                            }}
+                            onClick={() =>
+                              handleImageSelect(index, null, null)
+                            }
+                          >
+                            <Icon icon="ic:baseline-close" className="text-sm line-height-1" />
+                          </button>
+                        </div>
+                      )}
+                    </div>                    
+                    <div className="col-md-4">
                       <label className="form-label">
                         Brand Name <span className="text-danger">*</span>
                       </label>
@@ -95,36 +180,35 @@ const AddBrand = () => {
                         className="form-control"
                         placeholder="Enter Brand Name"
                         value={brand.name}
-                        onChange={(e) => handleBrandChange(index, e.target.value)}
+                        onChange={(e) => handleBrandChange(index, "name", e.target.value)}
                         required
+                        disabled={loading}
                       />
                     </div>
-                    {index === brands.length - 1 && (
-                      <div className="col-md-2 d-flex align-items-end">
+                    
+                    <div className="col-md-2 d-flex align-items-end">
+                      {index === brands.length - 1 && (
                         <button
                           type="button"
-                          className="btn p-0 mt-5"
-                          style={{background: "transparent", border: "none"}}
+                          className="btn p-4"
+                          style={{ background: "transparent", border: "none" }}
                           onClick={handleAddBrandField}
                           disabled={loading}
                         >
-                          <Icon icon="ic:baseline-plus" width="20" color="#007bff"/>
-                          
+                          <Icon icon="ic:baseline-plus" width="20" color="#007bff" />
                         </button>
-                      </div>
-                    )}
-                    {brands.length > 1 && index !== brands.length - 1 && (
-                      <div className="col-md-2 d-flex align-items-end">
+                      )}
+                      {brands.length > 1 && index !== brands.length - 1 && (
                         <button
                           type="button"
-                          className="btn p-0 mt-0"
+                          className="btn p-0 ms-2"
                           onClick={() => handleRemoveBrand(index)}
                           disabled={loading}
                         >
-                          <Icon icon="ic:baseline-close" width="20" color="#dc3545"/>
+                          <Icon icon="ic:baseline-close" width="20" color="#dc3545" />
                         </button>
-                      </div>
-                    )}
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
