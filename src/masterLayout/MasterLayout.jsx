@@ -148,7 +148,7 @@ const MasterLayout = ({ children }) => {
     productCatalogue: ["/category", "/sub-category", "/brands", "/products"],
     farmerManagement: ["/suppliers", "/deliveries", "/pending-bills", "/settled-bills", "/supply-residence"],
     invoices: ["/invoice-register", "/pending-invoices", "settled-invoices"],
-    depotManagement: ["/depots"],
+    depotManagement: ["/depot", "/stock-request", "/approved-stock", "/delivered-order"],
     warehouseManagement: ["/warehouses"],
     stockManagement: ["/stock", "/depot-reconciliation", "/salesperson-reconciliation"],
     storageFacility: ["/storage-facility", "/batch", "/drawing"],
@@ -490,10 +490,34 @@ const MasterLayout = ({ children }) => {
                 <ul className="sidebar-submenu">
                   <li>
                     <NavLink
-                      to="/depots"
+                      to="/depot"
                       className={(navData) => (navData.isActive ? "active-page" : "")}
                     >
                       Depots
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/stock-request"
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
+                    >
+                      Stock Request
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/approved-stock"
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
+                    >
+                      Approved Stock
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/delivered-order"
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
+                    >
+                      Delivered Order
                     </NavLink>
                   </li>
                 </ul>

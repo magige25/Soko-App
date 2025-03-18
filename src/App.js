@@ -155,6 +155,12 @@ import AddBrandPage from "./pages/AddBrandPage";
 import EditBrandPage from "./pages/EditBrandPage";
 import EditCustomerPage from "./pages/EditCustomerPage";
 import CustomerDetailsPage from "./pages/CustomerDetailsPage";
+import DepotPage from "./pages/DepotPage";
+import AddDepotPage from "./pages/AddDepotPage";
+import EditDepotPage from "./pages/EditDepotPage";
+import StockRequestPage from "./pages/StockRequestPage";
+import ApprovedStockPage from "./pages/ApprovedStockPage";
+import ApprovedStockDetailsPage from "./pages/ApprovedStockDetailsPage";
 
 function App() {
   return (
@@ -216,6 +222,12 @@ function App() {
             <Route path="/targets/details" element={<TargetsDetailsPage />} />
             <Route path="/stock" element={<StockPage />} />
             <Route path="/stock/add-stock" element={<AddStockPage />} />
+            <Route path="/depot" element={<DepotPage />} />
+            <Route path="/depot/add-depot" element={<AddDepotPage />} />
+            <Route path="/depot/edit-depot" element={<EditDepotPage />} />
+            <Route path="/depot/request-stock" element={<StockRequestPage />} />
+            <Route path="/approved-stock" element={<ApprovedStockPage />} />
+            <Route path="/approved-stock/stock-details" element={<ApprovedStockDetailsPage />} />
             <Route path="/batch" element={<BatchPage />} />
             <Route path="/roles-list" element={<RolesListPage />} />
             <Route path="/create-role" element={<CreateRolePage />} />

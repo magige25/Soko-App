@@ -16310,6 +16310,10 @@ td.fc-header-center {
   background-color: #f8f9fa !important;
 }
 
+[data-theme="dark"] .action-dropdown .dropdown-item:hover {
+  background-color: var(--neutral-300) !important;
+}
+
 .action-dropdown .dropdown-item.text-danger:hover {
   color: #fff !important;
   background-color: #dc3545 !important;
