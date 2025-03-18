@@ -158,6 +158,7 @@ import CustomerDetailsPage from "./pages/CustomerDetailsPage";
 import DepotPage from "./pages/DepotPage";
 import AddDepotPage from "./pages/AddDepotPage";
 import EditDepotPage from "./pages/EditDepotPage";
+import StockRequestPage from "./pages/StockRequestPage";
 import AddStockRequestPage from "./pages/AddStockRequestPage";
 import ApprovedStockPage from "./pages/ApprovedStockPage";
 import ApprovedStockDetailsPage from "./pages/ApprovedStockDetailsPage";
@@ -226,6 +227,7 @@ function App() {
             <Route path="/depot" element={<DepotPage />} />
             <Route path="/depot/add-depot" element={<AddDepotPage />} />
             <Route path="/depot/edit-depot" element={<EditDepotPage />} />
+            <Route path="/stock-request" element={<StockRequestPage />} />
             <Route path="/depot/request-stock" element={<AddStockRequestPage />} />
             <Route path="/approved-stock" element={<ApprovedStockPage />} />
             <Route path="/approved-stock/stock-details" element={<ApprovedStockDetailsPage />} />
