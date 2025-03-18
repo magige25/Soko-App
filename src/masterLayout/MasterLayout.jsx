@@ -126,7 +126,7 @@ const MasterLayout = ({ children }) => {
     productCatalogue: ["/category", "/sub-category", "/brands", "/products"],
     farmerManagement: ["/suppliers", "/deliveries", "/pending-bills", "/settled-bills", "/supply-residence"],
     invoices: ["/invoice-register", "/pending-invoices", "settled-invoices"],
-    deportManagement: ["/deports"],
+    depotManagement: ["/depots", "/stock-request","/approved-stock-request", "/delivered-request"],
     warehouseManagement: ["/warehouses"],
     stockManagement: ["/stock", "/reconciled"],
     storageFacility: ["/storage-facility"],
@@ -464,21 +464,51 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Deport Management */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.deportManagement) ? "submenu-active" : ""}`}>
+              {/* Depot Management */}
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.depotManagement) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:store-3-line" className="menu-icon" />
-                  <span>Deport Management</span>
+                  <span>Depot Management</span>
                 </Link>
                 <ul className="sidebar-submenu">
                   <li>
                     <NavLink
-                      to="/deports"
+                      to="/depots"
                       className={(navData) =>
                         navData.isActive ? "active-page" : ""
                       }
                     >
-                      Deports
+                      Depots
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/stock-request"
+                      className={(navData) =>
+                        navData.isActive ? "active-page" : ""
+                      }
+                    >
+                      Stock Request
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/approved-stock-request"
+                      className={(navData) =>
+                        navData.isActive ? "active-page" : ""
+                      }
+                    >
+                      Approved Stock Request
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/delivered-request"
+                      className={(navData) =>
+                        navData.isActive ? "active-page" : ""
+                      }
+                    >
+                      Delivered Request/Order
                     </NavLink>
                   </li>
                 </ul>

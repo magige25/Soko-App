@@ -1,64 +1,46 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import {Link } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-import { formatCurrency, formatDate } from "../hook/format-utils";
+import { formatDate } from "../hook/format-utils";
 
-const API_URL = "https://api.bizchain.co.ke/v1/supplier-deliveries";
+const API_URL = "https://api.bizchain.co.ke/v1/depots";
+const REGION_API = "https://api.bizchain.co.ke/v1/regions";
+const SUB_REGION_API = "https://api.bizchain.co.ke/v1/sub-regions";
 
-const useDebounce = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(timer);
-  }, [value, delay]);
-  return debouncedValue;
-};
-
-const DeliveriesLayer = () => {
-  const navigate = useNavigate();
-  const [deliveries, setDeliveries] = useState([]);
+const DepotsLayer = () => {
+  const [depots, setDepots] = useState([]);
   const [query, setQuery] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [deliveryToDelete, setDeliveryToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const debouncedQuery = useDebounce(query, 300);
+  const [regions, setRegions] = useState([]);
+  const [subRegions, setSubRegions] = useState([]);
+  const [depotToDelete, setDepotToDelete] = useState(null); // Added back
 
-  const fetchDeliveries = useCallback(
-    async (page = 1, searchQuery = "", start = "", end = "") => {
+  // Fetch depots
+  const fetchDepots = useCallback(
+    async (page = 1, searchQuery = "") => {
       setIsLoading(true);
       setError(null);
       try {
         const token = localStorage.getItem("token");
-        const params = {
-          page: page - 1,
-          size: itemsPerPage,
-          searchValue: searchQuery,
-        };
-        if (start) params.startDate = start;
-        if (end) params.endDate = end;
-
+        const params = { page: page - 1, size: itemsPerPage, searchValue: searchQuery };
         const response = await axios.get(API_URL, {
           headers: { Authorization: `Bearer ${token}` },
           params,
         });
-
         const data = response.data.data || [];
         const total = response.data.totalElements || data.length;
-        setDeliveries(data);
+        setDepots(data);
         setTotalItems(total);
       } catch (error) {
-        console.error("Error fetching deliveries:", error);
-        setError("Failed to fetch deliveries. Please try again.");
-        toast.error("Failed to fetch deliveries.");
-        setDeliveries([]);
-        setTotalItems(0);
+        console.error("Error fetching depots:", error);
+        setError("Failed to fetch depots.");
+        toast.error("Failed to fetch depots.");
       } finally {
         setIsLoading(false);
       }
@@ -66,47 +48,48 @@ const DeliveriesLayer = () => {
     [itemsPerPage]
   );
 
-  useEffect(() => {
-    fetchDeliveries(currentPage, debouncedQuery, startDate, endDate);
-  }, [currentPage, debouncedQuery, startDate, endDate, fetchDeliveries]);
-
-  const handleDeleteClick = (delivery) => {
-    setDeliveryToDelete(delivery);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!deliveryToDelete) return;
-    setIsLoading(true);
-    setError(null);
+  // Fetch regions
+  const fetchRegions = async () => {
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`${API_URL}/${deliveryToDelete.id}`, {
+      const response = await axios.get(REGION_API, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setDeliveryToDelete(null);
-      fetchDeliveries(currentPage, debouncedQuery, startDate, endDate);
-      toast.success("Delivery deleted successfully!");
+      setRegions(response.data.data || []);
     } catch (error) {
-      console.error("Error deleting delivery:", error);
-      setError(error.response?.data?.message || "Failed to delete delivery.");
-      toast.error(error.response?.data?.message || "Failed to delete delivery.");
-    } finally {
-      setIsLoading(false);
+      console.error("Error fetching regions:", error);
+      toast.error("Failed to fetch regions.");
     }
   };
+
+  // Fetch sub-regions
+  const fetchSubRegions = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(SUB_REGION_API, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const subRegionsData = (response.data.data || []).map((subRegion) => ({
+        ...subRegion,
+        regionId: subRegion.region.id,
+      }));
+      setSubRegions(subRegionsData);
+    } catch (error) {
+      console.error("Error fetching sub-regions:", error);
+      toast.error("Failed to fetch sub-regions.");
+    }
+  };
+
+  useEffect(() => {
+    const loadData = async () => {
+      await Promise.all([fetchRegions(), fetchSubRegions()]);
+      fetchDepots(currentPage, query);
+    };
+    loadData();
+  }, [currentPage, query, fetchDepots]);
 
   const handleSearchInputChange = (e) => {
     setQuery(e.target.value);
-    setCurrentPage(1);
-  };
-
-  const handleDateChange = (e, type) => {
-    const value = e.target.value;
-    if (type === "start") {
-      setStartDate(value);
-    } else {
-      setEndDate(value);
-    }
     setCurrentPage(1);
   };
 
@@ -114,11 +97,30 @@ const DeliveriesLayer = () => {
     setCurrentPage(pageNumber);
   };
 
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  const handleAddDeliveryClick = () => {
-    navigate("/deliveries/add-delivery");
+  const handleDeleteClick = (depot) => {
+    setDepotToDelete(depot);
   };
+
+  const handleDeleteConfirm = async () => {
+    if (!depotToDelete) return;
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(`${API_URL}/${depotToDelete.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setDepotToDelete(null);
+      fetchDepots(currentPage, query);
+      toast.success("Depot deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting depot:", error);
+      toast.error("Failed to delete depot.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <div className="card h-100 p-0 radius-12">
@@ -137,36 +139,20 @@ const DeliveriesLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search Supplier"
+              placeholder="Search Depot"
               value={query}
               onChange={handleSearchInputChange}
             />
             <Icon icon="ion:search-outline" className="icon" />
           </form>
-          <div className="d-flex align-items-center gap-2">
-            <input
-              type="date"
-              className="form-control h-40-px"
-              value={startDate}
-              onChange={(e) => handleDateChange(e, "start")}
-            />
-            <span>to</span>
-            <input
-              type="date"
-              className="form-control h-40-px"
-              value={endDate}
-              onChange={(e) => handleDateChange(e, "end")}
-            />
-          </div>
         </div>
-        <button
-          type="button"
+        <Link
+          to="/depots/add"
           className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-          onClick={handleAddDeliveryClick}
         >
           <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
-          Add Delivery
-        </button>
+          Add Depot
+        </Link>
       </div>
 
       <div className="card-body p-24">
@@ -176,13 +162,9 @@ const DeliveriesLayer = () => {
             <thead>
               <tr>
                 <th scope="col" className="text-center py-3 px-6">#</th>
-                <th scope="col" className="text-start py-3 px-4">Supplier</th>
-                <th scope="col" className="text-start py-3 px-4">Volume (L)</th>
-                <th scope="col" className="text-start py-3 px-4">Price/Litre</th>
-                <th scope="col" className="text-start py-3 px-4">Storage Facility</th>
-                <th scope="col" className="text-start py-3 px-4">Total Amount</th>
-                <th scope="col" className="text-start py-3 px-4">Status</th>
-                <th scope="col" className="text-start py-3 px-4">Created By</th>
+                <th scope="col" className="text-start py-3 px-4">Name</th>
+                <th scope="col" className="text-start py-3 px-4">Region</th>
+                <th scope="col" className="text-start py-3 px-4">Sub-Region</th>
                 <th scope="col" className="text-start py-3 px-4">Date Created</th>
                 <th scope="col" className="text-start py-3 px-4">Actions</th>
               </tr>
@@ -190,36 +172,28 @@ const DeliveriesLayer = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="10" className="text-center py-3">
-                    <div>
+                  <td colSpan="6" className="text-center py-3">
+                    <div className="spinner-border" role="status">
                       <span className="visually-hidden">Loading...</span>
                     </div>
                   </td>
                 </tr>
-              ) : deliveries.length > 0 ? (
-                deliveries.map((delivery, index) => (
-                  <tr key={delivery.id} style={{ transition: "background-color 0.2s" }}>
+              ) : depots.length > 0 ? (
+                depots.map((depot, index) => (
+                  <tr key={depot.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{delivery.supplier.name}</td>
-                    <td className="text-start small-text py-3 px-4">{delivery.litres}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(delivery.pricePerLitre.toFixed(2))}</td>
-                    <td className="text-start small-text py-3 px-4">{delivery?.storageFacility?.name || "N/A"}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(delivery.totalAmount.toFixed(2))}</td>
+                    <td className="text-start small-text py-3 px-4">{depot.name}</td>
                     <td className="text-start small-text py-3 px-4">
-                      <span
-                        className={`bg-${
-                          delivery.status.name === "Not Billed" ? "warning-focus" : "success-focus"
-                        } text-${
-                          delivery.status.name === "Not Billed" ? "warning-600" : "success-600"
-                        } px-24 py-4 radius-8 fw-medium text-sm`}
-                      >
-                        {delivery.status.name}
-                      </span>
+                      {depot.region.name || "N/A"}
+                    </td> 
+                    {/* regions.find((r) => r.id === depot.regionId)?.name */}
+                    <td className="text-start small-text py-3 px-4">
+                      {depot.subRegion.name || "N/A"}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{delivery.createdBy.name}</td>
-                    <td className="text-start small-text py-3 px-4">{formatDate(delivery.dateCreated)}</td>
+                    {/* subRegions.find((sr) => sr.id === depot.subRegionId)?.name */}
+                    <td className="text-start small-text py-3 px-4">{formatDate(depot.dateCreated)}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">
@@ -232,17 +206,19 @@ const DeliveriesLayer = () => {
                           </button>
                           <ul className="dropdown-menu">
                             <li>
-                              <button
-                                className="dropdown-item"
-                                onClick={() => navigate("/deliveries/edit-delivery", { state: { delivery } })}
-                              >
+                              <Link className="dropdown-item" to={`/depots/view/${depot.id}`}>
+                                View Details
+                              </Link>
+                            </li>
+                            <li>
+                              <Link className="dropdown-item" to={`/depots/edit/${depot.id}`}>
                                 Edit
-                              </button>
+                              </Link>
                             </li>
                             <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(delivery)}
+                                onClick={() => handleDeleteClick(depot)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
@@ -257,9 +233,7 @@ const DeliveriesLayer = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="10" className="text-center py-3">
-                    No deliveries found
-                  </td>
+                  <td colSpan="6" className="text-center py-3">No depots found</td>
                 </tr>
               )}
             </tbody>
@@ -322,17 +296,18 @@ const DeliveriesLayer = () => {
         )}
       </div>
 
+      {/* Delete Modal */}
       <div className="modal fade" id="deleteModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body pt-3 ps-18 pe-18">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="modal-title fs-6">Delete Delivery</h6>
+                <h6 className="modal-title fs-6">Delete Depot</h6>
                 <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <p className="pb-3 mb-0">
-                Are you sure you want to delete the delivery from{" "}
-                <strong>{deliveryToDelete?.supplier.name}</strong> permanently? This action cannot be undone.
+                Are you sure you want to delete the depot <strong>{depotToDelete?.name}</strong>{" "}
+                permanently? This action cannot be undone.
               </p>
             </div>
             <div className="d-flex justify-content-end gap-2 px-12 pb-3">
@@ -355,4 +330,4 @@ const DeliveriesLayer = () => {
   );
 };
 
-export default DeliveriesLayer;
+export default DepotsLayer;

@@ -2,27 +2,39 @@ import React, { useEffect, useState, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import {formatDate } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/countries";
 const CURRENCY_API_URL = "https://api.bizchain.co.ke/v1/currencies";
 
+// Debounce Hook
+const useDebounce = (value, delay) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(timer);
+  }, [value, delay]);
+  return debouncedValue;
+};
+
 const CountriesLayer = () => {
   const [countries, setCountries] = useState([]);
-  const [filteredCountries, setFilteredCountries] = useState([]);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useState("");
   const [editCountry, setEditCountry] = useState({ code: "", name: "", currencyCode: "" });
   const [newCountry, setNewCountry] = useState({ code: "", name: "", currencyCode: "" });
   const [countryToDelete, setCountryToDelete] = useState(null);
   const [countryToView, setCountryToView] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0); // Added for server-side pagination
   const [currencies, setCurrencies] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const addButtonRef = useRef(null);
+  const debouncedQuery = useDebounce(query, 300); // Debounced search query
 
   useEffect(() => {
-    fetchCountries();
+    fetchCountries(currentPage, debouncedQuery);
     fetchCurrencies();
 
     const addModal = document.getElementById("addCountryModal");
@@ -37,25 +49,31 @@ const CountriesLayer = () => {
       addModal?.removeEventListener("hidden.bs.modal", resetAddForm);
       editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
     };
-  }, []);
+  }, [currentPage, debouncedQuery]);
 
-  const fetchCountries = async () => {
+  const fetchCountries = async (page = 1, searchQuery = "") => {
     try {
       setIsLoading(true);
       const token = localStorage.getItem("token");
       if (!token) throw new Error("No authentication token found");
       const response = await axios.get(API_URL, {
-        headers: { "Authorization": `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          page: page - 1,
+          size: itemsPerPage,
+          search: searchQuery,
+        },
       });
       const data = response.data.data || [];
+      const total = response.data.totalElements || data.length; // Expect total from API
       setCountries(data);
-      setFilteredCountries(data);
+      setTotalItems(total);
       setError(null);
     } catch (error) {
       console.error("Error fetching countries:", error);
       setError(error.message || "Failed to fetch countries. Please try again.");
       setCountries([]);
-      setFilteredCountries([]);
+      setTotalItems(0);
     } finally {
       setIsLoading(false);
     }
@@ -82,35 +100,20 @@ const CountriesLayer = () => {
       setError("Please fill in all required fields.");
       return;
     }
-
     try {
       setIsLoading(true);
       setError(null);
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("No authentication token found");
-
       await axios.post(API_URL, newCountry, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
       });
-      await fetchCountries();
-      
+      await fetchCountries(currentPage, debouncedQuery);
       setNewCountry({ code: "", name: "", currencyCode: "" });
-
-      if (addButtonRef.current) {
-        addButtonRef.current.focus();
-      }
-
+      if (addButtonRef.current) addButtonRef.current.focus();
       const closeButton = document.querySelector("#addCountryModal .btn-close");
-      if (closeButton) {
-        closeButton.click();
-      }
+      if (closeButton) closeButton.click();
     } catch (error) {
-      console.error("Error adding country:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Failed to add country. Server error occurred.";
-      setError(errorMessage);
+      setError(error.response?.data?.message || error.message || "Failed to add country.");
     } finally {
       setIsLoading(false);
     }
@@ -126,24 +129,16 @@ const CountriesLayer = () => {
       setError("Please fill in all required fields.");
       return;
     }
-
     try {
       setIsLoading(true);
       setError(null);
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("No authentication token found");
-
       await axios.put(`${API_URL}/${editCountry.code}`, editCountry, {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
       });
-      await fetchCountries();
+      await fetchCountries(currentPage, debouncedQuery);
     } catch (error) {
-      console.error("Error updating country:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Failed to update country.";
-      setError(errorMessage);
+      setError(error.response?.data?.message || error.message || "Failed to update country.");
     } finally {
       setIsLoading(false);
     }
@@ -159,18 +154,13 @@ const CountriesLayer = () => {
       setIsLoading(true);
       setError(null);
       const token = localStorage.getItem("token");
-      if (!token) throw new Error("No authentication token found");
-
       await axios.delete(`${API_URL}/${countryToDelete.code}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCountries(countries.filter((c) => c.code !== countryToDelete.code));
-      setFilteredCountries(filteredCountries.filter((c) => c.code !== countryToDelete.code));
+      await fetchCountries(currentPage, debouncedQuery);
       setCountryToDelete(null);
     } catch (error) {
-      console.error("Error deleting country:", error);
-      const errorMessage = error.response?.data?.message || error.message || "Failed to delete country.";
-      setError(errorMessage);
+      setError(error.response?.data?.message || error.message || "Failed to delete country.");
     } finally {
       setIsLoading(false);
     }
@@ -181,40 +171,13 @@ const CountriesLayer = () => {
   };
 
   const handleSearchInputChange = (e) => {
-    const searchQuery = e.target.value;
-    setQuery(searchQuery);
-    filterCountries(searchQuery);
-  };
-
-  const filterCountries = (searchQuery) => {
-    const lowerQuery = searchQuery.toLowerCase();
-    const filtered = countries.filter(
-      (country) =>
-        country.code?.toLowerCase().includes(lowerQuery) ||
-        country.name?.toLowerCase().includes(lowerQuery) ||
-        country.currency?.name?.toLowerCase().includes(lowerQuery)
-    );
-    setFilteredCountries(filtered);
+    setQuery(e.target.value);
     setCurrentPage(1);
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredCountries.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(filteredCountries.length / itemsPerPage);
   const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
 
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix = (day % 10 === 1 && day !== 11) ? "st" :
-                   (day % 10 === 2 && day !== 12) ? "nd" :
-                   (day % 10 === 3 && day !== 13) ? "rd" : "th";
-    return `${day}${suffix} ${month} ${year}`;
-  };
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <div className="card h-100 p-0 radius-12">
@@ -228,6 +191,7 @@ const CountriesLayer = () => {
               placeholder="Search by code, name, or currency"
               value={query}
               onChange={handleSearchInputChange}
+              aria-label="Search countries"
             />
             <Icon icon="ion:search-outline" className="icon" />
           </form>
@@ -238,6 +202,7 @@ const CountriesLayer = () => {
           className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
           data-bs-toggle="modal"
           data-bs-target="#addCountryModal"
+          aria-label="Add new country"
         >
           <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
           Add New Country
@@ -245,9 +210,9 @@ const CountriesLayer = () => {
       </div>
 
       <div className="card-body p-24">
-        {error && <div className="alert alert-danger">{error}</div>}
+        {error && <div className="alert alert-danger" role="alert">{error}</div>}
         <div className="table-responsive scroll-sm">
-          <table className="table table-borderless sm-table mb-0">
+          <table className="table table-borderless sm-table mb-0" aria-label="Countries list">
             <thead>
               <tr>
                 <th scope="col" className="text-center py-3 px-6">#</th>
@@ -262,21 +227,23 @@ const CountriesLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="6" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <div aria-live="polite">Loading...</div>
                   </td>
                 </tr>
-              ) : currentItems.length > 0 ? (
-                currentItems.map((country, index) => (
+              ) : countries.length > 0 ? (
+                countries.map((country, index) => (
                   <tr key={country.code} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="text-start small-text py-3 px-4">{country.code}</td>
                     <td className="text-start small-text py-3 px-4">{country.name}</td>
-                    <td className="text-start small-text py-3 px-4">{country.currency?.name || 'N/A'}</td>
-                    <td className="text-start small-text py-3 px-4">{country.dateCreated ? formatDate(country.dateCreated) : ""}</td>
+                    <td className="text-start small-text py-3 px-4">
+                      {country.currency?.name || "N/A"}
+                    </td>
+                    <td className="text-start small-text py-3 px-4">
+                      {country.dateCreated ? formatDate(country.dateCreated) : ""}
+                    </td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">
@@ -284,6 +251,8 @@ const CountriesLayer = () => {
                             className="btn btn-outline-secondary btn-sm dropdown-toggle"
                             type="button"
                             data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                            aria-label={`Actions for ${country.name}`}
                           >
                             Actions
                           </button>
@@ -342,10 +311,10 @@ const CountriesLayer = () => {
             <div className="text-muted" style={{ fontSize: "13px" }}>
               <span>
                 Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, filteredCountries.length)} of {filteredCountries.length} entries
+                {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
               </span>
             </div>
-            <nav aria-label="Page navigation">
+            <nav aria-label="Countries pagination">
               <ul className="pagination mb-0" style={{ gap: "6px" }}>
                 <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
@@ -353,6 +322,7 @@ const CountriesLayer = () => {
                     style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
                     onClick={() => handlePageChange(currentPage - 1)}
                     disabled={currentPage === 1}
+                    aria-label="Previous page"
                   >
                     <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
                   </button>
@@ -372,6 +342,8 @@ const CountriesLayer = () => {
                         color: currentPage === i + 1 ? "#fff" : "",
                       }}
                       onClick={() => handlePageChange(i + 1)}
+                      aria-label={`Page ${i + 1}`}
+                      aria-current={currentPage === i + 1 ? "page" : undefined}
                     >
                       {i + 1}
                     </button>
@@ -383,6 +355,7 @@ const CountriesLayer = () => {
                     style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
                     onClick={() => handlePageChange(currentPage + 1)}
                     disabled={currentPage === totalPages}
+                    aria-label="Next page"
                   >
                     <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
                   </button>
@@ -394,40 +367,44 @@ const CountriesLayer = () => {
       </div>
 
       {/* Add Country Modal */}
-      <div className="modal fade" id="addCountryModal" tabIndex={-1} aria-hidden="true">
+      <div className="modal fade" id="addCountryModal" tabIndex={-1} aria-labelledby="addCountryModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6" id="addCountryModalLabel">
                 Add Country
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
+              {error && <div className="alert alert-danger" role="alert">{error}</div>}
               <form onSubmit={handleAddCountry}>
                 {["code", "name"].map((field) => (
                   <div className="mb-3" key={field}>
-                    <label className="form-label">
+                    <label className="form-label" htmlFor={`add-${field}`}>
                       {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
+                      id={`add-${field}`}
                       placeholder={`Enter Country ${field.charAt(0).toUpperCase() + field.slice(1)}`}
                       value={newCountry[field]}
                       onChange={(e) => setNewCountry({ ...newCountry, [field]: e.target.value })}
                       required
+                      aria-required="true"
                     />
                   </div>
                 ))}
                 <div className="mb-3">
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="add-currency">
                     Currency <span className="text-danger">*</span>
                   </label>
                   <select
                     className="form-control"
+                    id="add-currency"
                     value={newCountry.currencyCode}
                     onChange={(e) => setNewCountry({ ...newCountry, currencyCode: e.target.value })}
                     required
+                    aria-required="true"
                   >
                     <option value="">Select Currency</option>
                     {currencies.map((currency) => (
@@ -452,40 +429,44 @@ const CountriesLayer = () => {
       </div>
 
       {/* Edit Country Modal */}
-      <div className="modal fade" id="editCountryModal" tabIndex={-1} aria-hidden="true">
+      <div className="modal fade" id="editCountryModal" tabIndex={-1} aria-labelledby="editCountryModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6" id="editCountryModalLabel">
                 Edit Country
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
+              {error && <div className="alert alert-danger" role="alert">{error}</div>}
               <form onSubmit={handleEditSubmit}>
                 {["code", "name"].map((field) => (
                   <div className="mb-3" key={field}>
-                    <label className="form-label">
+                    <label className="form-label" htmlFor={`edit-${field}`}>
                       {field.charAt(0).toUpperCase() + field.slice(1)} <span className="text-danger">*</span>
                     </label>
                     <input
                       type="text"
                       className="form-control"
+                      id={`edit-${field}`}
                       placeholder={`Enter Country ${field.charAt(0).toUpperCase() + field.slice(1)}`}
                       value={editCountry[field]}
                       onChange={(e) => setEditCountry({ ...editCountry, [field]: e.target.value })}
                       required
+                      aria-required="true"
                     />
                   </div>
                 ))}
                 <div className="mb-3">
-                  <label className="form-label">
+                  <label className="form-label" htmlFor="edit-currency">
                     Currency <span className="text-danger">*</span>
                   </label>
                   <select
                     className="form-control"
+                    id="edit-currency"
                     value={editCountry.currencyCode}
                     onChange={(e) => setEditCountry({ ...editCountry, currencyCode: e.target.value })}
                     required
+                    aria-required="true"
                   >
                     <option value="">Select Currency</option>
                     {currencies.map((currency) => (
@@ -515,11 +496,11 @@ const CountriesLayer = () => {
       </div>
 
       {/* View Country Modal */}
-      <div className="modal fade" id="viewCountryModal" tabIndex={-1} aria-hidden="true">
+      <div className="modal fade" id="viewCountryModal" tabIndex={-1} aria-labelledby="viewCountryModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
+              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6" id="viewCountryModalLabel">
                 Details
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </h6>
@@ -532,10 +513,11 @@ const CountriesLayer = () => {
                     <strong>Name:</strong> {countryToView.name}
                   </p>
                   <p className="mb-3">
-                    <strong>Currency:</strong> {countryToView.currency?.name || 'N/A'}
+                    <strong>Currency:</strong> {countryToView.currency?.name || "N/A"}
                   </p>
                   <p className="mb-3">
-                    <strong>Date Created:</strong> {countryToView.dateCreated ? formatDate(countryToView.dateCreated) : "N/A"}
+                    <strong>Date Created:</strong>{" "}
+                    {countryToView.dateCreated ? formatDate(countryToView.dateCreated) : "N/A"}
                   </p>
                 </div>
               )}
@@ -550,20 +532,24 @@ const CountriesLayer = () => {
       </div>
 
       {/* Delete Confirmation Modal */}
-      <div className="modal fade" id="deleteCountryModal" tabIndex={-1} aria-hidden="true">
+      <div className="modal fade" id="deleteCountryModal" tabIndex={-1} aria-labelledby="deleteCountryModalLabel" aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body pt-3 ps-18 pe-18">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="modal-title fs-6">Delete Country</h6>
-                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
+                <h6 className="modal-title fs-6" id="deleteCountryModalLabel">
+                  Delete Country
+                </h6>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <p className="pb-3 mb-0">
                 Are you sure you want to delete the <strong>{countryToDelete?.name}</strong> country permanently? This action cannot be undone.
               </p>
             </div>
             <div className="d-flex justify-content-end gap-2 px-12 pb-3">
-              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
+                Cancel
+              </button>
               <button
                 type="button"
                 className="btn btn-danger"

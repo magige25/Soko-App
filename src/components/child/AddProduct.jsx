@@ -15,15 +15,14 @@ const AddProduct = () => {
 
   const [productData, setProductData] = useState({
     imageFile: null,
-    imageURL: null, // Renamed from imagePreview for consistency
+    imageURL: null,
     sku: "",
     name: "",
     description: "",
     brand: "",
-    discountPrice: "",
-    wholesalePrice: "", // Renamed from wPrice
-    distributorPrice: "", // Renamed from dPrice
-    retailPrice: "", // Renamed from rPrice
+    wholesalePrice: "",
+    distributorPrice: "", 
+    retailPrice: "", 
     category: "",
     subCategory: "",
   });
@@ -102,7 +101,6 @@ const AddProduct = () => {
     setError("");
 
     const prices = [
-      productData.discountPrice,
       productData.wholesalePrice,
       productData.distributorPrice,
       productData.retailPrice,      
@@ -127,7 +125,6 @@ const AddProduct = () => {
       name: productData.name,
       description: productData.description,
       brand: productData.brand,
-      discountPrice: parseFloat(productData.discountPrice),
       wholesalePrice: parseFloat(productData.wholesalePrice),
       distributorPrice: parseFloat(productData.distributorPrice),
       retailPrice: parseFloat(productData.retailPrice),
@@ -174,7 +171,6 @@ const AddProduct = () => {
           name: "",
           description: "",
           brand: "",
-          discountPrice: "",
           wholesalePrice: "",
           distributorPrice: "",
           retailPrice: "",

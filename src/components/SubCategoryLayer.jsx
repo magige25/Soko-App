@@ -26,7 +26,7 @@ const SubCategoryLayer = () => {
   const [subCategoryToDelete, setSubCategoryToDelete] = useState(null);
   const [newSubCategory, setNewSubCategory] = useState({ name: "", categoryId: "" });
   const [editSubCategory, setEditSubCategory] = useState({ id: null, name: "", categoryId: "" });
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1); // 1-based for UI
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,13 +57,11 @@ const SubCategoryLayer = () => {
     const token = localStorage.getItem("token");
     if (!token) return;
     try {
-      const params = { page: 0, size: 100 }; // Try 0-based indexing
-      console.log("Fetching categories with params:", params);
+      const params = { page: 0, size: 100 }; // 0-based indexing
       const response = await axios.get(CATEGORY_API_URL, {
         headers: { Authorization: `Bearer ${token}` },
         params,
       });
-      console.log("Categories Response:", response.data);
       if (response.data.status.code === 0) {
         setCategories(response.data.data);
       } else {
@@ -86,57 +84,25 @@ const SubCategoryLayer = () => {
     }
     try {
       const params = {
-        page: page, // 1-based indexing
-        size: itemsPerPage,
+        page: page -1, // 0-based indexing for API
+        limit: itemsPerPage,
         searchValue: searchQuery,
       };
-      console.log("Fetching subcategories with params:", params);
-      console.log("Request Headers:", { Authorization: `Bearer ${token}` });
-      const url = new URL(SUBCATEGORY_API_URL);
-      Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-      console.log("Full Request URL:", url.toString());
       const response = await axios.get(SUBCATEGORY_API_URL, {
         headers: { Authorization: `Bearer ${token}` },
         params,
       });
-      console.log("Full Subcategories Response:", response);
-      console.log("Subcategories Data:", response.data);
       const result = response.data;
       if (result.status.code === 0) {
-        if (result.data.length === 0) {
-          console.log("No subcategories returned from API. Retrying with page=0...");
-          const retryResponse = await axios.get(SUBCATEGORY_API_URL, {
-            headers: { Authorization: `Bearer ${token}` },
-            params: { page: 0, size: itemsPerPage, searchValue: searchQuery },
-          });
-          console.log("Retry Response:", retryResponse.data);
-          if (retryResponse.data.status.code === 0 && retryResponse.data.data.length > 0) {
-            const mappedSubCategories = retryResponse.data.data.map((subCategory) => ({
-              id: subCategory.id,
-              name: subCategory.name,
-              category: subCategory.category.name,
-              categoryId: subCategory.category.id,
-              date: subCategory.dateCreated,
-            }));
-            console.log("Mapped Subcategories (retry):", mappedSubCategories);
-            setSubCategories(mappedSubCategories);
-            setTotalItems(retryResponse.data.totalElements);
-          } else {
-            setSubCategories([]);
-            setTotalItems(0);
-          }
-        } else {
-          const mappedSubCategories = result.data.map((subCategory) => ({
-            id: subCategory.id,
-            name: subCategory.name,
-            category: subCategory.category.name,
-            categoryId: subCategory.category.id,
-            date: subCategory.dateCreated,
-          }));
-          console.log("Mapped Subcategories:", mappedSubCategories);
-          setSubCategories(mappedSubCategories);
-          setTotalItems(result.totalElements);
-        }
+        const mappedSubCategories = result.data.map((subCategory) => ({
+          id: subCategory.id,
+          name: subCategory.name,
+          category: subCategory.category.name,
+          categoryId: subCategory.category.id,
+          date: subCategory.dateCreated,
+        }));
+        setSubCategories(mappedSubCategories);
+        setTotalItems(result.totalElements);
       } else {
         setError(`Failed to fetch subcategories: ${result.status.message}`);
         setSubCategories([]);
@@ -144,8 +110,6 @@ const SubCategoryLayer = () => {
       }
     } catch (error) {
       console.error("Fetch error:", error);
-      console.error("Error response:", error.response?.data);
-      console.error("Error status:", error.response?.status);
       setError(`Error fetching subcategories: ${error.response?.data?.message || error.message}`);
       setSubCategories([]);
       setTotalItems(0);
@@ -177,14 +141,12 @@ const SubCategoryLayer = () => {
           },
         ],
       };
-      console.log("Adding subcategory with payload:", payload);
       const response = await axios.post(SUBCATEGORY_API_URL, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-      console.log("Add Response:", response.data);
       if (response.data.status.code === 0) {
         setNewSubCategory({ name: "", categoryId: "" });
         fetchSubCategories(currentPage, debouncedQuery);
@@ -231,14 +193,12 @@ const SubCategoryLayer = () => {
           },
         ],
       };
-      console.log("Editing subcategory with payload:", payload);
       const response = await axios.put(`${SUBCATEGORY_API_URL}/${editSubCategory.id}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
-      console.log("Edit Response:", response.data);
       if (response.data.status.code === 0) {
         setEditSubCategory({ id: null, name: "", categoryId: "" });
         fetchSubCategories(currentPage, debouncedQuery);
@@ -268,11 +228,9 @@ const SubCategoryLayer = () => {
     setError(null);
     const token = localStorage.getItem("token");
     try {
-      console.log("Deleting subcategory with ID:", subCategoryToDelete.id);
       const response = await axios.delete(`${SUBCATEGORY_API_URL}/${subCategoryToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("Delete Response:", response.data);
       if (response.data.status.code === 0) {
         setSubCategoryToDelete(null);
         fetchSubCategories(currentPage, debouncedQuery);

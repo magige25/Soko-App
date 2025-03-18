@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 
@@ -17,6 +17,9 @@ const useDebounce = (value, delay) => {
 };
 
 const SuppliersLayer = () => {
+  const location = useLocation();
+  const residenceId = location.state?.residenceId;
+
   const [suppliers, setSuppliers] = useState([]);
   const [query, setQuery] = useState("");
   const [supplierToDelete, setSupplierToDelete] = useState(null);
@@ -36,14 +39,19 @@ const SuppliersLayer = () => {
       setIsLoading(false);
       return;
     }
-    try {
-      const response = await axios.get(API_URL, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
+    try {      
+        const params = {
           page: page,
           limit: itemsPerPage,
           searchValue: searchQuery,
-        },
+        };
+        if (residenceId) {
+          params.residenceId = residenceId;
+        }
+
+        const response = await axios.get(API_URL, {
+          headers: { Authorization: `Bearer ${token}` },
+          params,
       });
       const result = response.data;
       if (result.status.code === 0) {
@@ -67,6 +75,7 @@ const SuppliersLayer = () => {
           contactPersonPhoneNumber: supplier.contactPersonPhoneNumber || "",
           paymentCycle: supplier.paymentCycle || "WKLY",
           dateCreated: supplier.dateCreated?.split("T")[0] || "N/A",
+          residenceId: supplier.supplierResidence.id,
         }));
         const startIndex = (page - 1) * itemsPerPage;
         const endIndex = Math.min(page * itemsPerPage, result.data.length);
@@ -87,7 +96,7 @@ const SuppliersLayer = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [itemsPerPage]);
+  }, [itemsPerPage, residenceId]);
 
   useEffect(() => {
     fetchSuppliers(currentPage, debouncedQuery);

@@ -151,6 +151,16 @@ import AddBrandPage from "./pages/AddBrandPage";
 import EditBrandPage from "./pages/EditBrandPage";
 import EditCustomerPage from "./pages/EditCustomerPage";
 import CustomerDetailsPage from "./pages/CustomerDetailsPage";
+import BrandDetailsPage from "./pages/BrandDetailsPage";
+import DepotsPage from "./pages/DepotsPage";
+import StockRequestPage from "./pages/StockRequestPage";
+import ApprovedStockRequestPage from "./pages/ApprovedStockRequestPage";
+import DeliveredRequestPage from "./pages/DeliveredRequestPage";
+import AddDepotPage from "./pages/AddDepotPage";
+import EditDepotPage from "./pages/EditDepotPage";
+import ViewDepotPage from "./pages/ViewDepotPage";
+import ViewStockRequestPage from "./pages/ViewStockRequestPage";
+import EditStockRequestPage from "./pages/EditStockRequestPage";
 
 function App() {
   return (
@@ -231,6 +241,7 @@ function App() {
             <Route path="/products/view" element={<ProductDetailsPage />} />
             <Route path="/brands/edit" element={<EditBrandPage />} />
             <Route path="/brands/add" element={<AddBrandPage />} />
+            <Route path="/brands/:id" element={<BrandDetailsPage />} />
             <Route path="/supply-residence" element={<SupplyResidencePage />} />          
             <Route path="/category" element={<CategoryPage />} />
             <Route path="/category/add-category" element={<AddCategoryPage/>} />
@@ -318,6 +329,15 @@ function App() {
             <Route path="/widgets" element={<WidgetsPage />} />
             <Route path="/wizard" element={<WizardPage />} />
             <Route path="/add-image" element={<AddImagePage />} />
+            <Route path="/depots" element={<DepotsPage />} />
+            <Route path="/depots/add" element={<AddDepotPage />} />
+            <Route path="/depots/edit/:id" element={<EditDepotPage />} />
+            <Route path="/depots/view/:id" element={<ViewDepotPage />} />
+            <Route path="/stock-request" element={<StockRequestPage />} />
+            <Route path="/stock-request/edit/:id" element={<EditStockRequestPage />} />
+            <Route path="/stock-request/view/:id" element={<ViewStockRequestPage />} />
+            <Route path="/approved-stock-request" element={<ApprovedStockRequestPage />} />
+            <Route path="/delivered-request" element={<DeliveredRequestPage />} />
           </Route>
 
           {/* Catch-all route */}

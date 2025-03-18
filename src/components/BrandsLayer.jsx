@@ -34,7 +34,9 @@ const BrandsLayer = () => {
       try {
         const token = localStorage.getItem("token");
         if (!token) {
-          throw new Error("Please login!");
+          toast.error("Please log in!");
+          navigate("/login");
+          return;
         }
         const response = await axios.get(API_URL, {
           headers: { Authorization: `Bearer ${token}` },
@@ -55,11 +57,12 @@ const BrandsLayer = () => {
         toast.error(message);
         setBrands([]);
         setTotalItems(0);
+        navigate("/login");
       } finally {
         setIsLoading(false);
       }
     },
-    [itemsPerPage]
+    [itemsPerPage, navigate]
   );
 
   useEffect(() => {

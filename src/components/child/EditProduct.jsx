@@ -274,7 +274,8 @@ const EditProduct = () => {
                       name="name"
                       value={editProduct.name}
                       onChange={handleChange}
-                      disabled
+                      required
+                      disabled={loading}
                     />
                   </div>
                   <div>
