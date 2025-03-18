@@ -11,7 +11,7 @@ const CATEGORIES_API = "https://api.bizchain.co.ke/v1/categories";
 const SUBCATEGORIES_API = "https://api.bizchain.co.ke/v1/sub-categories";
 const PRODUCTS_API = "https://api.bizchain.co.ke/v1/products";
 
-const StockRequestLayer = () => {
+const AddStockRequestLayer = () => {
   const navigate = useNavigate();
   const [stockRequests, setStockRequests] = useState([
     { depotId: "", categoryId: "", subCategoryId: "", productId: "", quantity: "" },
@@ -454,4 +454,4 @@ const StockRequestLayer = () => {
   );
 };
 
-export default StockRequestLayer;
+export default AddStockRequestLayer;

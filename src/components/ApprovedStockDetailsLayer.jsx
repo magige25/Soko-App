@@ -7,12 +7,12 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Icon } from '@iconify/react/dist/iconify.js';
 
-const STOCK_REQUEST_API_URL = "https://api.bizchain.co.ke/v1/stock-requests";
+const APPROVED_STOCK_API_URL = "https://api.bizchain.co.ke/v1/stock-requests";
 
 const ApprovedStockDetailsLayer = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [stockRequest, setStockRequest] = useState(null);
+  const [approvedStock, setApprovedStock] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -20,14 +20,14 @@ const ApprovedStockDetailsLayer = () => {
 
   useEffect(() => {
     if (!requestId) {
-      setError("No stock request ID provided.");
+      setError("No approved stock request ID provided.");
       setIsLoading(false);
-      toast.error("No stock request ID provided. Please select a stock request.");
+      toast.error("No approved stock request ID provided. Please select an approved stock request.");
       navigate("/approved-stock");
       return;
     }
 
-    const fetchStockRequestData = async () => {
+    const fetchApprovedStockData = async () => {
       setIsLoading(true);
       setError(null);
       const token = sessionStorage.getItem("token");
@@ -39,25 +39,25 @@ const ApprovedStockDetailsLayer = () => {
       }
 
       try {
-        const response = await axios.get(`${STOCK_REQUEST_API_URL}/${requestId}`, {
+        const response = await axios.get(`${APPROVED_STOCK_API_URL}/${requestId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         if (response.data.status.code === 0) {
-          setStockRequest(response.data.data);
+          setApprovedStock(response.data.data);
         } else {
-          throw new Error(`Failed to fetch stock request details: ${response.data.status.message}`);
+          throw new Error(`Failed to fetch approved stock details: ${response.data.status.message}`);
         }
       } catch (err) {
-        console.error("Error fetching stock request data:", err.response?.data || err.message);
-        setError(`Error: ${err.message || "Failed to load stock request details."}`);
-        toast.error(`Error: ${err.message || "Failed to load stock request details."}`);
+        console.error("Error fetching approved stock data:", err.response?.data || err.message);
+        setError(`Error: ${err.message || "Failed to load approved stock details."}`);
+        toast.error(`Error: ${err.message || "Failed to load approved stock details."}`);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchStockRequestData();
+    fetchApprovedStockData();
   }, [requestId, navigate]);
 
   const formatDate = (dateString) => {
@@ -83,8 +83,8 @@ const ApprovedStockDetailsLayer = () => {
   };
 
   const handleDownload = () => {
-    const stockRequestElement = document.getElementById('stock-request-details');
-    html2canvas(stockRequestElement, { scale: 2, width: stockRequestElement.scrollWidth, height: stockRequestElement.scrollHeight }).then((canvas) => {
+    const approvedStockElement = document.getElementById('approved-stock-details');
+    html2canvas(approvedStockElement, { scale: 2, width: approvedStockElement.scrollWidth, height: approvedStockElement.scrollHeight }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -105,7 +105,7 @@ const ApprovedStockDetailsLayer = () => {
       const yOffset = marginTop;
 
       pdf.addImage(imgData, 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
-      pdf.save(`StockRequest_${stockRequest?.orderCode || 'details'}.pdf`);
+      pdf.save(`ApprovedStock_${approvedStock?.orderCode || 'details'}.pdf`);
     }).catch((error) => {
       console.error('Error generating PDF:', error);
       toast.error('Failed to generate PDF');
@@ -113,14 +113,14 @@ const ApprovedStockDetailsLayer = () => {
   };
 
   const handlePrint = () => {
-    const stockRequestElement = document.getElementById('stock-request-details');
-    html2canvas(stockRequestElement, { scale: 2, width: stockRequestElement.scrollWidth, height: stockRequestElement.scrollHeight }).then((canvas) => {
+    const approvedStockElement = document.getElementById('approved-stock-details');
+    html2canvas(approvedStockElement, { scale: 2, width: approvedStockElement.scrollWidth, height: approvedStockElement.scrollHeight }).then((canvas) => {
       const imgData = canvas.toDataURL('image/png');
       const printWindow = window.open('', '_blank');
       printWindow.document.write(`
         <html>
           <head>
-            <title>Print Stock Request #${stockRequest?.orderCode || 'Details'}</title>
+            <title>Print Approved Stock #${approvedStock?.orderCode || 'Details'}</title>
             <style>
               body { margin: 0; padding: 10mm; }
               img { width: 190mm; height: auto; display: block; }
@@ -141,7 +141,7 @@ const ApprovedStockDetailsLayer = () => {
   if (isLoading) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24 text-center">Loading stock request details...</div>
+        <div className="card-body p-24 text-center">Loading approved stock details...</div>
       </div>
     );
   }
@@ -160,8 +160,8 @@ const ApprovedStockDetailsLayer = () => {
     <div className="card h-100 p-0 radius-12">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
-        <h6 className="mb-0 fs-5">Stock Request Details: {stockRequest?.orderCode || "N/A"}</h6>
-        <div className="d-flex align-items-center gap-2">
+        <h6 className="mb-0 fs-5">Stock: {approvedStock?.orderCode || "N/A"}</h6>
+        <div className="d-flex gap-2">
           <button
             onClick={handleDownload}
             className="btn btn-sm btn-success radius-8 d-flex align-items-center gap-1"
@@ -176,31 +176,31 @@ const ApprovedStockDetailsLayer = () => {
           </button>
         </div>
       </div>
-      <div className="card-body p-24" id="stock-request-details">
-        {/* Basic Stock Request Information */}
+      <div className="card-body p-24" id="approved-stock-details">
+        {/* Basic Approved Stock Information */}
         <div className="mb-4">
           <h6 className="fw-semibold text-primary-light mb-3">Basic Information</h6>
           <div className="row">
             <div className="col-md-6">
-              <p><strong>Order Code:</strong> {stockRequest?.orderCode || "N/A"}</p>
-              <p><strong>Depot:</strong> {stockRequest?.depot?.name || "N/A"}</p>
-              <p><strong>Number of Products:</strong> {stockRequest?.products || 0}</p>
+              <p><strong>Order Code:</strong> {approvedStock?.orderCode || "N/A"}</p>
+              <p><strong>Depot:</strong> {approvedStock?.depot?.name || "N/A"}</p>
+              <p><strong>Number of Products:</strong> {approvedStock?.products || 0}</p>
             </div>
             <div className="col-md-6">
               <p>
                 <strong>Status:</strong> 
-                <span className="badge bg-success ms-2">{stockRequest?.status?.name || "N/A"}</span>
+                <span className="badge bg-success ms-2">{approvedStock?.status?.name || "N/A"}</span>
               </p>
-              <p><strong>Created By:</strong> {stockRequest?.createdBy?.name || "N/A"}</p>
-              <p><strong>Approved By:</strong> {stockRequest?.approvedBy?.name || "N/A"}</p>
+              <p><strong>Created By:</strong> {approvedStock?.createdBy?.name || "N/A"}</p>
+              <p><strong>Approved By:</strong> {approvedStock?.approvedBy?.name || "N/A"}</p>
             </div>
           </div>
         </div>
 
         {/* Product Details */}
         <div className="mb-5">
-          <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Product Details</h6>
-          {stockRequest?.productModelList?.length > 0 ? (
+          <h6 className="fw-semibold fs-5 text-primary-light mb-3 mt-3">Product Details</h6>
+          {approvedStock?.productModelList?.length > 0 ? (
             <div className="table-responsive">
               <table className="table table-borderless sm-table mb-0">
                 <thead>
@@ -213,7 +213,7 @@ const ApprovedStockDetailsLayer = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {stockRequest.productModelList.map((product, index) => (
+                  {approvedStock.productModelList.map((product, index) => (
                     <tr key={index}>
                       <td className="text-start small-text py-3 px-4">
                         {product.product?.name || "N/A"}
