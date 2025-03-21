@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/pricing-categories";
 const STATUS_API_URL = "https://api.bizchain.co.ke/v1/pricing-categories/update-status";
@@ -239,9 +240,7 @@ const PricingCategoriesLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="4" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : pricingCategories.length > 0 ? (

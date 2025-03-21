@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Icon } from '@iconify/react/dist/iconify.js';
+import { Spinner } from "../hook/spinner-utils";
 
 const APPROVED_STOCK_API_URL = "https://api.bizchain.co.ke/v1/stock-requests";
 
@@ -140,8 +141,8 @@ const ApprovedStockDetailsLayer = () => {
 
   if (isLoading) {
     return (
-      <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24 text-center">Loading approved stock details...</div>
+      <div className="d-flex justify-content-center align-items-center">
+        <Spinner />
       </div>
     );
   }

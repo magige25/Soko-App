@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/stock-batches";
 
@@ -155,9 +156,7 @@ const BatchLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="7" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : batches.length > 0 ? (

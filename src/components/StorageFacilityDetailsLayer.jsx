@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/storage-facilities";
 
@@ -95,7 +96,7 @@ const StorageFacilityDetailsLayer = () => {
               </div>
             </div>
           ) : (
-            <p>Loading facility details...</p>
+            <Spinner />
           )}
         </div>
       </div>

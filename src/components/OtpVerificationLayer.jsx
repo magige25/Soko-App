@@ -12,7 +12,7 @@ const OtpVerificationLayer = () => {
     password: "",
     otp: ["", "", "", "", ""],
   });
-  const [message, setMessage] = useState("We have sent an OTP to your email");
+  const [message, setMessage] = useState("We’ve sent a one-time password (OTP) code to your email.");
   const [timer, setTimer] = useState(180);
   const [resendDisabled, setResendDisabled] = useState(true);
   const inputRefs = useRef([]);
@@ -339,16 +339,15 @@ const OtpVerificationLayer = () => {
             <Link to="/" className="mb-40 max-w-290-px">
               <img
                 src="assets/images/logo.png"
-                alt="Logo"
-                style={{ width: "100%", maxWidth: "200px" }}
+                alt="otp"
+                style={{ width: "100%", maxWidth: "350px", margin: "0 auto" }}
               />
             </Link>
-            <h5 className="mb-12">Enter OTP</h5>
-            <p className="mb-32 text-secondary-light" style={{ fontSize: "14px" }}>
+            <p className="mb-32 text-secondary-light" style={{ fontSize: "13px" }}>
               {message}
             </p>
-            <p className="mb-24" style={{ fontSize: "14px" }}>
-              Your code will expire in {`${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, "0")}`}
+            <p className="mb-24" style={{ fontSize: "13px" }}>
+              This code will expire in {`${Math.floor(timer / 60)}:${String(timer % 60).padStart(2, "0")}`}
             </p>
           </div>
 
@@ -362,9 +361,9 @@ const OtpVerificationLayer = () => {
                     textAlign: "left",
                   }}
                 >
-                  OTP Code
+                  Enter OTP Code
                 </label>
-                <div className="otp-inputs d-flex gap-2" style={{ width: "100%" }}>
+                <div className="otp-inputs d-flex gap-2" style={{ width: "100%", maxWidth: "350px", margin: "0 auto" }}>
                   {formData.otp.map((digit, index) => (
                     <input
                       key={index}
@@ -382,6 +381,7 @@ const OtpVerificationLayer = () => {
                         textAlign: "center",
                         padding: "0", 
                         fontSize: "16px",
+                        fontWeight: "800",
                       }}
                       autoFocus={index === 0}
                     />
@@ -392,12 +392,12 @@ const OtpVerificationLayer = () => {
 
             <button
               type="submit"
-              className="btn btn-primary text-sm btn-sm radius-4 mt-32"
+              className="btn btn-primary auth-btn text-sm btn-sm radius-4 mt-32"
               disabled={formData.otp.includes("") || loading}
               style={{ 
                 height: "40px",
                 maxWidth: "350px", 
-                margin: "32px auto 0", 
+                margin: "0 auto", 
                 display: "block",
                 width: "100%",
                 border: "1px solid #ccc",
@@ -405,21 +405,26 @@ const OtpVerificationLayer = () => {
                 lineHeight: "1",
               }}
             >
-              {loading ? <div className="spinner"></div> : "Submit"}
+              {loading ? <div className="spinner"></div> : "Confirm OTP"}
             </button>
-          </form>
 
-          <p className="text-secondary-light text-center mt-20" style={{ fontSize: "13px" }}>
-            Did not receive code?{" "}
-            <button
-              className="btn btn-link text-primary-400 fw-medium"
-              onClick={handleResend}
-              disabled={resendDisabled || loading}
-              style={{ fontSize: "16px" }}
-            >
-              Resend
-            </button>
-          </p>
+            <div style={{ maxWidth: "350px", margin: "0 auto" }}>
+              <p
+                className="text-secondary-light mt-4"
+                style={{ fontSize: "13px", textAlign: "right" }}
+              >
+                Did not receive code?{" "}
+                <button
+                  className="btn btn-link resend-link text-primary-800 fw-bold"
+                  onClick={handleResend}
+                  disabled={resendDisabled || loading}
+                  style={{ fontSize: "13px" }}
+                >
+                  Resend
+                </button>
+              </p>
+            </div>
+          </form>
         </div>
       </div>
     </section>

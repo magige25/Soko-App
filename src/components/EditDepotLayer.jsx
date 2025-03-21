@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { Spinner } from "../hook/spinner-utils";
 
 const DEPOT_API_URL = "https://api.bizchain.co.ke/v1/depots";
 const REGIONS_API_URL = "https://api.bizchain.co.ke/v1/regions";
@@ -9,7 +10,7 @@ const SUBREGIONS_API_URL = "https://api.bizchain.co.ke/v1/sub-regions";
 const EditDepotLayer = ({ onDepotUpdated }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const depotId = location.state?.depotId; // Get depotId from navigation state
+  const depotId = location.state?.depotId; 
 
   const [formData, setFormData] = useState({
     name: '',
@@ -22,7 +23,6 @@ const EditDepotLayer = ({ onDepotUpdated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  // Fetch depot data, regions, and subregions on component mount
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -30,12 +30,10 @@ const EditDepotLayer = ({ onDepotUpdated }) => {
         const token = sessionStorage.getItem('token');
         if (!token) throw new Error('No authentication token found');
 
-        // Fetch depot data
         const depotResponse = await axios.get(`${DEPOT_API_URL}/${depotId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
-        // Fetch regions and subregions
         const [regionsResponse, subRegionsResponse] = await Promise.all([
           axios.get(REGIONS_API_URL, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(SUBREGIONS_API_URL, { headers: { Authorization: `Bearer ${token}` } }),
@@ -71,7 +69,6 @@ const EditDepotLayer = ({ onDepotUpdated }) => {
     }
   }, [depotId]);
 
-  // Filter subregions when region or subregion changes
   useEffect(() => {
     if (formData.regionId) {
       const filtered = subRegions.filter(
@@ -170,7 +167,7 @@ const EditDepotLayer = ({ onDepotUpdated }) => {
         {errors.fetch && <div className="alert alert-warning">{errors.fetch}</div>}
 
         {isLoading ? (
-          <div className="text-center">Loading depot data...</div>
+          <Spinner />
         ) : (
           <form onSubmit={handleSubmit}>
             <div className="row gx-3">

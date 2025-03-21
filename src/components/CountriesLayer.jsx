@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/countries";
 const CURRENCY_API_URL = "https://api.bizchain.co.ke/v1/currencies";
@@ -262,9 +263,7 @@ const CountriesLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="6" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : currentItems.length > 0 ? (

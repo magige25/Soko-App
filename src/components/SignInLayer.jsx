@@ -19,7 +19,7 @@ const SignInLayer = () => {
   const handleEmailChange = (e) => {
     const email = e.target.value;
     setFormData({ ...formData, email });
-    
+
     if (!email) {
       setEmailError("Email is required");
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -32,7 +32,7 @@ const SignInLayer = () => {
   const handlePasswordChange = (e) => {
     const password = e.target.value;
     setFormData({ ...formData, password });
-    
+
     if (!password) {
       setPasswordError("Password is required");
     } else if (password.length < 5) {
@@ -57,7 +57,6 @@ const SignInLayer = () => {
       return;
     }
 
-    // Check network availability before making request
     if (!navigator.onLine) {
       toast.error("No network connection. Please check your internet.", {
         position: "top-right",
@@ -76,7 +75,7 @@ const SignInLayer = () => {
           headers: {
             "APP-KEY": "BCM8WTL9MQU4MJLE",
           },
-          timeout: 10000, // Set a timeout of 10 seconds
+          timeout: 10000,
         }
       );
 
@@ -89,14 +88,14 @@ const SignInLayer = () => {
         });
 
         sessionStorage.setItem("userToken", response.data.token);
-        
+
         setTimeout(() => {
           console.log("Navigating to OTP page with:", {
             email: formData.email,
             password: formData.password,
           });
-          navigate("/otp", { 
-            state: { email: formData.email, password: formData.password }
+          navigate("/otp", {
+            state: { email: formData.email, password: formData.password },
           });
         }, 2000);
       } else {
@@ -108,8 +107,7 @@ const SignInLayer = () => {
       }
     } catch (error) {
       console.error("Login Error:", error.message, error.response?.data);
-      
-      // Handle different types of errors
+
       if (!navigator.onLine) {
         toast.error("Network disconnected. Please check your connection.", {
           position: "top-right",
@@ -121,7 +119,6 @@ const SignInLayer = () => {
           autoClose: 2000,
         });
       } else if (error.response) {
-        // Server responded with a status code
         if (error.response.status === 401) {
           toast.error("Invalid email or password.", {
             position: "top-right",
@@ -144,13 +141,11 @@ const SignInLayer = () => {
           });
         }
       } else if (error.request) {
-        // Request was made but no response received
         toast.error("Network error. Unable to reach server.", {
           position: "top-right",
           autoClose: 2000,
         });
       } else {
-        // Something else caused the error
         toast.error("An unexpected error occurred.", {
           position: "top-right",
           autoClose: 2000,
@@ -166,40 +161,38 @@ const SignInLayer = () => {
       <ToastContainer position="top-right" autoClose={2000} />
       <div className="auth-left d-lg-block d-none">
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
-          <img
-            src="/assets/images/auth/auth-img.png"
-            alt="Authentication"
-          />
+          <img src="/assets/images/auth/auth-img.png" alt="Authentication" />
         </div>
       </div>
       <div className="auth-right py-32 px-24 d-flex flex-column justify-content-center">
         <div className="max-w-464-px mx-auto w-100">
           <div className="text-center">
             <Link to="/" className="mb-40 max-w-290-px">
-              <img
-                src="/assets/images/logo.png"
-                alt="Logo"
+              <img 
+                src="/assets/images/logo.png" 
+                alt="Logo" 
+                style={{ width: "100%", maxWidth: "350px", margin: "0 auto" }}
               />
             </Link>
-            <h5 className="mb-12">Sign In</h5>
+            <h6 className="mb-12 gw-bold">Welcome Back!</h6>
             <p
               className="mb-32 text-secondary-light"
-              style={{ fontSize: "14px", fontWeight: 600 }}
+              style={{ fontSize: "13px", maxWidth: "350px",margin: "0 auto", fontWeight: 600 }}
             >
-              Welcome! Please enter your details
+              Enter your credentials to get started.
             </p>
           </div>
           <form>
             <div className="mb-20">
               <div style={{ maxWidth: "350px", margin: "0 auto" }}>
-                <label 
-                  className="mb-8 d-block" 
-                  style={{ 
-                    fontSize: "14px",
+                <label
+                  className="mb-8 d-block"
+                  style={{
+                    fontSize: "13px",
                     textAlign: "left",
                   }}
                 >
-                  Email
+                  Enter your email address
                 </label>
                 <div style={{ position: "relative", height: "40px" }}>
                   <input
@@ -218,11 +211,11 @@ const SignInLayer = () => {
                   />
                 </div>
                 {emailError && (
-                  <p 
-                    style={{ 
-                      color: "red", 
-                      fontSize: "12px", 
-                      marginTop: "2px", 
+                  <p
+                    style={{
+                      color: "red",
+                      fontSize: "12px",
+                      marginTop: "2px",
                       textAlign: "left",
                     }}
                   >
@@ -231,16 +224,16 @@ const SignInLayer = () => {
                 )}
               </div>
             </div>
-            <div className="mb-20" style={{ position: "relative" }}>
+            <div className="mb-8" style={{ position: "relative" }}>
               <div style={{ maxWidth: "350px", margin: "0 auto" }}>
-                <label 
-                  className="mb-8 d-block" 
-                  style={{ 
-                    fontSize: "14px",
+                <label
+                  className="mb-8 d-block"
+                  style={{
+                    fontSize: "13px",
                     textAlign: "left",
                   }}
                 >
-                  Password
+                  Enter your password
                 </label>
                 <div style={{ position: "relative", height: "40px" }}>
                   <input
@@ -274,15 +267,14 @@ const SignInLayer = () => {
                       display: "flex",
                       alignItems: "center",
                     }}
-                  >
-                  </span>
+                  ></span>
                 </div>
                 {passwordError && (
-                  <p 
-                    style={{ 
-                      color: "red", 
-                      fontSize: "12px", 
-                      marginTop: "2px", 
+                  <p
+                    style={{
+                      color: "red",
+                      fontSize: "12px",
+                      marginTop: "2px",
                       textAlign: "left",
                     }}
                   >
@@ -291,17 +283,26 @@ const SignInLayer = () => {
                 )}
               </div>
             </div>
-            <div className="">
-              <div className="d-flex justify-content-between gap-2">
-                <div className="form-check style-check d-flex align-items-center"></div>
-                <Link to="/forgot-password" className="text-primary-600 fw-medium" style={{ fontSize: "12px", paddingRight: "32px"}}>
-                  Forgot Password?
+            <div className="mb-32">
+              <div
+                style={{
+                  maxWidth: "350px",
+                  margin: "0 auto",
+                  textAlign: "right",
+                }}
+              >
+                <Link
+                  to="/forgot-password"
+                  className="forgot-password-link text-primary-800 fw-bold"
+                  style={{ fontSize: "12px" }}
+                >
+                  Forgot your password?
                 </Link>
               </div>
             </div>
             <button
               type="submit"
-              className="btn btn-primary text-sm btn-sm radius-4 mt-32"
+              className="btn btn-primary auth-btn text-sm btn-sm radius-4"
               onClick={handleClick}
               disabled={
                 loading ||
@@ -310,10 +311,10 @@ const SignInLayer = () => {
                 emailError ||
                 passwordError
               }
-              style={{ 
+              style={{
                 height: "40px",
-                maxWidth: "350px", 
-                margin: "32px auto 0", 
+                maxWidth: "350px",
+                margin: "0 auto",
                 display: "block",
                 width: "100%",
                 lineHeight: "1",

@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/sub-regions";
 const REGIONS_API_URL = "https://api.bizchain.co.ke/v1/regions";
@@ -23,7 +24,9 @@ const SubRegionsLayer = () => {
   useEffect(() => {
     fetchSubRegions();
     fetchRegions();
+  }, []); 
 
+  useEffect(() => {
     const addModal = document.getElementById("addSubRegionModal");
     const editModal = document.getElementById("editSubRegionModal");
     const resetAddForm = () => !isLoading && setNewSubRegion({ name: "", region: "" });
@@ -39,6 +42,7 @@ const SubRegionsLayer = () => {
   }, [isLoading]);
 
   const fetchSubRegions = async () => {
+    setIsLoading(true);
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
@@ -60,10 +64,13 @@ const SubRegionsLayer = () => {
     } catch (error) {
       console.error("Error fetching sub-regions:", error);
       setError("Failed to fetch sub-regions. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const fetchRegions = async () => {
+    setIsLoading(true);
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(REGIONS_API_URL, {
@@ -73,6 +80,8 @@ const SubRegionsLayer = () => {
     } catch (error) {
       console.error("Error fetching regions:", error);
       setError("Failed to fetch regions. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -83,7 +92,7 @@ const SubRegionsLayer = () => {
       return;
     }
     try {
-      setIsLoading(true);
+      setIsLoading(true); 
       setError(null);
       const token = sessionStorage.getItem("token");
       const payload = {
@@ -114,7 +123,7 @@ const SubRegionsLayer = () => {
         "Failed to add sub-region. Please check the input and try again.";
       setError(errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
 
@@ -134,7 +143,7 @@ const SubRegionsLayer = () => {
       return;
     }
     try {
-      setIsLoading(true);
+      setIsLoading(true); 
       setError(null);
       const token = sessionStorage.getItem("token");
       const payload = {
@@ -161,7 +170,7 @@ const SubRegionsLayer = () => {
         "Failed to update sub-region.";
       setError(errorMessage);
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
 
@@ -276,7 +285,13 @@ const SubRegionsLayer = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-3">
+                    <Spinner />
+                  </td>
+                </tr>
+              ) : currentItems.length > 0 ? (
                 currentItems.map((subRegion) => (
                   <tr key={subRegion.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
@@ -347,58 +362,60 @@ const SubRegionsLayer = () => {
           </table>
         </div>
 
-        <div className="d-flex justify-content-between align-items-center mt-3">
-          <div className="text-muted" style={{ fontSize: "13px" }}>
-            <span>
-              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredSubRegions.length)} of{" "}
-              {filteredSubRegions.length} entries
-            </span>
-          </div>
-          <nav aria-label="Page navigation">
-            <ul className="pagination mb-0" style={{ gap: "6px" }}>
-              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <button
-                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
-                </button>
-              </li>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+        {!isLoading && (
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <div className="text-muted" style={{ fontSize: "13px" }}>
+              <span>
+                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredSubRegions.length)} of{" "}
+                {filteredSubRegions.length} entries
+              </span>
+            </div>
+            <nav aria-label="Page navigation">
+              <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
-                    className={`page-link btn ${
-                      currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
-                    } rounded-circle d-flex align-items-center justify-content-center`}
-                    style={{
-                      width: "30px",
-                      height: "30px",
-                      padding: "0",
-                      transition: "all 0.2s",
-                      fontSize: "10px",
-                      color: currentPage === i + 1 ? "#fff" : "",
-                    }}
-                    onClick={() => handlePageChange(i + 1)}
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
                   >
-                    {i + 1}
+                    <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
                   </button>
                 </li>
-              ))}
-              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <button
-                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                    <button
+                      className={`page-link btn ${
+                        currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
+                      } rounded-circle d-flex align-items-center justify-content-center`}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        padding: "0",
+                        transition: "all 0.2s",
+                        fontSize: "10px",
+                        color: currentPage === i + 1 ? "#fff" : "",
+                      }}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Add Sub-Region Modal */}

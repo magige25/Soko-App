@@ -194,15 +194,15 @@ const ResetPasswordLayer = () => {
               <img
                 src="assets/images/logo.png"
                 alt="Logo"
-                style={{ width: "100%", maxWidth: "200px" }}
+                style={{ width: "100%", maxWidth: "350px", margin: "0 auto" }}
               />
             </Link>
-            <h5 className="mb-12">Reset Password</h5>
+            <h6 className="mb-12">Set New Password</h6>
             <p
               className="mb-32 text-secondary-light"
-              style={{ fontSize: "14px", fontWeight: 600 }}
+              style={{ fontSize: "13px", maxWidth: "350px",margin: "0 auto", fontWeight: 600 }}
             >
-              Enter your new password
+              Enter and confirm your new password.
             </p>
           </div>
           <form onSubmit={handleSubmit}>
@@ -212,11 +212,11 @@ const ResetPasswordLayer = () => {
                   <label 
                     className="mb-8 d-block" 
                     style={{ 
-                      fontSize: "14px",
+                      fontSize: "13px",
                       textAlign: "left",
                     }}
                   >
-                    {field === "password" ? "New Password" : "Confirm Password"}
+                    {field === "password" ? "Enter New Password" : "Confirm New Password"}
                   </label>
                   <div style={{ position: "relative", height: "40px" }}>
                     <input
@@ -271,7 +271,7 @@ const ResetPasswordLayer = () => {
             ))}
             <button
               type="submit"
-              className="btn btn-primary text-sm btn-sm radius-4 mt-32"
+              className="btn btn-primary auth-btn text-sm btn-sm radius-4 mt-32"
               disabled={
                 loading ||
                 !formData.password ||

@@ -180,28 +180,27 @@ const ForgotPasswordLayer = () => {
                             <img
                                 src="assets/images/logo.png"
                                 alt="Logo"
-                                style={{ width: "100%", maxWidth: "200px" }}
+                                style={{ width: "100%", maxWidth: "350px", margin: "0 auto" }}
                             />
                         </Link>
-                        <h5 className="mb-12">Forgot Password</h5>
                         <p
                             className="mb-32 text-secondary-light"
-                            style={{ fontSize: "14px", fontWeight: 600 }}
+                            style={{ fontSize: "13px", maxWidth: "350px", margin: "0 auto", fontWeight: 600 }}
                         >
-                            Enter the email linked to your account
+                            We’ll send you an email with a link to reset your password.
                         </p>
                     </div>
                     <form onSubmit={handleClick}>
-                        <div className="mb-20" style={{ position: "relative" }}>
+                        <div className="mb-28" style={{ position: "relative" }}>
                             <div style={{ maxWidth: "350px", margin: "0 auto" }}>
                                 <label 
                                     className="mb-8 d-block" 
                                     style={{ 
-                                        fontSize: "14px",
+                                        fontSize: "13px",
                                         textAlign: "left",
                                     }}
                                 >
-                                    Email
+                                    Enter your email address
                                 </label>
                                 <div style={{ position: "relative", height: "40px" }}>
                                     <input
@@ -235,7 +234,7 @@ const ForgotPasswordLayer = () => {
                         </div>
                         <button
                             type="submit"
-                            className="btn btn-primary text-sm btn-sm radius-4 mt-32"
+                            className="btn btn-primary auth-btn text-sm btn-sm radius-4 mt-32"
                             disabled={loading || !formData.email || emailError}
                             style={{ 
                                 height: "40px",
@@ -246,12 +245,12 @@ const ForgotPasswordLayer = () => {
                                 lineHeight: "1",
                             }}
                         >
-                            {loading ? <div className="spinner"></div> : "Continue"}
+                            {loading ? <div className="spinner"></div> : "Send Reset Link"}
                         </button>
-                        <div className="text-center text-sm mt-20">
-                            <p className="mb-0">
-                                Already have an account?{" "}
-                                <Link to="/sign-in" className="text-primary-600 fw-medium">
+                        <div className="text-sm fs-6 mt-10" style={{ maxWidth: "350px", margin: "0 auto"}}>
+                            <p className="mb-0" style={{ fontSize: "13px", textAlign: "right" }}>
+                                Remember your password?{" "}
+                                <Link to="/sign-in" className="sign-in-link text-primary-800 fw-bold">
                                     Sign In
                                 </Link>
                             </p>

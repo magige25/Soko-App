@@ -9,7 +9,7 @@ const SALESPERSON_API_URL = "https://api.bizchain.co.ke/v1/salesperson";
 const EditTargetsLayer = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { targetId } = location.state || {}; // Get targetId from navigation state
+  const { targetId } = location.state || {}; 
 
   const [formData, setFormData] = useState({
     salesperson: "",
@@ -59,11 +59,11 @@ const EditTargetsLayer = () => {
         if (targetRes.data.status.code === 0) {
           const target = targetRes.data.data;
           setFormData({
-            salesperson: target.salesperson.id.toString(), // Convert to string for select
-            target: target.target.toString(), // Convert to string for input
+            salesperson: target.salesperson.id.toString(), 
+            target: target.target.toString(), 
             targetType: target.targetType.code,
-            startDate: target.startDate.split("T")[0], // Convert to YYYY-MM-DD
-            endDate: target.endDate.split("T")[0], // Convert to YYYY-MM-DD
+            startDate: target.startDate.split("T")[0], 
+            endDate: target.endDate.split("T")[0],
           });
         } else {
           setErrors({ submit: "Failed to load target data. Please try again." });
@@ -117,8 +117,8 @@ const EditTargetsLayer = () => {
 
   const formatDateForServer = (dateString) => {
     if (!dateString) return "";
-    const [year, month, day] = dateString.split("-"); // YYYY-MM-DD from input
-    return `${day}/${month}/${year}`; // Convert to DD/MM/YYYY as per AddTargetsLayer
+    const [year, month, day] = dateString.split("-"); 
+    return `${day}/${month}/${year}`; 
   };
 
   const handleSubmit = async (e) => {

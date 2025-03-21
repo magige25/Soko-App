@@ -2,10 +2,10 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/routes";
 const SUBREGIONS_API_URL = "https://api.bizchain.co.ke/v1/sub-regions";
-const REGIONS_API_URL = "https://api.bizchain.co.ke/v1/regions";
 
 const RoutesLayer = () => {
   const [routes, setRoutes] = useState([]);
@@ -21,8 +21,6 @@ const RoutesLayer = () => {
   });
   const [routeToDelete, setRouteToDelete] = useState(null);
   const [subRegions, setSubRegions] = useState([]);
-  // eslint-disable-next-line no-unused-vars
-  const [regions, setRegions] = useState([]);
   const [showSubRegionDropdown, setShowSubRegionDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -30,11 +28,14 @@ const RoutesLayer = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Fetch data once on mount
   useEffect(() => {
     fetchRoutes();
     fetchSubRegions();
-    fetchRegions();
+  }, []); // Empty dependency array for initial fetch
 
+  // Handle modal event listeners with isLoading dependency
+  useEffect(() => {
     const addModal = document.getElementById("addRouteModal");
     const editModal = document.getElementById("editRouteModal");
     const resetAddForm = () => !isLoading && setNewRoute({ name: "", subRegionId: "", regionId: "" });
@@ -56,9 +57,10 @@ const RoutesLayer = () => {
       addModal?.removeEventListener("hidden.bs.modal", resetAddForm);
       editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
     };
-  }, [isLoading]);
+  }, [isLoading]); 
 
   const fetchRoutes = async () => {
+    setIsLoading(true); 
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
@@ -82,10 +84,13 @@ const RoutesLayer = () => {
     } catch (error) {
       console.error("Error fetching routes:", error);
       setError("Failed to fetch routes. Please try again.");
+    } finally {
+      setIsLoading(false); 
     }
   };
 
   const fetchSubRegions = async () => {
+    setIsLoading(true); 
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(SUBREGIONS_API_URL, {
@@ -95,19 +100,8 @@ const RoutesLayer = () => {
     } catch (error) {
       console.error("Error fetching sub-regions:", error);
       setError("Failed to fetch sub-regions. Please try again.");
-    }
-  };
-
-  const fetchRegions = async () => {
-    try {
-      const token = sessionStorage.getItem("token");
-      const response = await axios.get(REGIONS_API_URL, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setRegions(response.data.data || []);
-    } catch (error) {
-      console.error("Error fetching regions:", error);
-      setError("Failed to fetch regions. Please try again.");
+    } finally {
+      setIsLoading(false); 
     }
   };
 
@@ -118,7 +112,7 @@ const RoutesLayer = () => {
       return;
     }
     try {
-      setIsLoading(true);
+      setIsLoading(true); 
       setError(null);
       const token = sessionStorage.getItem("token");
       const payload = {
@@ -144,7 +138,7 @@ const RoutesLayer = () => {
       console.log("Response data:", error.response?.data);
       setError(error.response?.data?.message || "Failed to add route.");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
 
@@ -166,7 +160,7 @@ const RoutesLayer = () => {
       return;
     }
     try {
-      setIsLoading(true);
+      setIsLoading(true); 
       setError(null);
       const token = sessionStorage.getItem("token");
       const payload = {
@@ -196,7 +190,7 @@ const RoutesLayer = () => {
       console.log("Response data:", error.response?.data);
       setError(error.response?.data?.message || "Failed to update route.");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); 
     }
   };
 
@@ -206,7 +200,7 @@ const RoutesLayer = () => {
 
   const handleDeleteConfirm = async () => {
     try {
-      setIsLoading(true);
+      setIsLoading(true); 
       const token = sessionStorage.getItem("token");
       await axios.delete(`${API_URL}/${routeToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -314,7 +308,13 @@ const RoutesLayer = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                <td colSpan="8" className="text-center py-3">
+                  <Spinner />
+                </td>
+              </tr>
+              ) : currentItems.length > 0 ? (
                 currentItems.map((route) => (
                   <tr key={route.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
@@ -386,58 +386,60 @@ const RoutesLayer = () => {
           </table>
         </div>
 
-        <div className="d-flex justify-content-between align-items-center mt-3">
-          <div className="text-muted" style={{ fontSize: "13px" }}>
-            <span>
-              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredRoutes.length)} of{" "}
-              {filteredRoutes.length} entries
-            </span>
-          </div>
-          <nav aria-label="Page navigation">
-            <ul className="pagination mb-0" style={{ gap: "6px" }}>
-              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <button
-                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                  onClick={() => historicPage(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
-                </button>
-              </li>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+        {!isLoading && (
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <div className="text-muted" style={{ fontSize: "13px" }}>
+              <span>
+                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredRoutes.length)} of{" "}
+                {filteredRoutes.length} entries
+              </span>
+            </div>
+            <nav aria-label="Page navigation">
+              <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
-                    className={`page-link btn ${
-                      currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
-                    } rounded-circle d-flex align-items-center justify-content-center`}
-                    style={{
-                      width: "30px",
-                      height: "30px",
-                      padding: "0",
-                      transition: "all 0.2s",
-                      fontSize: "10px",
-                      color: currentPage === i + 1 ? "#fff" : "",
-                    }}
-                    onClick={() => historicPage(i + 1)}
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => historicPage(currentPage - 1)}
+                    disabled={currentPage === 1}
                   >
-                    {i + 1}
+                    <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
                   </button>
                 </li>
-              ))}
-              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <button
-                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                  onClick={() => historicPage(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                    <button
+                      className={`page-link btn ${
+                        currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
+                      } rounded-circle d-flex align-items-center justify-content-center`}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        padding: "0",
+                        transition: "all 0.2s",
+                        fontSize: "10px",
+                        color: currentPage === i + 1 ? "#fff" : "",
+                      }}
+                      onClick={() => historicPage(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => historicPage(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Add Route Modal */}

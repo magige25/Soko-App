@@ -4,6 +4,7 @@ import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/categories";
 
@@ -223,7 +224,7 @@ const CategoryLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="4" className="text-center py-3">
-                    <div>Loading...</div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : categories.length > 0 ? (

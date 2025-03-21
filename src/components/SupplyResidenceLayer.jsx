@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/supplier-residence";
 
@@ -202,9 +203,7 @@ const SupplyResidenceLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="8" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : residence.length > 0 ? (

@@ -2,6 +2,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/regions";
 const COUNTRIES_API_URL = "https://api.bizchain.co.ke/v1/countries";
@@ -22,7 +23,9 @@ const RegionsLayer = () => {
   useEffect(() => {
     fetchRegions();
     fetchCountries();
-
+  }, []); 
+  
+  useEffect(() => {
     const addModal = document.getElementById("addRegionModal");
     const editModal = document.getElementById("editRegionModal");
     const resetAddForm = () => !isLoading && setNewRegion({ name: "", countryCode: "" });
@@ -38,6 +41,8 @@ const RegionsLayer = () => {
   }, [isLoading]);
 
   const fetchRegions = async () => {
+    setIsLoading(true); 
+    
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
@@ -60,10 +65,13 @@ const RegionsLayer = () => {
     } catch (error) {
       console.error("Error fetching regions:", error);
       setError("Failed to fetch regions. Please try again.");
+    } finally {
+      setIsLoading(false); 
     }
   };
 
   const fetchCountries = async () => {
+    setIsLoading(true);
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(COUNTRIES_API_URL, {
@@ -73,6 +81,8 @@ const RegionsLayer = () => {
     } catch (error) {
       console.error("Error fetching countries:", error);
       setError("Failed to fetch countries. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -269,7 +279,13 @@ const RegionsLayer = () => {
               </tr>
             </thead>
             <tbody>
-              {currentItems.length > 0 ? (
+              {isLoading ? (
+                <tr>
+                  <td colSpan="7" className="text-center py-3">
+                    <Spinner />
+                  </td>
+                </tr>
+              ) : currentItems.length > 0 ? (
                 currentItems.map((region) => (
                   <tr key={region.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
@@ -340,58 +356,60 @@ const RegionsLayer = () => {
           </table>
         </div>
 
-        <div className="d-flex justify-content-between align-items-center mt-3">
-          <div className="text-muted" style={{ fontSize: "13px" }}>
-            <span>
-              Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredRegions.length)} of{" "}
-              {filteredRegions.length} entries
-            </span>
-          </div>
-          <nav aria-label="Page navigation">
-            <ul className="pagination mb-0" style={{ gap: "6px" }}>
-              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                <button
-                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
-                </button>
-              </li>
-              {Array.from({ length: totalPages }, (_, i) => (
-                <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+        {!isLoading && (
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <div className="text-muted" style={{ fontSize: "13px" }}>
+              <span>
+                Showing {indexOfFirstItem + 1} to {Math.min(indexOfLastItem, filteredRegions.length)} of{" "}
+                {filteredRegions.length} entries
+              </span>
+            </div>
+            <nav aria-label="Page navigation">
+              <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
-                    className={`page-link btn ${
-                      currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
-                    } rounded-circle d-flex align-items-center justify-content-center`}
-                    style={{
-                      width: "30px",
-                      height: "30px",
-                      padding: "0",
-                      transition: "all 0.2s",
-                      fontSize: "10px",
-                      color: currentPage === i + 1 ? "#fff" : "",
-                    }}
-                    onClick={() => handlePageChange(i + 1)}
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
                   >
-                    {i + 1}
+                    <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
                   </button>
                 </li>
-              ))}
-              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                <button
-                  className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                  style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
-                </button>
-              </li>
-            </ul>
-          </nav>
-        </div>
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                    <button
+                      className={`page-link btn ${
+                        currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
+                      } rounded-circle d-flex align-items-center justify-content-center`}
+                      style={{
+                        width: "30px",
+                        height: "30px",
+                        padding: "0",
+                        transition: "all 0.2s",
+                        fontSize: "10px",
+                        color: currentPage === i + 1 ? "#fff" : "",
+                      }}
+                      onClick={() => handlePageChange(i + 1)}
+                    >
+                      {i + 1}
+                    </button>
+                  </li>
+                ))}
+                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <button
+                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                  >
+                    <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        )}
       </div>
 
       {/* Add Region Modal */}

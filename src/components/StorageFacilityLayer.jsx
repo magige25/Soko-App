@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Icon } from '@iconify/react/dist/iconify.js';
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/storage-facilities";
 
@@ -149,9 +150,7 @@ const StorageFacilityLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="9" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : facilities.length > 0 ? (

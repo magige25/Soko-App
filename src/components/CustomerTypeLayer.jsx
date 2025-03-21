@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/customer-types";
 const STATUS_API = "https://api.bizchain.co.ke/v1/customer-types/update-status";
@@ -257,9 +258,7 @@ const CustomerTypeLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="4" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : customerTypes.length > 0 ? (
@@ -272,9 +271,9 @@ const CustomerTypeLayer = () => {
                     <td className="text-start small-text py-3 px-4">
                       <span
                         className={`bg-${
-                          customerType.status.name === "Active" ? "success-focus" : "neutral-200"
+                          customerType.status.name === "Inactive" ? "danger-focus" : "success-focus"
                         } text-${
-                          customerType.status.name === "Inactive" ? "danger-600" : "neutral-600"
+                          customerType.status.name === "Inactive" ? "danger-600" : "success-600"
                         } px-24 py-4 radius-8 fw-medium text-sm`}
                       >
                         {customerType.status.name || "N/A"}

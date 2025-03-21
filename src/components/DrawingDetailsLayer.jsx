@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Icon } from '@iconify/react/dist/iconify.js';
+import { Spinner } from "../hook/spinner-utils";
 
 const DRAWING_API_URL = "https://api.bizchain.co.ke/v1/drawing";
 const DRAWING_DETAILS_API_URL = "https://api.bizchain.co.ke/v1/drawing/details";
@@ -163,9 +164,7 @@ const DrawingDetailsLayer = () => {
 
   if (isLoading) {
     return (
-      <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24 text-center">Loading drawing details...</div>
-      </div>
+      <Spinner />
     );
   }
 

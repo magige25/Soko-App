@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/user";
 const ROL_URL = "https://api.bizchain.co.ke/v1/roles";
@@ -84,7 +84,6 @@ const UsersDetailsLayer = () => {
     <div className="page-wrapper">
       <div className="card shadow-sm mt-3" style={{ width: "100%" }}>
         <div className="card-body">
-          <h6 className="mb-4">Details</h6>
           {error && <div className="alert alert-danger">{error}</div>}
           {userToView ? (
             <div>
@@ -111,7 +110,7 @@ const UsersDetailsLayer = () => {
               </p>
 
               <div className="mt-5">
-                <h6 className="mb-3">Module Permissions</h6>
+                <h6 className="mb-3 fs-5">Module Permissions</h6>
                 {userToView.userModelModulePermissions && userToView.userModelModulePermissions.length > 0 ? (
                   <table className="table table-bordered">
                     <thead>
@@ -162,7 +161,7 @@ const UsersDetailsLayer = () => {
               </div>
             </div>
           ) : (
-            <p>Loading user details...</p>
+            <Spinner />
           )}
         </div>
       </div>

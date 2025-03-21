@@ -149,8 +149,10 @@ const UsersListLayer = () => {
                   {isLoading ? (
                     <tr>
                       <td colSpan="8" className="text-center py-3">
-                        <div>
-                          <span className="visually-hidden">Loading...</span>
+                        <div className="d-flex justify-content-center align-items-center">
+                          <div className="spinner-border custom-spinner" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                          </div>
                         </div>
                       </td>
                     </tr>

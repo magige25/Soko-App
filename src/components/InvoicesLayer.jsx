@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/invoice";
 
@@ -129,9 +130,7 @@ const InvoicesLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="11" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : invoices.length > 0 ? (
@@ -144,7 +143,7 @@ const InvoicesLayer = () => {
                       <Link
                         to="/pending-invoices/invoice"
                         state={{ invoiceId: invoice.id }}
-                        className="text-primary-600 hover:text-black !important text-decoration-none"
+                        className="text-primary text-hover-primary"
                       >
                         {invoice.supplier.name}
                       </Link>

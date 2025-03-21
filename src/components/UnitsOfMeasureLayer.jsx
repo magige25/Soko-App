@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/unit-of-measure";
 const STATUS_API_URL = "https://api.bizchain.co.ke/v1/unit-of-measure/update-status";
@@ -260,9 +261,7 @@ const UnitsOfMeasureLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="5" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : unitsOfMeasure.length > 0 ? (

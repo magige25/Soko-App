@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/user";
 const ROL_URL = "https://api.bizchain.co.ke/v1/roles";
@@ -15,7 +16,7 @@ const EditUsersLayer = () => {
     lastName: '',
     email: '',
     phoneNumber: '',
-    roleId: '', // Keep as string for consistency
+    roleId: '', 
     countryCode: '',
     userPermissions: [],
   });
@@ -44,12 +45,12 @@ const EditUsersLayer = () => {
         }));
 
         setFormData({
-          id: userData.id ? String(userData.id) : '', // Ensure id is a string
+          id: userData.id ? String(userData.id) : '', 
           firstName: userData.firstName || '',
           lastName: userData.lastName || '',
           email: userData.email || '',
           phoneNumber: userData.phoneNo || '',
-          roleId: userData.role?.id ? String(userData.role.id) : '', // Ensure roleId is a string
+          roleId: userData.role?.id ? String(userData.role.id) : '', 
           countryCode: userData.countryCode || 'KE',
           userPermissions,
         });
@@ -67,7 +68,7 @@ const EditUsersLayer = () => {
         });
         const rolesData = Array.isArray(response.data) ? response.data : response.data.data || [];
         const roleList = rolesData.map(role => ({
-          roleId: String(role.roleId), // Ensure roleId is a string
+          roleId: String(role.roleId),
           roleName: role.roleName,
         }));
         setRoles(roleList);
@@ -75,7 +76,7 @@ const EditUsersLayer = () => {
         const allModules = [];
         const permissionsMap = {};
         rolesData.forEach((role) => {
-          permissionsMap[String(role.roleId)] = {}; // Use string keys for consistency
+          permissionsMap[String(role.roleId)] = {};
           role.roleModulePermissions.forEach((module) => {
             if (!allModules.some((m) => m.moduleId === module.moduleId)) {
               allModules.push({
@@ -411,7 +412,7 @@ const EditUsersLayer = () => {
               </div>
             </form>
           ) : (
-            <p>Loading user details...</p>
+            <Spinner />
           )}
         </div>
       </div>

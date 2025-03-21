@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
+import { Spinner } from "../hook/spinner-utils";
 
 const ROLES_API_URL = "https://api.bizchain.co.ke/v1/roles";
 const MODULES_API_URL = "https://api.bizchain.co.ke/v1/module-permission";
@@ -321,9 +322,7 @@ const RolesLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="5" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : roles.length > 0 ? (

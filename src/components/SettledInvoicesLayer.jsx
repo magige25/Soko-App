@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/invoice";
 
@@ -9,7 +10,7 @@ const SettledInvoicesLayer = () => {
   const [invoices, setInvoices] = useState([]);
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(10); // Fixed at 10 items per page
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -22,8 +23,8 @@ const SettledInvoicesLayer = () => {
       const response = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
-          page: page - 1,
-          limit: itemsPerPage,
+          page: page - 1, // API expects 0-based indexing
+          limit: itemsPerPage, // Request 10 items per page
           searchValue: searchQuery,
           _t: new Date().getTime(),
         },
@@ -33,8 +34,12 @@ const SettledInvoicesLayer = () => {
       const responseData = response.data;
       if (responseData.status.code === 0) {
         const paidOnly = (responseData.data || []).filter(invoice => invoice.status.code === "PD");
-        console.log("Settled Invoices Data:", paidOnly);
-        setInvoices(paidOnly);
+        // Calculate the correct slice based on current page and total items
+        const startIndex = (page - 1) * itemsPerPage;
+        const endIndex = Math.min(startIndex + itemsPerPage, paidOnly.length);
+        const paginatedInvoices = paidOnly.slice(startIndex, endIndex);
+        console.log("Settled Invoices Data:", paginatedInvoices);
+        setInvoices(paginatedInvoices);
         setTotalItems(responseData.totalElements || paidOnly.length);
       } else {
         throw new Error(responseData.status.message);
@@ -124,9 +129,7 @@ const SettledInvoicesLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="11" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : invoices.length > 0 ? (
@@ -139,8 +142,8 @@ const SettledInvoicesLayer = () => {
                       <Link
                         to="/settled-invoices/invoice"
                         state={{ invoiceId: invoice.id }}
-                        className="text-decoration-none text-primary-600 hover-text-primary-700"
-                      >
+                        className="text-primary text-hover-primary"
+                        >
                         {invoice.supplier.name}
                       </Link>
                     </td>

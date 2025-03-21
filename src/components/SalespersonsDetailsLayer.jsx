@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/salesperson";
 const REGIONS_API = "https://api.bizchain.co.ke/v1/regions";
@@ -112,9 +113,7 @@ const SalespersonsDetailsLayer = () => {
       <div className="page-wrapper">
         <div className="row">
           <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
-            <div className="card-body">
-              <p>Loading salesperson details...</p>
-            </div>
+            <Spinner />
           </div>
         </div>
       </div>

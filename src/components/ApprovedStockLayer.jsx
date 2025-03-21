@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Icon } from '@iconify/react/dist/iconify.js';
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/stock-requests";
 
@@ -14,33 +15,48 @@ const ApprovedStockLayer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchRequests = useCallback(async (page = 1, searchQuery = '') => {
+  const fetchAllRequests = useCallback(async (searchQuery = '') => {
     setIsLoading(true);
     setError(null);
     try {
       const token = sessionStorage.getItem('token');
-      const response = await axios.get(API_URL, {
-        headers: { Authorization: `Bearer ${token}` },
-        params: {
-          page: page - 1,
-          size: itemsPerPage,
-          searchValue: searchQuery,
-          _t: new Date().getTime(),
-        },
-      });
+      let allData = [];
+      let page = 0;
+      let hasMore = true;
 
-      const responseData = response.data;
-      if (responseData.status.code === 0) {
-        const data = responseData.data || [];
-        // Filter for approved requests only
-        const approvedData = data.filter(item => item.status.code === 'APVD');
-        setRequests(approvedData);
-        setTotalItems(approvedData.length); // Note: This assumes totalElements reflects all data; adjust if API provides filtered total
-      } else {
-        throw new Error(responseData.status.message);
+      while (hasMore) {
+        const response = await axios.get(API_URL, {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Cache-Control': 'no-cache'
+          },
+          params: {
+            page: page,
+            size: itemsPerPage,
+            searchValue: searchQuery,
+            _t: new Date().getTime(),
+          },
+        });
+
+        const responseData = response.data;
+        console.log(`Page ${page} Raw Response:`, responseData);
+
+        if (responseData.status.code === 0) {
+          const data = responseData.data || [];
+          const approvedData = data.filter(item => item.status.code === 'APVD');
+          allData = [...allData, ...approvedData];
+          hasMore = data.length === itemsPerPage && allData.length < responseData.totalElements;
+          page++;
+        } else {
+          throw new Error(responseData.status.message);
+        }
       }
+
+      console.log('All Filtered Approved Data:', allData);
+      setRequests(allData);
+      setTotalItems(allData.length); // Total approved items
     } catch (error) {
-      console.error('Error fetching stock requests:', error);
+      console.error('Error fetching approved stock requests:', error);
       setError("Failed to fetch approved stock requests. Please try again.");
       setRequests([]);
       setTotalItems(0);
@@ -50,8 +66,8 @@ const ApprovedStockLayer = () => {
   }, [itemsPerPage]);
 
   useEffect(() => {
-    fetchRequests(currentPage, query);
-  }, [currentPage, query, fetchRequests]);
+    fetchAllRequests(query);
+  }, [query, fetchAllRequests]);
 
   const handleSearchInputChange = (e) => {
     setQuery(e.target.value);
@@ -79,6 +95,11 @@ const ApprovedStockLayer = () => {
         : "th";
     return `${day}${suffix} ${month} ${year}`;
   };
+
+  const paginatedRequests = requests.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="card h-100 p-0 radius-12">
@@ -118,13 +139,11 @@ const ApprovedStockLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="8" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
-              ) : requests.length > 0 ? (
-                requests.map((request, index) => (
+              ) : paginatedRequests.length > 0 ? (
+                paginatedRequests.map((request, index) => (
                   <tr key={request.id} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}

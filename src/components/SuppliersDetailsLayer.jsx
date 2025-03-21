@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/suppliers";
 
@@ -46,7 +47,7 @@ const SuppliersDetailsLayer = () => {
         console.log("Full API Response:", data);
 
         if (data.status && data.status.code === 0 && data.data) {
-          const supplier = data.data; // Directly use data.data as an object
+          const supplier = data.data; 
           return {
             id: supplier.id,
             firstName: supplier.firstName,
@@ -100,9 +101,7 @@ const SuppliersDetailsLayer = () => {
       <div className="page-wrapper">
         <div className="row">
           <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
-            <div className="card-body">
-              <p>Loading supplier details...</p>
-            </div>
+            <Spinner />
           </div>
         </div>
       </div>

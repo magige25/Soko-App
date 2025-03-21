@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/drawing";
 const CATEGORIES_API = "https://api.bizchain.co.ke/v1/categories";
@@ -240,7 +241,7 @@ const DrawRequestLayer = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="card-body">
         {isFetchingData && !categories.length && (
-          <div className="text-center">Loading data...</div>
+          <Spinner />
         )}
         <form onSubmit={handleFormSubmit}>
           {processingRequests.map((req, index) => (

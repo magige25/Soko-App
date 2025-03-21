@@ -3,6 +3,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/supplier-deliveries";
 
@@ -210,9 +211,7 @@ const DeliveriesLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="10" className="text-center py-3">
-                    <div>
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : deliveries.length > 0 ? (

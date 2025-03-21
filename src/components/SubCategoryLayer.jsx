@@ -4,6 +4,7 @@ import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Spinner } from "../hook/spinner-utils";
 
 const SUBCATEGORY_API_URL = "https://api.bizchain.co.ke/v1/sub-categories";
 const CATEGORY_API_URL = "https://api.bizchain.co.ke/v1/categories";
@@ -207,7 +208,6 @@ const SubCategoryLayer = () => {
     setCurrentPage(1);
   };
 
-  // Client-side pagination
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedSubCategories = subCategories.slice(startIndex, endIndex);
@@ -255,9 +255,11 @@ const SubCategoryLayer = () => {
             </thead>
             <tbody>
               {isLoading ? (
-                <tr>
-                  <td colSpan="5" className="text-center py-3">Loading...</td>
-                </tr>
+               <tr>
+                <td colSpan="4" className="text-center py-3">
+                  <Spinner />
+                </td>
+              </tr>
               ) : paginatedSubCategories.length > 0 ? (
                 paginatedSubCategories.map((subCategory, index) => (
                   <tr key={subCategory.id}>

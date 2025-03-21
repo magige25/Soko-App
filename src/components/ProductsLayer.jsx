@@ -3,6 +3,7 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/products";
 
@@ -174,9 +175,7 @@ const ProductsLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="14" className="text-center py-3">
-                    <div className="spinner-border" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : products.length > 0 ? (

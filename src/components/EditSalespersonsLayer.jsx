@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, useLocation } from "react-router-dom";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/salesperson";
 const ROUTES_API = "https://api.bizchain.co.ke/v1/routes";
@@ -247,7 +248,9 @@ const EditSalespersonsLayer = () => {
   return (
     <div className="card h-100 p-0 radius-12">
       <div className="card-body">
-        {isLoading && <div className="alert alert-info">Loading salesperson data...</div>}
+        {isLoading && 
+          <Spinner />
+        }
         {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
 
         {!isLoading && (

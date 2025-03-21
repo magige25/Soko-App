@@ -22,7 +22,6 @@ const MasterLayout = ({ children }) => {
     setMobileMenu((prev) => !prev);
   };
 
-  // Handle clicks outside the sidebar to close mobile menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -45,7 +44,6 @@ const MasterLayout = ({ children }) => {
     };
   }, [mobileMenu]);
 
-  // Handle dropdown menu toggling
   useEffect(() => {
     const handleDropdownClick = (index) => (event) => {
       event.preventDefault();
@@ -112,17 +110,15 @@ const MasterLayout = ({ children }) => {
     };
   }, [location.pathname]);
 
-  // Scroll to the active menu or submenu item
   useEffect(() => {
     if (sidebarRef.current) {
       const activeElement = sidebarRef.current.querySelector(".active-page");
       if (activeElement) {
         activeElement.scrollIntoView({
-          behavior: "smooth", // Smooth scrolling
-          block: "center", // Center the active item in the sidebar
+          behavior: "smooth",
+          block: "center",
         });
       } else {
-        // If no submenu item is active, check for an active parent dropdown
         const activeDropdown = sidebarRef.current.querySelector(".submenu-active");
         if (activeDropdown) {
           activeDropdown.scrollIntoView({
@@ -132,38 +128,99 @@ const MasterLayout = ({ children }) => {
         }
       }
     }
-  }, [location.pathname]); // Run when the route changes
+  }, [location.pathname]);
 
-  const isSubmenuActive = (paths) => {
-    return paths.some((path) => location.pathname === path);
+  // Updated isSubmenuActive to include child routes
+  const isSubmenuActive = (paths, childRoutes = []) => {
+    const allPaths = [...paths, ...childRoutes];
+    return allPaths.some((path) => location.pathname.startsWith(path));
   };
 
   const submenuPaths = {
-    systemUsers: ["/users"],
-    customerManagement: ["/customers", "/creditors-request"],
-    orderManagement: ["/pending-orders", "/pending-deliveries", "/settled-orders"],
-    salespersonOperation: ["/salespersons", "/targets"],
-    paymentManagement: ["/payments", "/creditors-payment"],
-    regions: ["/regions", "/sub-regions", "/routes"],
-    productCatalogue: ["/category", "/sub-category", "/brands", "/products"],
-    farmerManagement: ["/suppliers", "/deliveries", "/pending-bills", "/settled-bills", "/supply-residence"],
-    invoices: ["/invoice-register", "/pending-invoices", "settled-invoices"],
-    depotManagement: ["/depot", "/stock-request", "/approved-stock", "/delivered-order"],
-    warehouseManagement: ["/warehouses"],
-    stockManagement: ["/stock", "/depot-reconciliation", "/salesperson-reconciliation"],
-    storageFacility: ["/storage-facility", "/batch", "/drawing"],
-    authentication: ["/sign-in", "/forgot-password", "/reset-password"],
-    roles: ["/roles-list"],
-    settings: ["/customer-type", "/pricing-categories", "/currencies", "/units-of-measure", "/countries"],
-    invoice: ["/invoice-list", "/invoice-preview", "/invoice-add", "/invoice-edit"],
-    components: [
-      "/typography", "/colors", "/button", "/dropdown", "/alert", "/card", "/carousel", "/avatar",
-      "/progress", "/tabs", "/pagination", "/badges", "/tooltip", "/videos", "/star-rating", "/tags",
-      "/list", "/calendar", "/radio", "/switch", "/image-upload"
-    ],
-    forms: ["/form", "/form-layout", "/form-validation", "/wizard"],
-    table: ["/table-basic", "/table-data"],
-    chart: ["/line-chart", "/column-chart", "/pie-chart"],
+    systemUsers: {
+      paths: ["/users"],
+      childRoutes: ["/users/add", "/users/edit"], // Add child routes here
+    },
+    customerManagement: {
+      paths: ["/customers", "/creditors-request"],
+      childRoutes: [],
+    },
+    orderManagement: {
+      paths: ["/pending-orders", "/pending-deliveries", "/settled-orders"],
+      childRoutes: [],
+    },
+    salespersonOperation: {
+      paths: ["/salespersons", "/targets"],
+      childRoutes: [],
+    },
+    paymentManagement: {
+      paths: ["/payments", "/creditors-payment"],
+      childRoutes: [],
+    },
+    regions: {
+      paths: ["/regions", "/sub-regions", "/routes"],
+      childRoutes: [],
+    },
+    productCatalogue: {
+      paths: ["/category", "/sub-category", "/brands", "/products"],
+      childRoutes: [],
+    },
+    farmerManagement: {
+      paths: ["/suppliers", "/deliveries", "/pending-bills", "/settled-bills", "/supply-residence"],
+      childRoutes: [],
+    },
+    invoices: {
+      paths: ["/invoice-register", "/pending-invoices", "/settled-invoices"],
+      childRoutes: ["/settled-invoices/invoice"],
+    },
+    depotManagement: {
+      paths: ["/depot", "/stock-request", "/approved-stock", "/delivered-order"],
+      childRoutes: [],
+    },
+    stockManagement: {
+      paths: ["/stock", "/depot-reconciliation", "/salesperson-reconciliation"],
+      childRoutes: [],
+    },
+    storageFacility: {
+      paths: ["/storage-facility", "/batch", "/drawing"],
+      childRoutes: [],
+    },
+    authentication: {
+      paths: ["/sign-in", "/forgot-password", "/reset-password"],
+      childRoutes: [],
+    },
+    roles: {
+      paths: ["/roles-list"],
+      childRoutes: [],
+    },
+    settings: {
+      paths: ["/customer-type", "/pricing-categories", "/currencies", "/units-of-measure", "/countries"],
+      childRoutes: [],
+    },
+    invoice: {
+      paths: ["/invoice-list", "/invoice-preview", "/invoice-add", "/invoice-edit"],
+      childRoutes: [],
+    },
+    components: {
+      paths: [
+        "/typography", "/colors", "/button", "/dropdown", "/alert", "/card", "/carousel", "/avatar",
+        "/progress", "/tabs", "/pagination", "/badges", "/tooltip", "/videos", "/star-rating", "/tags",
+        "/list", "/calendar", "/radio", "/switch", "/image-upload"
+      ],
+      childRoutes: [],
+    },
+    forms: {
+      paths: ["/form", "/form-layout", "/form-validation", "/wizard"],
+      childRoutes: [],
+    },
+    table: {
+      paths: ["/table-basic", "/table-data"],
+      childRoutes: [],
+    },
+    chart: {
+      paths: ["/line-chart", "/column-chart", "/pie-chart"],
+      childRoutes: [],
+    },
   };
 
   return (
@@ -217,7 +274,7 @@ const MasterLayout = ({ children }) => {
                 </NavLink>
               </li>
               {/* System Users */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.systemUsers) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.systemUsers.paths, submenuPaths.systemUsers.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <GroupAddOutlinedIcon className="menu-icon" />
                   <span>System Users</span>
@@ -234,7 +291,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Customer Management */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.customerManagement) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.customerManagement.paths, submenuPaths.customerManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:user-line" className="menu-icon" />
                   <span>Customer Management</span>
@@ -259,7 +316,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Orders */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.orderManagement) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.orderManagement.paths, submenuPaths.orderManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:shopping-cart-line" className="menu-icon" />
                   <span>Order Management</span>
@@ -292,7 +349,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Salespersons */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.salespersonOperation) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.salespersonOperation.paths, submenuPaths.salespersonOperation.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:group-line" className="menu-icon" />
                   <span>Salesperson Operation</span>
@@ -317,7 +374,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Payment */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.paymentManagement) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.paymentManagement.paths, submenuPaths.paymentManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:wallet-line" className="menu-icon" />
                   <span>Payment Management</span>
@@ -342,7 +399,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Regions */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.regions) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.regions.paths, submenuPaths.regions.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:map-pin-line" className="menu-icon" />
                   <span>Regions</span>
@@ -375,7 +432,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Product Catalogue */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.productCatalogue) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.productCatalogue.paths, submenuPaths.productCatalogue.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:archive-2-line" className="menu-icon" />
                   <span>Product Catalogue</span>
@@ -416,7 +473,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Farmer Management */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.farmerManagement) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.farmerManagement.paths, submenuPaths.farmerManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:clipboard-line" className="menu-icon" />
                   <span>Farmer Management</span>
@@ -449,7 +506,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Invoices */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.invoices) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.invoices.paths, submenuPaths.invoices.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="hugeicons:invoice-03" className="menu-icon" />
                   <span>Invoices</span>
@@ -482,7 +539,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Depot Management */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.depotManagement) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.depotManagement.paths, submenuPaths.depotManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:store-3-line" className="menu-icon" />
                   <span>Depot Management</span>
@@ -523,7 +580,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Stock Management */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.stockManagement) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.stockManagement.paths, submenuPaths.stockManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:equalizer-line" className="menu-icon" />
                   <span>Stock Management</span>
@@ -556,7 +613,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Storage Facility */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.storageFacility) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.storageFacility.paths, submenuPaths.storageFacility.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri-store-line" className="menu-icon" />
                   <span>Storage Facility</span>
@@ -589,7 +646,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Authentication */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.authentication) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.authentication.paths, submenuPaths.authentication.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:shield-user-line" className="menu-icon" />
                   <span>Authentication</span>
@@ -622,7 +679,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Roles */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.roles) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.roles.paths, submenuPaths.roles.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:user-settings-line" className="menu-icon" />
                   <span>Roles</span>
@@ -639,7 +696,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Settings */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.settings) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.settings.paths, submenuPaths.settings.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="icon-park-outline:setting-two" className="menu-icon" />
                   <span>Settings</span>
@@ -688,7 +745,7 @@ const MasterLayout = ({ children }) => {
                 </ul>
               </li>
               {/* Chart */}
-              <li className={`dropdown ${isSubmenuActive(submenuPaths.chart) ? "submenu-active" : ""}`}>
+              <li className={`dropdown ${isSubmenuActive(submenuPaths.chart.paths, submenuPaths.chart.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="solar:pie-chart-outline" className="menu-icon" />
                   <span>Chart</span>

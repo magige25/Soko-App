@@ -1,20 +1,21 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Link } from "react-router-dom";
 import axios from "axios";
-import { useNavigate, Link } from "react-router-dom";
+import { Icon } from "@iconify/react/dist/iconify.js";
 import toast, { Toaster } from "react-hot-toast";
 import { formatDate } from "../hook/format-utils";
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/stock-requests";
 
 const StockRequestLayer = () => {
-  const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingRequests, setLoadingRequests] = useState({}); // Per-request loading state
   const [error, setError] = useState(null);
   const [requestToDelete, setRequestToDelete] = useState(null);
 
@@ -23,20 +24,33 @@ const StockRequestLayer = () => {
       setIsLoading(true);
       setError(null);
       try {
-        const token = localStorage.getItem("token");
-        const params = { page: page - 1, size: itemsPerPage, searchValue: searchQuery, status: "PEND" };
+        const token = sessionStorage.getItem("token");
+        if (!token) throw new Error("Authentication token not found.");
+        const params = {
+          page: page - 1,
+          size: itemsPerPage,
+          searchValue: searchQuery,
+          status: "PEND",
+          _t: new Date().getTime(), // Cache-busting
+        };
         const response = await axios.get(API_URL, {
           headers: { Authorization: `Bearer ${token}` },
           params,
         });
-        const data = response.data.data || [];
-        const total = response.data.totalElements || data.length;
-        setRequests(data);
-        setTotalItems(total);
+
+        const responseData = response.data;
+        if (responseData.status.code === 0) {
+          const data = responseData.data || [];
+          setRequests(data);
+          setTotalItems(responseData.totalElements || data.length);
+        } else {
+          throw new Error(responseData.status.message || "Failed to fetch stock requests.");
+        }
       } catch (error) {
         console.error("Error fetching stock requests:", error);
-        setError("Failed to fetch stock requests.");
-        toast.error("Failed to fetch stock requests.");
+        setError(error.message || "Failed to fetch stock requests. Please try again.");
+        setRequests([]);
+        toast.error(error.message || "Failed to fetch stock requests.");
       } finally {
         setIsLoading(false);
       }
@@ -58,21 +72,34 @@ const StockRequestLayer = () => {
   };
 
   const handleApproveClick = async (requestId) => {
-    setIsLoading(true);
+    setLoadingRequests((prev) => ({ ...prev, [requestId]: true }));
     try {
-      const token = localStorage.getItem("token");
-      await axios.put(
+      const token = sessionStorage.getItem("token");
+      if (!token) throw new Error("Authentication token not found. Please log in again.");
+
+      const response = await axios.put(
         `${API_URL}/approve/${requestId}`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      toast.success("Stock request approved successfully!");
-      fetchStockRequests(currentPage, query);
+
+      if (response.data.status.code === 0) {
+        toast.success("Stock request approved successfully!");
+        setTimeout(() => fetchStockRequests(currentPage, query), 500); // Slight delay for server sync
+      } else {
+        throw new Error(response.data.status.message || "Approval failed");
+      }
     } catch (error) {
       console.error("Error approving stock request:", error);
-      toast.error("Failed to approve stock request.");
+      if (error.response) {
+        toast.error(`Approval failed: ${error.response.data.message || error.response.statusText}`);
+      } else if (error.request) {
+        toast.error("Network error: Could not reach the server.");
+      } else {
+        toast.error(`Error: ${error.message}`);
+      }
     } finally {
-      setIsLoading(false);
+      setLoadingRequests((prev) => ({ ...prev, [requestId]: false }));
     }
   };
 
@@ -84,7 +111,8 @@ const StockRequestLayer = () => {
     if (!requestToDelete) return;
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("token");
+      const token = sessionStorage.getItem("token");
+      if (!token) throw new Error("Authentication token not found.");
       await axios.delete(`${API_URL}/${requestToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -93,7 +121,7 @@ const StockRequestLayer = () => {
       toast.success("Stock request deleted successfully!");
     } catch (error) {
       console.error("Error deleting stock request:", error);
-      toast.error("Failed to delete stock request.");
+      toast.error(error.message || "Failed to delete stock request.");
     } finally {
       setIsLoading(false);
     }
@@ -147,9 +175,7 @@ const StockRequestLayer = () => {
               {isLoading ? (
                 <tr>
                   <td colSpan="8" className="text-center py-3">
-                    <div className="spinner-border" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
+                    <Spinner />
                   </td>
                 </tr>
               ) : requests.length > 0 ? (
@@ -169,7 +195,7 @@ const StockRequestLayer = () => {
                     <td className="text-start small-text py-3 px-4">
                       {formatDate(request.dateCreated) || "N/A"}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{request.createdBy.name}</td>
+                    <td className="text-start small-text py-4 px-4">{request.createdBy.name}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">
@@ -201,8 +227,17 @@ const StockRequestLayer = () => {
                               <button
                                 className="dropdown-item text-success"
                                 onClick={() => handleApproveClick(request.id)}
+                                disabled={loadingRequests[request.id]}
                               >
-                                Approve
+                                {loadingRequests[request.id] ? (
+                                  <span
+                                    className="spinner-border spinner-border-sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                  ></span>
+                                ) : (
+                                  "Approve"
+                                )}
                               </button>
                             </li>
                             <li>
@@ -223,7 +258,9 @@ const StockRequestLayer = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center py-3">No pending stock requests found</td>
+                  <td colSpan="8" className="text-center py-3">
+                    No pending stock requests found
+                  </td>
                 </tr>
               )}
             </tbody>
@@ -297,7 +334,8 @@ const StockRequestLayer = () => {
               </div>
               <p className="pb-3 mb-0">
                 Are you sure you want to delete the stock request{" "}
-                <strong>{requestToDelete?.orderCode}</strong> permanently? This action cannot be undone.
+                <strong>{requestToDelete?.orderCode}</strong> permanently? This action cannot be
+                undone.
               </p>
             </div>
             <div className="d-flex justify-content-end gap-2 px-12 pb-3">

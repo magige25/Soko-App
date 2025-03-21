@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = 'https://api.bizchain.co.ke/v1/invoice';
 
@@ -100,14 +101,11 @@ const InvoicesPreviewLayer = () => {
     });
   };
 
-  if (!invoice) return <div>Loading...</div>;
+  if (!invoice) return <Spinner />;
 
   return (
     <div className="card">
-      <div className="card-header d-flex justify-content-end gap-2">
-        <Link to="#" className="btn btn-sm btn-primary-600 radius-8 d-flex align-items-center gap-1">
-          <Icon icon="pepicons-pencil:paper-plane" className="text-xl" /> Send
-        </Link>
+      <div className="card-header d-flex justify-content-center gap-2">
         <button
           onClick={handleDownload}
           className="btn btn-sm btn-success radius-8 d-flex align-items-center gap-1"
@@ -138,7 +136,7 @@ const InvoicesPreviewLayer = () => {
                   </p>
                 </div>
                 <div>
-                  <img src="/assets/images/logo.png" alt="image_icon" className="mb-8" />
+                  <img src="/assets/images/logo.png" alt="image_icon" className="mb-0 mt-0 small-logo" />
                   <p className="mb-1 text-sm">4517 Kenyatta Ave. Nairobi, I&M Tower</p>
                   <p className="mb-0 text-sm">tigersoft@gmail.com, +254746721984</p>
                 </div>

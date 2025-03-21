@@ -34,7 +34,7 @@ const EditSuppliersLayer = () => {
     expansionCapacity: "",
     contactPersonName: "",
     contactPersonPhoneNumber: "",
-    paymentCycle: "", // Not prefilled
+    paymentCycle: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
@@ -89,7 +89,7 @@ const EditSuppliersLayer = () => {
             expansionCapacity: supplier.expansionCapacity,
             contactPersonName: supplier.contactPersonName || "",
             contactPersonPhoneNumber: supplier.contactPersonPhoneNumber || "",
-            paymentCycle: supplier.paymentCycle?.code || "", // Use code if object, otherwise empty
+            paymentCycle: supplier.paymentCycle?.code || "", 
           });
         }
         if (criteriaRes.data.status.code === 0) setDisbursementCriteria(criteriaRes.data.data);
@@ -108,10 +108,8 @@ const EditSuppliersLayer = () => {
   const validateField = (field, value) => {
     const errors = {};
 
-    // Skip validation for non-required fields
     if (field === "pendingBills" || field === "unpaidBills") return errors;
 
-    // Basic required field validation
     if (typeof value === "string" && !value.trim()) {
       if (field === "expansionCapacity" && !formData.expansionSpace) return errors;
       if (field === "disbursementPhoneNumber" && disbursementMethods.find(m => m.name === formData.paymentMethod)?.code !== "MPS") return errors;
@@ -122,7 +120,6 @@ const EditSuppliersLayer = () => {
       return errors;
     }
 
-    // Phone number validation
     if ((field === "phoneNumber" || field === "contactPersonPhoneNumber" || field === "disbursementPhoneNumber") && value) {
       const digitsOnly = value.replace(/\D/g, '');
       if (digitsOnly.length < 9) {
@@ -136,7 +133,6 @@ const EditSuppliersLayer = () => {
       }
     }
 
-    // Numeric field validation
     if ((field === "productionQuantity" || field === "numberCattle" || field === "disbursementLitresTarget" || field === "expansionCapacity") && value) {
       if (isNaN(value)) {
         errors[field] = `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} must be a number`;
