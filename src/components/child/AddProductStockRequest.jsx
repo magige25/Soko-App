@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 const API_URL = "https://api.bizchain.co.ke/v1/stock-requests/product";
 const PRODUCTS_API = "https://api.bizchain.co.ke/v1/products";
+const STOCK_REQUEST_API_URL = "https://api.bizchain.co.ke/v1/stock-requests";
 
 const AddProductStockRequest = () => {
   const location = useLocation();
@@ -15,6 +16,7 @@ const AddProductStockRequest = () => {
 
   const [stockRequests, setStockRequests] = useState([{ productId: "", quantity: "" }]);
   const [products, setProducts] = useState([]);
+  const [existingProducts, setExistingProducts] = useState([]); // New state for existing products
   const [isFetchingData, setIsFetchingData] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
@@ -47,6 +49,33 @@ const AddProductStockRequest = () => {
     }
   }, [navigate]);
 
+  const fetchStockRequestProducts = useCallback(async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      toast.error("No authentication token found. Please log in.");
+      navigate("/login");
+      return;
+    }
+
+    setIsFetchingData(true);
+    try {
+      const response = await axios.get(`${STOCK_REQUEST_API_URL}/${depotStockRequestId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (response.data.status.code === 0) {
+        setExistingProducts(response.data.data.productModelList || []);
+      } else {
+        throw new Error("Failed to load stock request details");
+      }
+    } catch (err) {
+      console.error("Error fetching stock request:", err.response?.data || err.message);
+      toast.error(`Failed to load stock request: ${err.message || "Please try again"}`);
+    } finally {
+      setIsFetchingData(false);
+    }
+  }, [depotStockRequestId, navigate]);
+
   useEffect(() => {
     if (!depotStockRequestId) {
       toast.error("No stock request ID provided. Please select a stock request to edit.");
@@ -54,15 +83,20 @@ const AddProductStockRequest = () => {
       return;
     }
     fetchProducts();
-  }, [fetchProducts, depotStockRequestId, navigate]);
+    fetchStockRequestProducts();
+  }, [fetchProducts, fetchStockRequestProducts, depotStockRequestId, navigate]);
 
   const getAvailableProducts = (currentIndex) => {
+    const existingProductIds = existingProducts.map((prod) => prod.product.id);
     const selectedProductIds = stockRequests
       .filter((_, index) => index !== currentIndex)
       .map((req) => parseInt(req.productId, 10))
       .filter((id) => !isNaN(id));
 
-    return products.filter((prod) => !selectedProductIds.includes(prod.id));
+    // Combine existing and selected product IDs to exclude them from the available options
+    const excludedProductIds = [...existingProductIds, ...selectedProductIds];
+
+    return products.filter((prod) => !excludedProductIds.includes(prod.id));
   };
 
   const validateField = (index, field, value) => {
@@ -163,12 +197,10 @@ const AddProductStockRequest = () => {
         },
       });
 
-      console.log("API Response:", response.data); // Log the response for debugging
-
       if (response.data.status.code === 0) {
         toast.success("Products added successfully!", {
-          onClose: () => navigate("/stock-request"), // Navigate after toast closes
-          autoClose: 2000, // Show toast for 2 seconds
+          onClose: () => navigate("/stock-request/edit", { state: { depotStockRequestId } }),
+          autoClose: 2000,
         });
         setStockRequests([{ productId: "", quantity: "" }]);
       } else {
