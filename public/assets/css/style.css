@@ -15592,10 +15592,6 @@ td.fc-header-center {
   color: #fff;
 }
 
-/* .positioned-icon {
-  inset-inline-start: 16px;
-} */
-
 /* Component-Specific Styles */
 .user-image {
   width: 28px !important;
@@ -15670,7 +15666,7 @@ td.fc-header-center {
   padding-left: 16px;
 }
 
-.position-relative {
+.positioning {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -15679,7 +15675,7 @@ td.fc-header-center {
   transition: background-color 0.3s ease-in-out;
 }
 
-.position-relative:hover {
+.positioning:hover {
   background-color: var(--neutral-400) !important;
   border-radius: 4px;
 }
@@ -15693,7 +15689,7 @@ td.fc-header-center {
 }
 
 .text-sm.text-secondary-light {
-  font-size: 12px !important;
+  font-size: 11px !important;
 }
 
 .text-primary-600.fw-semibold.text-md {

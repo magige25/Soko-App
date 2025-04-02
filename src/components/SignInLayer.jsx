@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Spinner } from "../hook/spinner-utils";
 
 const SignInLayer = () => {
   const navigate = useNavigate();
@@ -88,14 +89,16 @@ const SignInLayer = () => {
         });
 
         sessionStorage.setItem("userToken", response.data.token);
+        const userId = response.data.data?.id || response.data.data?.userId || response.data.account?.id;
 
         setTimeout(() => {
           console.log("Navigating to OTP page with:", {
             email: formData.email,
             password: formData.password,
+            userId,
           });
           navigate("/otp", {
-            state: { email: formData.email, password: formData.password },
+            state: { email: formData.email, password: formData.password, userId },
           });
         }, 2000);
       } else {
@@ -177,7 +180,7 @@ const SignInLayer = () => {
             <h6 className="mb-12 gw-bold">Welcome Back!</h6>
             <p
               className="mb-32 text-secondary-light"
-              style={{ fontSize: "13px", maxWidth: "350px",margin: "0 auto", fontWeight: 600 }}
+              style={{ fontSize: "13px", maxWidth: "350px", margin: "0 auto", fontWeight: 600 }}
             >
               Enter your credentials to get started.
             </p>
@@ -320,7 +323,7 @@ const SignInLayer = () => {
                 lineHeight: "1",
               }}
             >
-              {loading ? <div className="spinner"></div> : "Sign In"}
+              {loading ? <div className=""><Spinner /></div> : "Sign In"}
             </button>
           </form>
         </div>

@@ -2,9 +2,10 @@ import React, { useEffect, useState, useRef } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext"; 
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
+import { Spinner } from "../hook/spinner-utils";
 
 const MasterLayout = ({ children }) => {
   const [sidebarActive, setSidebarActive] = useState(false);
@@ -12,7 +13,7 @@ const MasterLayout = ({ children }) => {
   const dropdownRefs = useRef([]);
   const sidebarRef = useRef(null);
   const location = useLocation();
-  const { signOut } = useAuth();
+  const { signOut, user, loading } = useAuth(); 
 
   const sidebarControl = () => {
     setSidebarActive((prev) => !prev);
@@ -130,7 +131,6 @@ const MasterLayout = ({ children }) => {
     }
   }, [location.pathname]);
 
-  // Updated isSubmenuActive to include child routes
   const isSubmenuActive = (paths, childRoutes = []) => {
     const allPaths = [...paths, ...childRoutes];
     return allPaths.some((path) => location.pathname.startsWith(path));
@@ -139,7 +139,7 @@ const MasterLayout = ({ children }) => {
   const submenuPaths = {
     systemUsers: {
       paths: ["/users"],
-      childRoutes: ["/users/add", "/users/edit"], // Add child routes here
+      childRoutes: ["/users/add", "/users/edit"],
     },
     customerManagement: {
       paths: ["/customers", "/creditors-request"],
@@ -201,22 +201,6 @@ const MasterLayout = ({ children }) => {
       paths: ["/invoice-list", "/invoice-preview", "/invoice-add", "/invoice-edit"],
       childRoutes: [],
     },
-    components: {
-      paths: [
-        "/typography", "/colors", "/button", "/dropdown", "/alert", "/card", "/carousel", "/avatar",
-        "/progress", "/tabs", "/pagination", "/badges", "/tooltip", "/videos", "/star-rating", "/tags",
-        "/list", "/calendar", "/radio", "/switch", "/image-upload"
-      ],
-      childRoutes: [],
-    },
-    forms: {
-      paths: ["/form", "/form-layout", "/form-validation", "/wizard"],
-      childRoutes: [],
-    },
-    table: {
-      paths: ["/table-basic", "/table-data"],
-      childRoutes: [],
-    },
     chart: {
       paths: ["/line-chart", "/column-chart", "/pie-chart"],
       childRoutes: [],
@@ -273,7 +257,6 @@ const MasterLayout = ({ children }) => {
                   <span>Dashboards</span>
                 </NavLink>
               </li>
-              {/* System Users */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.systemUsers.paths, submenuPaths.systemUsers.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <GroupAddOutlinedIcon className="menu-icon" />
@@ -290,7 +273,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Customer Management */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.customerManagement.paths, submenuPaths.customerManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:user-line" className="menu-icon" />
@@ -315,7 +297,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Orders */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.orderManagement.paths, submenuPaths.orderManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:shopping-cart-line" className="menu-icon" />
@@ -348,7 +329,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Salespersons */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.salespersonOperation.paths, submenuPaths.salespersonOperation.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:group-line" className="menu-icon" />
@@ -373,7 +353,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Payment */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.paymentManagement.paths, submenuPaths.paymentManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:wallet-line" className="menu-icon" />
@@ -398,7 +377,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Regions */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.regions.paths, submenuPaths.regions.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:map-pin-line" className="menu-icon" />
@@ -431,7 +409,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Product Catalogue */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.productCatalogue.paths, submenuPaths.productCatalogue.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:archive-2-line" className="menu-icon" />
@@ -472,7 +449,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Farmer Management */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.farmerManagement.paths, submenuPaths.farmerManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:clipboard-line" className="menu-icon" />
@@ -505,7 +481,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Invoices */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.invoices.paths, submenuPaths.invoices.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="hugeicons:invoice-03" className="menu-icon" />
@@ -538,7 +513,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Depot Management */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.depotManagement.paths, submenuPaths.depotManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:store-3-line" className="menu-icon" />
@@ -579,7 +553,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Stock Management */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.stockManagement.paths, submenuPaths.stockManagement.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:equalizer-line" className="menu-icon" />
@@ -612,7 +585,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Storage Facility */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.storageFacility.paths, submenuPaths.storageFacility.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri-store-line" className="menu-icon" />
@@ -645,7 +617,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Authentication */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.authentication.paths, submenuPaths.authentication.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:shield-user-line" className="menu-icon" />
@@ -678,7 +649,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Roles */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.roles.paths, submenuPaths.roles.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="ri:user-settings-line" className="menu-icon" />
@@ -695,7 +665,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Settings */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.settings.paths, submenuPaths.settings.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="icon-park-outline:setting-two" className="menu-icon" />
@@ -744,7 +713,6 @@ const MasterLayout = ({ children }) => {
                   </li>
                 </ul>
               </li>
-              {/* Chart */}
               <li className={`dropdown ${isSubmenuActive(submenuPaths.chart.paths, submenuPaths.chart.childRoutes) ? "submenu-active" : ""}`}>
                 <Link to="#">
                   <Icon icon="solar:pie-chart-outline" className="menu-icon" />
@@ -818,7 +786,7 @@ const MasterLayout = ({ children }) => {
                   <ThemeToggleButton />
                   <div className="dropdown">
                     <button
-                      className="position-relative border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-1"
+                      className="positioning position-relative border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-1"
                       type="button"
                       data-bs-toggle="dropdown"
                     >
@@ -844,7 +812,7 @@ const MasterLayout = ({ children }) => {
                           className="px-24 py-12 d-flex align-items-start gap-3 mb-2 justify-content-between"
                         >
                           <div className="text-black hover-bg-transparent hover-text-primary d-flex align-items-center gap-3">
-                            <span className="w-40-px h-40-px rounded-circle flex-shrink-0 position-relative">
+                            <span className="w-40-px h-40-px rounded-circle flex-shrink-0 positioning position-relative">
                               <img
                                 src="/assets/images/notification/profile-7.png"
                                 alt=""
@@ -912,7 +880,7 @@ const MasterLayout = ({ children }) => {
                   </div>
                   <div className="dropdown">
                     <button
-                      className="position-relative border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-1"
+                      className="positioning position-relative border-0 bg-transparent p-0 d-flex justify-content-center align-items-center gap-1"
                       type="button"
                       data-bs-toggle="dropdown"
                     >
@@ -995,7 +963,7 @@ const MasterLayout = ({ children }) => {
                   </div>
                   <div className="dropdown">
                     <button
-                      className="user-image d-flex justify-content-center align-items-center rounded-circle position-relative gap-2"
+                      className="user-image d-flex justify-content-center align-items-center rounded-circle positioning position-relative gap-2"
                       type="button"
                       data-bs-toggle="dropdown"
                       aria-expanded="false"
@@ -1015,12 +983,23 @@ const MasterLayout = ({ children }) => {
                           className="profile-image object-fit-cover"
                         />
                         <div className="headers bg-primary-50">
-                          <h6 className="text-sm text-primary-light fw-semibold mb-2">
-                            Tigersoft Developers
-                          </h6>
-                          <span className="text-secondary-light fw-sm text-sm mb-6">
-                            tigersoft@gmail.com
-                          </span>
+                          {loading ? (
+                            <span><Spinner /></span>
+                          ) : user ? (
+                            <>
+                              <h6 className="text-lg text-primary-light fw-semibold mb-2">
+                                {`${user.firstName} ${user.lastName}`}
+                              </h6>
+                              <span className="text-secondary-light fw-sm text-sm mb-4">
+                                {user.email}
+                              </span>
+                              <p className="text-secondary-light fw-bold text-sm mb-0">
+                                {user.role}
+                              </p>
+                            </>
+                          ) : (
+                            <span>Please log in</span>
+                          )}
                         </div>
                       </div>
                       <ul className="to-top-list">
@@ -1032,7 +1011,7 @@ const MasterLayout = ({ children }) => {
                             <Icon
                               icon="ri-account-circle-line"
                               className="icon text-md"
-                            />{" "}
+                            />
                             My Profile
                           </Link>
                         </li>
@@ -1044,7 +1023,7 @@ const MasterLayout = ({ children }) => {
                             <Icon
                               icon="tabler:message-check"
                               className="icon text-md"
-                            />{" "}
+                            />
                             Inbox
                           </Link>
                         </li>
@@ -1065,7 +1044,7 @@ const MasterLayout = ({ children }) => {
                             className="dropdown-item text-black px-0 py-8 hover-text-danger d-flex align-items-center gap-3 w-100 mt-32"
                             onClick={signOut}
                           >
-                            <Icon icon="lucide:power" className="icon text-md" />{" "}
+                            <Icon icon="lucide:power" className="icon text-md" />
                             Sign Out
                           </button>
                         </li>

@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+// import { UserProvider } from './context/UserContext';
 import PrivateRouteLayer from "./components/PrivateRouteLayer";
 import OtpRoutePage from "./pages/OtpRoutePage";
 import HomePageOne from "./pages/HomePageOne";
@@ -171,8 +172,8 @@ function App() {
   return (
     <BrowserRouter
       future={{
-        v7_startTransition: true, // Opt into React.startTransition
-        v7_relativeSplatPath: true, // Opt into new splat route behavior
+        v7_startTransition: true,
+        v7_relativeSplatPath: true, 
       }}
     >
       <AuthProvider>

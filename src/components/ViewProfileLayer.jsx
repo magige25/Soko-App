@@ -6,12 +6,10 @@ const ViewProfileLayer = () => {
     const [passwordVisible, setPasswordVisible] = useState(false);
     const [confirmPasswordVisible, setConfirmPasswordVisible] = useState(false);
 
-    // Toggle function for password field
     const togglePasswordVisibility = () => {
         setPasswordVisible(!passwordVisible);
     };
 
-    // Toggle function for confirm password field
     const toggleConfirmPasswordVisibility = () => {
         setConfirmPasswordVisible(!confirmPasswordVisible);
     };
