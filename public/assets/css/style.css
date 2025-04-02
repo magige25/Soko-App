@@ -155,6 +155,7 @@
   --font-sm: 0.875rem;
   --font-xs: 0.75rem;
   --font-xxs: 0.625rem;
+  --primary-1: #003cb3;
   --primary-50: #e4f1ff;
   --primary-100: #bfdcff;
   --primary-200: #95c7ff;
@@ -296,7 +297,6 @@
   --input-bg: var(--neutral-50);
   --input-stroke: var(--neutral-300);
   --border-color: #d1d5db80;
-  --primary-1: #003cb3;
 }
 
 [data-theme="dark"] {
@@ -3235,23 +3235,23 @@ th {
 }
 
 .bg-gradient-start-1 {
-  background: linear-gradient(to right, #e6f9ff, #feffff);
+  background: linear-gradient(to right, white);
 }
 
 .bg-gradient-start-2 {
-  background: linear-gradient(to right, #f7e9ff, #fffefd);
+  background: linear-gradient(to right, white);
 }
 
 .bg-gradient-start-3 {
-  background: linear-gradient(to right, #e6ebff, #ffffff);
+  background: linear-gradient(to right, white);
 }
 
 .bg-gradient-start-4 {
-  background: linear-gradient(to right, #e8fff5, #ffffff);
+  background: linear-gradient(to right, white);
 }
 
 .bg-gradient-start-5 {
-  background: linear-gradient(to right, #ffeeee, #fffcfc);
+  background: linear-gradient(to right, white);
 }
 
 .bg-gradient-dark-start-1 {
@@ -8755,6 +8755,17 @@ h6,
 }
 
 /* Pill Btn */
+.btn-primary-1 {
+  background-color: var(--primary-1);
+  color: #fff;
+}
+
+.btn-primary-1:hover {
+  background-color: var(--primary-700);
+  color: #fff !important;
+  border-color: var(--primary-700);
+}
+
 .btn-primary-50 {
   background-color: var(--primary-50);
   color: #fff;
@@ -13047,11 +13058,11 @@ select option {
 /* === card css start === */
 .card {
   background-color: var(--white);
-  border-radius: 8px;
-  -webkit-border-radius: 8px;
-  -moz-border-radius: 8px;
-  -ms-border-radius: 8px;
-  -o-border-radius: 8px;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  -ms-border-radius: 4px;
+  -o-border-radius: 4px;
   box-shadow: 0 0.25rem 1.875rem rgba(46, 45, 116, 0.05);
   border: none;
   position: initial;
@@ -13066,7 +13077,7 @@ select option {
 }
 
 .card .card-title {
-  font-size: 1.125rem !important;
+  font-size: 0.8125rem !important;
   font-weight: 600;
   color: var(--text-primary-light);
 }
@@ -15532,31 +15543,33 @@ td.fc-header-center {
   }
 }
 .navbar-search input {
-  width: 24.25rem;
-  height: 2.5rem;
+  width: 20rem;
+  height: 1rem;
   background-color: var(--neutral-50);
   border: 1px solid var(--input-form-light);
-  border-radius: 0.5rem;
-  -webkit-border-radius: 0.5rem;
-  -moz-border-radius: 0.5rem;
-  -ms-border-radius: 0.5rem;
-  -o-border-radius: 0.5rem;
-  padding-block: 0.3125rem;
-  padding-inline-start: 2.625rem;
-  padding-inline-end: 1.25rem;
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  -webkit-border-radius: 0.25rem;
+  -moz-border-radius: 0.25rem;
+  -ms-border-radius: 0.25rem;
+  -o-border-radius: 0.25rem;
+  padding-block: 0;
+  padding-inline-start: 1.65rem;
+  padding-inline-end: 0.875rem;
   color: var(--text-primary-light);
 }
 
 .navbar-search input:focus {
   border-color: var(--brand);
+
 }
 
 .navbar-search .icon {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  inset-inline-start: 0.9375rem;
-  font-size: 1.125rem;
+  inset-inline-start: 0.5rem;
+  font-size: 0.9rem;
   color: var(--black);
 }
 
@@ -15570,7 +15583,7 @@ td.fc-header-center {
   content: "\ef75";
   font-family: remixicon;
   font-style: normal;
-  font-size: 1.25rem;
+  font-size: 1rem;
   color: var(--text-primary-light);
 }
 
@@ -15579,9 +15592,9 @@ td.fc-header-center {
   color: #fff;
 }
 
-.positioned-icon {
+/* .positioned-icon {
   inset-inline-start: 16px;
-}
+} */
 
 /* Component-Specific Styles */
 .user-image {
@@ -16492,7 +16505,7 @@ td.fc-header-center {
 /* Table Borderless */
 .table-responsive {
   background-color: var(--white);
-  box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.1); */
   width: 100%;
   max-width: 100%;
   overflow-x: auto;
@@ -16551,7 +16564,7 @@ td.fc-header-center {
 
 .custom-spinner {
   position: relative;
-  animation: rotate 2s linear infinite;
+  animation: rotate 1s linear infinite;
 }
 
 .spinner-circle {

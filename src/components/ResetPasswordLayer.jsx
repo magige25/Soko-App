@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom"; // Add useParams
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const ResetPasswordLayer = () => {
   const navigate = useNavigate();
+  const { token } = useParams(); // Extract token from URL
   const [loading, setLoading] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState({
     password: false,
@@ -65,7 +66,6 @@ const ResetPasswordLayer = () => {
     }
 
     if (passwordError || confirmPasswordError) {
-      console.log("Validation failed:", { passwordError, confirmPasswordError });
       toast.error("Please fix the errors before submitting", {
         position: "top-right",
         autoClose: 2000,
@@ -81,26 +81,21 @@ const ResetPasswordLayer = () => {
       return;
     }
 
-    console.log("Attempting password reset with:", formData);
     setLoading(true);
 
     try {
-      console.log("Sending Request with Payload:", { password: formData.password });
       const response = await axios.post(
-        "https://api.bizchain.co.ke/v1/auth/reset-password/17e6cb85-7fd6-4185-867b-adbd757284e0",
+        `https://api.bizchain.co.ke/v1/auth/reset-password/${token}`, // Use dynamic token
         {
-          password: formData.password,
+          newPassword: formData.password,
         },
         {
           headers: {
             "APP-KEY": "BCM8WTL9MQU4MJLE",
           },
-          timeout: 10000, // 10-second timeout
+          timeout: 10000,
         }
       );
-
-      console.log("Full API Response:", response);
-      console.log("Response Data:", response.data);
 
       if (response.status === 200 && response.data.status?.code === 0) {
         toast.success("Password reset successful!", {
@@ -119,7 +114,7 @@ const ResetPasswordLayer = () => {
       }
     } catch (error) {
       console.error("Reset Password Error:", error.message, error.response?.data);
-      
+      // Error handling remains the same as in your original code
       if (!navigator.onLine) {
         toast.error("Network disconnected. Please check your connection.", {
           position: "top-right",
@@ -176,13 +171,14 @@ const ResetPasswordLayer = () => {
     }
   };
 
+  // Rest of your JSX remains unchanged
   return (
     <section className="auth bg-base d-flex flex-wrap">
       <ToastContainer position="top-right" autoClose={2000} />
       <div className="auth-left d-lg-block d-none">
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
-            src="assets/images/auth/reset-forgot-img.png"
+            src="/assets/images/auth/reset-forgot-img.png"
             alt="Reset Password"
           />
         </div>
@@ -192,7 +188,7 @@ const ResetPasswordLayer = () => {
           <div className="text-center">
             <Link to="/sign-in" className="mb-40 max-w-290-px">
               <img
-                src="assets/images/logo.png"
+                src="/assets/images/logo.png"
                 alt="Logo"
                 style={{ width: "100%", maxWidth: "350px", margin: "0 auto" }}
               />
@@ -200,7 +196,7 @@ const ResetPasswordLayer = () => {
             <h6 className="mb-12">Set New Password</h6>
             <p
               className="mb-32 text-secondary-light"
-              style={{ fontSize: "13px", maxWidth: "350px",margin: "0 auto", fontWeight: 600 }}
+              style={{ fontSize: "13px", maxWidth: "350px", margin: "0 auto", fontWeight: 600 }}
             >
               Enter and confirm your new password.
             </p>
@@ -209,9 +205,9 @@ const ResetPasswordLayer = () => {
             {["password", "confirmPassword"].map((field) => (
               <div className="mb-20" key={field} style={{ position: "relative" }}>
                 <div style={{ maxWidth: "350px", margin: "0 auto" }}>
-                  <label 
-                    className="mb-8 d-block" 
-                    style={{ 
+                  <label
+                    className="mb-8 d-block"
+                    style={{
                       fontSize: "13px",
                       textAlign: "left",
                     }}
@@ -255,11 +251,11 @@ const ResetPasswordLayer = () => {
                     </span>
                   </div>
                   {(field === "password" && passwordError) || (field === "confirmPassword" && confirmPasswordError) ? (
-                    <p 
-                      style={{ 
-                        color: "red", 
-                        fontSize: "12px", 
-                        marginTop: "2px", 
+                    <p
+                      style={{
+                        color: "red",
+                        fontSize: "12px",
+                        marginTop: "2px",
                         textAlign: "left",
                       }}
                     >
@@ -279,10 +275,10 @@ const ResetPasswordLayer = () => {
                 passwordError ||
                 confirmPasswordError
               }
-              style={{ 
+              style={{
                 height: "40px",
-                maxWidth: "350px", 
-                margin: "32px auto 0", 
+                maxWidth: "350px",
+                margin: "32px auto 0",
                 display: "block",
                 width: "100%",
                 lineHeight: "1",

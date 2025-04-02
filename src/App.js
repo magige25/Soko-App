@@ -163,6 +163,9 @@ import AddStockRequestPage from "./pages/AddStockRequestPage";
 import ApprovedStockPage from "./pages/ApprovedStockPage";
 import ApprovedStockDetailsPage from "./pages/ApprovedStockDetailsPage";
 import DeliveredOrderPage from "./pages/DeliveredOrderPage";
+import EditStockRequestPage from "./pages/EditStockRequestPage";
+import AddProductStockRequestPage from "./pages/AddProductStockRequestPage";
+import ViewStockRequestPage from "./pages/ViewStockRequestPage";
 
 function App() {
   return (
@@ -182,7 +185,7 @@ function App() {
             <Route path="/otp" element={<OtpPage />} />
           </Route>
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
+          <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
           <Route path="/coming-soon" element={<ComingSoonPage />} />
           <Route path="/access-denied" element={<AccessDeniedPage />} />
           <Route path="/maintenance" element={<MaintenancePage />} />
@@ -205,9 +208,9 @@ function App() {
             <Route path="/chat-profile" element={<ChatProfilePage />} />
             <Route path="/code-generator" element={<CodeGeneratorPage />} />
             <Route path="/regions" element={<RegionsPage />} />
+            <Route path="/regions/details" element={<RegionsDetailsPage />} />
             <Route path="/sub-regions" element={<SubRegionsPage />} />
             <Route path="/routes" element={<RoutesPage />} />
-            <Route path="/regions/:regionName" element={<RegionsDetailsPage />} />
             <Route path="/sub-regions/:sub-regionName" element={<SubRegionsDetailsPage />} />
             <Route path="/routes/:regionName" element={<RoutesDetailsPage />} />
             <Route path="/users" element={<UsersListPage />} />
@@ -228,6 +231,9 @@ function App() {
             <Route path="/depot/add-depot" element={<AddDepotPage />} />
             <Route path="/depot/edit-depot" element={<EditDepotPage />} />
             <Route path="/stock-request" element={<StockRequestPage />} />
+            <Route path="/stock-request/edit" element={<EditStockRequestPage />} />
+            <Route path="/stock-request/edit/add-product" element={<AddProductStockRequestPage />} />
+            <Route path="/stock-request/view" element={<ViewStockRequestPage />} />
             <Route path="/depot/request-stock" element={<AddStockRequestPage />} />
             <Route path="/approved-stock" element={<ApprovedStockPage />} />
             <Route path="/approved-stock/stock-details" element={<ApprovedStockDetailsPage />} />
@@ -342,7 +348,6 @@ function App() {
             <Route path="/widgets" element={<WidgetsPage />} />
             <Route path="/wizard" element={<WizardPage />} />
             <Route path="/add-image" element={<AddImagePage />} />
-            {/* Catch-all route */}
             <Route path="*" element={<ErrorPage />} />
           </Route>          
         </Routes>

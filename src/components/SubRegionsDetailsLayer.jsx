@@ -1,24 +1,33 @@
 import { Icon } from "@iconify/react";
 import React, { useState } from "react";
-import { useLocation, useParams, } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const SubRegionDetails = () => {
   const location = useLocation();
-  const { subregionName } = useParams();
-  const { subRegion } = location.state || { subRegion: { name: "Default Sub Region" } }; // Fallback for SubRegion
+  const defaultSubRegion = {
+    name: "Default Sub Region",
+    salesAgents: 0,
+    customers: 0,
+    country: "N/A",
+    dateCreated: null,
+  };
 
+  const subRegion = location.state?.subRegion || defaultSubRegion;
+  console.log("location.state:", location.state);
+  console.log("SubRegion data:", subRegion);
   const [selectedTable, setSelectedTable] = useState("customers");
   const [selectedStatus, setSelectedStatus] = useState("All");
+  const [selectedDateFilter, setSelectedDateFilter] = useState("");
 
   const stats = [
-    { title: "Total Employees", count: 1007, icon: "mdi:account-group", color: "bg-dark" },
-    { title: "Active", count: 1007, icon: "mdi:account-check", color: "bg-success" },
-    { title: "Inactive", count: 1007, icon: "mdi:account-off", color: "bg-danger" },
+    { title: "Total Employees", count: subRegion.salesAgents || 1007, icon: "mdi:account-group", color: "bg-dark" },
+    { title: "Active", count: subRegion.salesAgents || 1007, icon: "mdi:account-check", color: "bg-success" },
+    { title: "Inactive", count: 0, icon: "mdi:account-off", color: "bg-danger" },
     { title: "New Joiners", count: 67, icon: "mdi:account-plus", color: "bg-info" },
   ];
 
   if (!subRegion) {
-    return <div>No Sub Region data found for {subregionName}</div>;
+    return <div>No sub-region data found</div>;
   }
 
   const tables = {
@@ -33,9 +42,9 @@ const SubRegionDetails = () => {
       { id: 3, orderId: "ORD125", amount: 200, status: "Defaulted" },
     ],
     salesAgents: [
-      { id: 1, name: "Agent X", subRegion: "Nyanza" },
-      { id: 2, name: "Agent Y", subRegion: "Coastal" },
-      { id: 3, name: "Agent Z", subRegion: "Nairobi" },
+      { id: 1, name: "Agent X", subRegion: subRegion.name || "Nyanza" },
+      { id: 2, name: "Agent Y", subRegion: subRegion.name || "Coastal" },
+      { id: 3, name: "Agent Z", subRegion: subRegion.name || "Nairobi" },
     ],
   };
 
@@ -43,19 +52,23 @@ const SubRegionDetails = () => {
     "Today", "Yesterday", "Last 7 Days", "Last 30 Days", "This Month", "Last Month", "Custom Range"
   ];
 
+  const tableOptions = ["customers", "orders", "salesAgents"];
+  const statusOptions = ["All", "Completed", "Pending", "Defaulted"];
 
   const filteredOrders = selectedStatus === "All"
     ? tables.orders
-    : tables.orders.filter(order => order.status === selectedStatus);
+    : tables.orders.filter((order) => order.status === selectedStatus);
 
   const renderTable = () => {
+    console.log("Selected table:", selectedTable);
+    console.log("Table data:", tables[selectedTable]);
     switch (selectedTable) {
       case "customers":
         return (
           <table className="table table-borderless text-start small-text">
             <thead className="table-light text-start small-text">
               <tr>
-              <th className="text-start">#</th>
+                <th className="text-start">#</th>
                 <th className="text-start">Name</th>
                 <th className="text-start">Phone NO.</th>
                 <th className="text-start">Email</th>
@@ -86,7 +99,7 @@ const SubRegionDetails = () => {
           <table className="table table-borderless text-start small-text">
             <thead className="table-light text-start small-text">
               <tr>
-              <th className="text-start">#</th>
+                <th className="text-start">#</th>
                 <th className="text-start">Order ID</th>
                 <th className="text-start">Amount</th>
                 <th className="text-start">Status</th>
@@ -135,18 +148,21 @@ const SubRegionDetails = () => {
       <div className="d-flex justify-content-end custom-right-align mb-24 mt-2">
         <div className="dropdown">
           <button
-            className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle"
+            className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle toggle-icon"
             type="button"
-            id="dateFilterDropdown"
             data-bs-toggle="dropdown"
             aria-expanded="false"
+            autoFocus
           >
-            Date Filter
+            {selectedDateFilter || "Date Filter"}
           </button>
-          <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="dateFilterDropdown">
+          <ul className="dropdown-menu">
             {filterOptions.map((option, index) => (
               <li key={index}>
-                <button className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900" type="button">
+                <button
+                  className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
+                  onClick={() => setSelectedDateFilter(option)}
+                >
                   {option}
                 </button>
               </li>
@@ -155,7 +171,7 @@ const SubRegionDetails = () => {
         </div>
       </div>
 
-      <div className="row g-2">
+      <div className="row g-4 mb-3">
         {stats.map((item, index) => (
           <div className="col-lg-3 col-md-6 col-sm-12 d-flex" key={index}>
             <div className="card flex-fill full-width-card">
@@ -165,13 +181,13 @@ const SubRegionDetails = () => {
                     <Icon icon={item.icon} className="text-lg text-white" />
                   </div>
                   <div className="ms-2">
-                    <p className="fs-8 fw-medium mb-1 text-truncate">{item.title}</p>
+                    <p className="fs-8 fw-medium mb-1 text-truncate" style={{ fontSize: "12px" }}>{item.title}</p>
                     <h6 className="mb-0 fs-8 fw-bold">{item.count}</h6>
                   </div>
                 </div>
                 <div className="stat-change">
                   <span className="badge bg-light text-dark px-1 py-1 d-flex align-items-center gap-1">
-                    <Icon icon="mdi:trending-up" className="text-xs text-success" />
+                    <Icon icon="tabler:arrow-wave-right-up" className="text-xs text-success" />
                     <small className="fs-8">+19.01%</small>
                   </span>
                 </div>
@@ -183,32 +199,54 @@ const SubRegionDetails = () => {
       <div className="card shadow-sm mt-3 full-width-card">
         <div className="card-body">
           <div className="d-flex align-items-center justify-content-between mb-3">
-            <div className="dropdown d-flex align-items-center justify-content-between mb-3 bg-light">
-              <button className="btn btn-white dropdown-toggle" data-bs-toggle="dropdown">
-                Select Table
+            <div className="dropdown">
+              <button
+                className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle toggle-icon"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                autoFocus
+              >
+                {selectedTable ? selectedTable.charAt(0).toUpperCase() + selectedTable.slice(1) : "Table"}
               </button>
-              <ul className="dropdown-menu dropdown-menu-end p-3">
-                <li><button className="dropdown-item" onClick={() => setSelectedTable("customers")}>Customers</button></li>
-                <li><button className="dropdown-item" onClick={() => setSelectedTable("orders")}>Orders</button></li>
-                <li><button className="dropdown-item" onClick={() => setSelectedTable("salesAgents")}>Sales Agents</button></li>
+              <ul className="dropdown-menu">
+                {tableOptions.map((option, index) => (
+                  <li key={index}>
+                    <button
+                      className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
+                      onClick={() => setSelectedTable(option)}
+                    >
+                      {option.charAt(0).toUpperCase() + option.slice(1)}
+                    </button>
+                  </li>
+                ))}
               </ul>
             </div>
-            <div className="dropdown d-flex align-items-center justify-content-between mb-3 bg-light">
-              <button className="btn btn-white dropdown-toggle" data-bs-toggle="dropdown">
-                Select Status
+            <div className="dropdown">
+              <button
+                className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle toggle-icon"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                autoFocus
+              >
+                {selectedStatus || "Status"}
               </button>
-              <ul className="dropdown-menu dropdown-menu-end p-3">
-                <li><button className="dropdown-item" onClick={() => setSelectedStatus("All")}>All</button></li>
-                <li><button className="dropdown-item" onClick={() => setSelectedStatus("Completed")}>Completed</button></li>
-                <li><button className="dropdown-item" onClick={() => setSelectedStatus("Pending")}>Pending</button></li>
-                <li><button className="dropdown-item" onClick={() => setSelectedStatus("Defaulted")}>Defaulted</button></li>
+              <ul className="dropdown-menu">
+                {statusOptions.map((option, index) => (
+                  <li key={index}>
+                    <button
+                      className="dropdown-item px-16 py-8 rounded text-secondary-light bg-hover-neutral-200 text-hover-neutral-900"
+                      onClick={() => setSelectedStatus(option)}
+                    >
+                      {option}
+                    </button>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
           {renderTable()}
-          {/* <Link to="/sub-regions" className="btn btn-primary">
-            Back
-          </Link> */}
         </div>
       </div>
     </div>

@@ -312,12 +312,12 @@ const RegionsLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/regions/${region.id}`}
-                                state={{ region }}
+                                to="/regions/details"
+                                state={{ regionId: region.id }}
                               >
                                 View
                               </Link>
-                            </li>
+                            </li>    
                             <li>
                               <Link
                                 className="dropdown-item"
