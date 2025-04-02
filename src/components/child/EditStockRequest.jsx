@@ -72,7 +72,7 @@ const EditStockRequest = () => {
       toast.error("Please specify a valid quantity.");
       return;
     }
-
+  
     const token = sessionStorage.getItem("token");
     try {
       const payload = {
@@ -84,20 +84,25 @@ const EditStockRequest = () => {
           },
         ],
       };
-
+  
       const response = await axios.put(
         `${UPDATE_QUANTITY_API_URL}/${editProduct.id}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
-      setProductList(
-        productList.map((p) =>
-          p.id === editProduct.id ? { ...p, quantityRequested: editProduct.quantityRequested } : p
-        )
-      );
-      setEditProduct(null);
-      toast.success("Quantity updated successfully!");
+  
+      // Use the response if needed (example)
+      if (response.data.status?.code === 0) {
+        setProductList(
+          productList.map((p) =>
+            p.id === editProduct.id ? { ...p, quantityRequested: editProduct.quantityRequested } : p
+          )
+        );
+        setEditProduct(null);
+        toast.success("Quantity updated successfully!");
+      } else {
+        throw new Error(response.data.status?.message || "Update failed on server");
+      }
     } catch (err) {
       console.error("Update error details:", err.response?.data);
       const errorMessage = err.response?.data?.message || "Failed to update quantity.";
@@ -160,7 +165,7 @@ const EditStockRequest = () => {
       </div>
       <div className="card-body p-24">
         <div className="mb-5">
-          <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Requested Products</h6>
+          {/* <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Requested Products</h6> */}
           {productList.length > 0 ? (
             <div className="table-responsive">
               <table className="table table-borderless sm-table mb-0">
