@@ -2,65 +2,95 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
+import { Spinner } from "../../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/customers";
-const SALES_PERSON_API = "https://api.bizchain.co.ke/v1/salespersons";
-const PRICING_CATEGORY_API = "https://api.bizchain.co.ke/v1/pricing-categories";
-const CUSTOMER_TYPE_API = "https://api.bizchain.co.ke/v1/customer-types";
+const PRICING_CATEGORY_API = "https://api.bizchain.co.ke/v1/customer-pricing-categories";
+const CUSTOMER_CATEGORY_API = "https://api.bizchain.co.ke/v1/customer-categories";
 const ROUTE_API = "https://api.bizchain.co.ke/v1/routes";
 
 const EditCustomer = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { customer } = location.state || {};
+  const customerId = location.state?.customerId;
 
-  const [editCustomer, setEditCustomer] = useState({
-    name: customer?.name || "",
-    phoneNo: customer?.phoneNo || "",
-    pricingCategoryId: customer?.pricingCategoryId || "",
-    customerTypeId: customer?.customerTypeId || "",
-    routeId: customer?.routeId || "",
-    salespersonId: customer?.salespersonId || "",
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    countryCode: "KE",
+    pricingCategory: "",
+    customerCategory: "",
+    routeId: "",
   });
-  const [showPricingCategoryDropdown, setShowPricingCategoryDropdown] = useState(false);
-  const [showCustomerTypeDropdown, setShowCustomerTypeDropdown] = useState(false);
-  const [showRouteDropdown, setShowRouteDropdown] = useState(false);
-  const [showSalespersonDropdown, setShowSalespersonDropdown] = useState(false);
-  const [salespeople, setSalespeople] = useState([]);
-  const [pricingCategories, setPricingCategories] = useState([]); 
-  const [customerTypes, setCustomerTypes] = useState([]);
-  const [routes, setRoutes] = useState([]); 
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [fetchLoading, setFetchLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
+  const [pricingCategories, setPricingCategories] = useState([]);
+  const [customerCategories, setCustomerCategories] = useState([]);
+  const [routes, setRoutes] = useState([]);
 
   useEffect(() => {
-    if (!customer) {
+    if (!customerId) {
       toast.error("No customer selected to edit.");
       navigate("/customers");
       return;
     }
 
-    const fetchData = async () => {
-      try {
-        const token = sessionStorage.getItem("token");
-        if (!token) throw new Error("No authentication token found");
+    const parsedId = parseInt(customerId, 10);
+    if (isNaN(parsedId) || parsedId <= 0) {
+      setErrors({ submit: "Invalid customer ID: Must be a positive number" });
+      setFetchLoading(false);
+      return;
+    }
 
-        const [salespeopleRes, pricingRes, customerTypeRes, routeRes] = await Promise.all([
-          axios.get(SALES_PERSON_API, { headers: { Authorization: `Bearer ${token}` } }),
+    const fetchData = async () => {
+      const token = sessionStorage.getItem("token");
+      if (!token || token.trim() === "") {
+        setErrors({ submit: "No authentication token found. Please log in." });
+        navigate("/login");
+        return;
+      }
+
+      try {
+        setFetchLoading(true);
+        const [customerRes, pricingRes, customerCategoryRes, routeRes] = await Promise.all([
+          axios.get(`${API_URL}/${parsedId}`, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(PRICING_CATEGORY_API, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(CUSTOMER_TYPE_API, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(CUSTOMER_CATEGORY_API, { headers: { Authorization: `Bearer ${token}` } }),
           axios.get(ROUTE_API, { headers: { Authorization: `Bearer ${token}` } }),
         ]);
 
-        // Set data directly from API responses
-        setSalespeople(salespeopleRes.data.data || []);
-        setPricingCategories(pricingRes.data.data || []);
-        setCustomerTypes(customerTypeRes.data.data || []);
-        setRoutes(routeRes.data.data || []);
+        const customerData = customerRes.data;
+        if (customerData.status && customerData.status.code === 0 && customerData.data) {
+          const fullCustomer = customerData.data;
+          setFormData({
+            firstName: fullCustomer.firstName || "",
+            lastName: fullCustomer.lastName || "",
+            email: fullCustomer.email || "",
+            phoneNumber: fullCustomer.phoneNo || "",
+            countryCode: "KE",
+            pricingCategory: fullCustomer.customerPricingCategory?.code || "",
+            customerCategory: fullCustomer.customerCategory?.code || "",
+            routeId: fullCustomer.route?.id ? String(fullCustomer.route.id) : "",
+          });
+        } else {
+          throw new Error("Failed to load customer data.");
+        }
+
+        if (pricingRes.data.status.code === 0) {
+          setPricingCategories(pricingRes.data.data || []);
+        }
+        if (customerCategoryRes.data.status.code === 0) {
+          setCustomerCategories(customerCategoryRes.data.data || []);
+        }
+        if (routeRes.data.status.code === 0) {
+          setRoutes(routeRes.data.data || []);
+        }
       } catch (error) {
-        console.error("Error fetching data:", error);
-        setError("Failed to load dropdown options. Please try again later.");
+        console.error("Error fetching data:", error.message);
+        setErrors({ submit: error.message || "Failed to load data. Please try again." });
         toast.error("Failed to load options.");
       } finally {
         setFetchLoading(false);
@@ -68,277 +98,260 @@ const EditCustomer = () => {
     };
 
     fetchData();
-  }, [customer, navigate]);
+  }, [customerId, navigate]);
 
-  // Helper functions to get display names from IDs
-  const getPricingCategoryName = (id) =>
-    pricingCategories.find((cat) => cat.id === id)?.name || "Select Pricing Category";
-  const getCustomerTypeName = (id) =>
-    customerTypes.find((type) => type.id === id)?.name || "Select Customer Type";
-  const getRouteName = (id) => routes.find((route) => route.id === id)?.name || "Select Route";
-  const getSalespersonName = (id) =>
-    salespeople.find((person) => person.id === id)?.name || "Select Salesperson";
+  const validateField = (field, value) => {
+    if (typeof value === "string" && !value.trim()) {
+      return `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} is required`;
+    }
+    if (field === "phoneNumber" && value && !/^\+?\d{9,}$/.test(value)) {
+      return "Please enter a valid phone number (e.g., +254765746534 or 0765746534)";
+    }
+    if (field === "email" && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      return "Please enter a valid email address";
+    }
+    return "";
+  };
 
-  const handleEditCustomer = async (e) => {
+  const handleInputChange = (field, value) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    const error = validateField(field, value);
+    setErrors((prev) => ({
+      ...prev,
+      [field]: error,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
 
-    if (
-      !editCustomer.name ||
-      !editCustomer.phoneNo ||
-      !editCustomer.pricingCategoryId ||
-      !editCustomer.customerTypeId ||
-      !editCustomer.routeId ||
-      !editCustomer.salespersonId
-    ) {
-      setError("Please fill in all required fields.");
-      toast.error("Please fill in all required fields.");
+    const newErrors = {};
+    Object.keys(formData).forEach((field) => {
+      const error = validateField(field, formData[field]);
+      if (error) newErrors[field] = error;
+    });
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Please fill in all required fields correctly.");
       return;
     }
 
-    const customerData = {
-      name: editCustomer.name,
-      phoneNo: editCustomer.phoneNo,
-      pricingCategoryId: editCustomer.pricingCategoryId,
-      customerTypeId: editCustomer.customerTypeId,
-      routeId: editCustomer.routeId,
-      salespersonId: editCustomer.salespersonId,
-    };
-
-    setLoading(true);
     try {
+      setIsLoading(true);
+      setErrors({});
       const token = sessionStorage.getItem("token");
-      if (!token) throw new Error("Please log in.");
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
 
-      const response = await axios.put(`${API_URL}/${customer.id}`, customerData, {
+      const payload = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        phoneNumber: formData.phoneNumber,
+        countryCode: formData.countryCode,
+        customerPricingCategory: formData.pricingCategory,
+        customerCategory: formData.customerCategory,
+        routeId: parseInt(formData.routeId, 10),
+      };
+
+      console.log("Submitting payload:", payload);
+
+      const response = await axios.put(`${API_URL}/${customerId}`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
       });
 
-      if (response.status === 200 || response.status === 201) {
-        toast.success("Customer updated successfully!");
-        navigate("/customers");
+      if (response.data.status.code !== 0) {
+        throw new Error(response.data.status.message || "Failed to update customer");
       }
+
+      toast.success("Customer updated successfully!");
+      navigate("/customers", { state: { refresh: true } });
     } catch (error) {
       console.error("Error updating customer:", error.response?.data || error.message);
-      setError(error.response?.data?.detail || "Failed to update customer. Please try again.");
-      toast.error("Failed to update customer.");
+      const errorMessage = error.response?.data?.detail || error.message || "Failed to update customer";
+      setErrors({ submit: errorMessage });
+      toast.error("Failed to update customer: " + errorMessage);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   const handleCancel = () => navigate("/customers");
 
   return (
-    <div className="page-wrapper">
+    <div className="card h-100 p-0 radius-12">
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="row">
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
-          <div className="card-body">
-            <h6 className="fs-6 mb-4">Edit Customer</h6>
-            {error && <div className="alert alert-danger">{error}</div>}
-            {fetchLoading && <div className="alert alert-info">Loading options...</div>}
-            <form onSubmit={handleEditCustomer}>
-              <div className="row mb-3">
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Customer Name"
-                    value={editCustomer.name}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, name: e.target.value })}
-                    required
-                    disabled={fetchLoading}
-                  />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Phone No <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Phone Number"
-                    value={editCustomer.phoneNo}
-                    onChange={(e) => setEditCustomer({ ...editCustomer, phoneNo: e.target.value })}
-                    required
-                    disabled={fetchLoading}
-                  />
-                </div>
+      <div className="card-body">
+        {fetchLoading && <Spinner />}
+        {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
+
+        {!fetchLoading && (
+          <form onSubmit={handleSubmit}>
+            <div className="row gx-3">
+              <div className="col-md-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  First Name <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className={`form-control radius-8 ${errors.firstName ? "is-invalid" : ""}`}
+                  placeholder="Enter First Name"
+                  value={formData.firstName}
+                  onChange={(e) => handleInputChange("firstName", e.target.value)}
+                  disabled={isLoading}
+                />
+                {errors.firstName && <div className="invalid-feedback">{errors.firstName}</div>}
               </div>
-              <div className="row mb-3">
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Pricing Category <span className="text-danger">*</span>
-                  </label>
-                  <div className="position-relative">
-                    <div
-                      className="form-control d-flex justify-content-between align-items-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => !fetchLoading && setShowPricingCategoryDropdown(!showPricingCategoryDropdown)}
-                    >
-                      <span>{getPricingCategoryName(editCustomer.pricingCategoryId)}</span>
-                      <i className="dropdown-toggle ms-2"></i>
-                    </div>
-                    {showPricingCategoryDropdown && (
-                      <ul
-                        className="dropdown-menu w-100 show"
-                        style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}
-                      >
-                        {pricingCategories.map((category) => (
-                          <li key={category.id}>
-                            <button
-                              type="button"
-                              className="dropdown-item"
-                              onClick={() => {
-                                setEditCustomer({ ...editCustomer, pricingCategoryId: category.id });
-                                setShowPricingCategoryDropdown(false);
-                              }}
-                            >
-                              {category.name}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Customer Type <span className="text-danger">*</span>
-                  </label>
-                  <div className="position-relative">
-                    <div
-                      className="form-control d-flex justify-content-between align-items-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => !fetchLoading && setShowCustomerTypeDropdown(!showCustomerTypeDropdown)}
-                    >
-                      <span>{getCustomerTypeName(editCustomer.customerTypeId)}</span>
-                      <i className="dropdown-toggle ms-2"></i>
-                    </div>
-                    {showCustomerTypeDropdown && (
-                      <ul
-                        className="dropdown-menu w-100 show"
-                        style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}
-                      >
-                        {customerTypes.map((type) => (
-                          <li key={type.id}>
-                            <button
-                              type="button"
-                              className="dropdown-item"
-                              onClick={() => {
-                                setEditCustomer({ ...editCustomer, customerTypeId: type.id });
-                                setShowCustomerTypeDropdown(false);
-                              }}
-                            >
-                              {type.name}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
+
+              <div className="col-md-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Last Name <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className={`form-control radius-8 ${errors.lastName ? "is-invalid" : ""}`}
+                  placeholder="Enter Last Name"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange("lastName", e.target.value)}
+                  disabled={isLoading}
+                />
+                {errors.lastName && <div className="invalid-feedback">{errors.lastName}</div>}
               </div>
-              <div className="row mb-3">
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Route <span className="text-danger">*</span>
-                  </label>
-                  <div className="position-relative">
-                    <div
-                      className="form-control d-flex justify-content-between align-items-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => !fetchLoading && setShowRouteDropdown(!showRouteDropdown)}
-                    >
-                      <span>{getRouteName(editCustomer.routeId)}</span>
-                      <i className="dropdown-toggle ms-2"></i>
-                    </div>
-                    {showRouteDropdown && (
-                      <ul
-                        className="dropdown-menu w-100 show"
-                        style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}
-                      >
-                        {routes.map((route) => (
-                          <li key={route.id}>
-                            <button
-                              type="button"
-                              className="dropdown-item"
-                              onClick={() => {
-                                setEditCustomer({ ...editCustomer, routeId: route.id });
-                                setShowRouteDropdown(false);
-                              }}
-                            >
-                              {route.name}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label">
-                    Salesperson <span className="text-danger">*</span>
-                  </label>
-                  <div className="position-relative">
-                    <div
-                      className="form-control d-flex justify-content-between align-items-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => !fetchLoading && setShowSalespersonDropdown(!showSalespersonDropdown)}
-                    >
-                      <span>{getSalespersonName(editCustomer.salespersonId)}</span>
-                      <i className="dropdown-toggle ms-2"></i>
-                    </div>
-                    {showSalespersonDropdown && (
-                      <ul
-                        className="dropdown-menu w-100 show"
-                        style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}
-                      >
-                        {salespeople.map((salesperson) => (
-                          <li key={salesperson.id}>
-                            <button
-                              type="button"
-                              className="dropdown-item"
-                              onClick={() => {
-                                setEditCustomer({ ...editCustomer, salespersonId: salesperson.id });
-                                setShowSalespersonDropdown(false);
-                              }}
-                            >
-                              {salesperson.name}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
+
+              <div className="col-md-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Email <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="email"
+                  className={`form-control radius-8 ${errors.email ? "is-invalid" : ""}`}
+                  placeholder="Enter Email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  disabled={isLoading}
+                />
+                {errors.email && <div className="invalid-feedback">{errors.email}</div>}
               </div>
-              <div className="text-muted small mt-3">
-                Fields marked with <span className="text-danger">*</span> are required.
+
+              <div className="col-md-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Phone Number <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="tel"
+                  className={`form-control radius-8 ${errors.phoneNumber ? "is-invalid" : ""}`}
+                  placeholder="Enter Phone Number (e.g., +254765746534)"
+                  value={formData.phoneNumber}
+                  onChange={(e) => handleInputChange("phoneNumber", e.target.value)}
+                  disabled={isLoading}
+                />
+                {errors.phoneNumber && <div className="invalid-feedback">{errors.phoneNumber}</div>}
               </div>
-              <div className="d-flex justify-content-end gap-2">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={handleCancel}
-                  disabled={loading || fetchLoading}
+
+              <div className="col-md-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Country Code <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  className={`form-control radius-8 ${errors.countryCode ? "is-invalid" : ""}`}
+                  placeholder="Enter Country Code (e.g., KE)"
+                  value={formData.countryCode}
+                  onChange={(e) => handleInputChange("countryCode", e.target.value)}
+                  disabled={isLoading}
+                />
+                {errors.countryCode && <div className="invalid-feedback">{errors.countryCode}</div>}
+              </div>
+
+              <div className="col-md-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Pricing Category <span className="text-danger">*</span>
+                </label>
+                <select
+                  className={`form-control radius-8 form-select ${errors.pricingCategory ? "is-invalid" : ""}`}
+                  value={formData.pricingCategory}
+                  onChange={(e) => handleInputChange("pricingCategory", e.target.value)}
+                  disabled={isLoading}
                 >
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={loading || fetchLoading}>
-                  {loading ? "Saving..." : "Save"}
-                </button>
+                  <option value="">Select Pricing Category</option>
+                  {pricingCategories.map((category) => (
+                    <option key={category.code} value={category.code}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.pricingCategory && (
+                  <div className="invalid-feedback">{errors.pricingCategory}</div>
+                )}
               </div>
-            </form>
-          </div>
-        </div>
+
+              <div className="col-md-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Customer Category <span className="text-danger">*</span>
+                </label>
+                <select
+                  className={`form-control radius-8 form-select ${errors.customerCategory ? "is-invalid" : ""}`}
+                  value={formData.customerCategory}
+                  onChange={(e) => handleInputChange("customerCategory", e.target.value)}
+                  disabled={isLoading}
+                >
+                  <option value="">Select Customer Category</option>
+                  {customerCategories.map((category) => (
+                    <option key={category.code} value={category.code}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.customerCategory && (
+                  <div className="invalid-feedback">{errors.customerCategory}</div>
+                )}
+              </div>
+
+              <div className="col-md-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                  Route <span className="text-danger">*</span>
+                </label>
+                <select
+                  className={`form-control radius-8 form-select ${errors.routeId ? "is-invalid" : ""}`}
+                  value={formData.routeId}
+                  onChange={(e) => handleInputChange("routeId", e.target.value)}
+                  disabled={isLoading}
+                >
+                  <option value="">Select Route</option>
+                  {routes.map((route) => (
+                    <option key={route.id} value={route.id}>
+                      {route.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.routeId && <div className="invalid-feedback">{errors.routeId}</div>}
+              </div>
+            </div>
+
+            <div className="text-muted small mt-4 mb-3">
+              Fields marked with <span className="text-danger">*</span> are required.
+            </div>
+
+            <div className="mt-4 d-flex justify-content-end gap-2">
+              <button
+                type="button"
+                className="btn btn-secondary px-12"
+                onClick={handleCancel}
+                disabled={isLoading}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary px-12" disabled={isLoading}>
+                {isLoading ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

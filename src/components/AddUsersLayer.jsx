@@ -160,7 +160,6 @@ const AddUsersLayer = ({ onUserAdded }) => {
       ...prev,
       [field]: error,
     }));
-    // Removed toast notification from here
   };
 
   const handlePermissionChange = (moduleId, code, checked) => {
@@ -289,7 +288,6 @@ const AddUsersLayer = ({ onUserAdded }) => {
   };
 
   const isDepotManager = roles.find(r => r.roleId === parseInt(formData.roleId, 10))?.roleName === 'Depot Manager';
-  console.log("Role ID:", formData.roleId, "Is Depot Manager:", isDepotManager);
 
   return (
     <div className="card h-100 p-0 radius-12">
@@ -366,26 +364,27 @@ const AddUsersLayer = ({ onUserAdded }) => {
               {errors.roleId && <div className="invalid-feedback">{errors.roleId}</div>}
             </div>
 
-            <div className="col-md-6 mb-3">
-              <label className="form-label fw-semibold text-primary-light mb-2">
-                Depot {isDepotManager && <span className="text-danger">*</span>}
-              </label>
-              <select
-                key={formData.roleId}
-                className={`form-control rounded-lg form-select pr-4 bg-white ${errors.depotId ? 'is-invalid' : ''}`}
-                value={formData.depotId}
-                onChange={(e) => handleInputChange('depotId', e.target.value)}
-                disabled={!isDepotManager}
-              >
-                <option value="">Select Depot</option>
-                {depots.map((depot) => (
-                  <option key={depot.id} value={depot.id}>
-                    {depot.name}
-                  </option>
-                ))}
-              </select>
-              {errors.depotId && <div className="invalid-feedback">{errors.depotId}</div>}
-            </div>
+            {isDepotManager && (
+              <div className="col-md-6 mb-3">
+                <label className="form-label fw-semibold text-primary-light mb-2">
+                  Depot <span className="text-danger">*</span>
+                </label>
+                <select
+                  key={formData.roleId}
+                  className={`form-control rounded-lg form-select pr-4 bg-white ${errors.depotId ? 'is-invalid' : ''}`}
+                  value={formData.depotId}
+                  onChange={(e) => handleInputChange('depotId', e.target.value)}
+                >
+                  <option value="">Select Depot</option>
+                  {depots.map((depot) => (
+                    <option key={depot.id} value={depot.id}>
+                      {depot.name}
+                    </option>
+                  ))}
+                </select>
+                {errors.depotId && <div className="invalid-feedback">{errors.depotId}</div>}
+              </div>
+            )}
           </div>
 
           {formData.roleId && (
@@ -409,7 +408,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
                             <td>
                               <div className="d-flex flex-row flex-grow-1 gap-2">
                                 {perms.map((perm) => (
-                                  <div className="form-check form-check-md d-flex align-items-center gap-2" key={perm.code}>
+                                  <div className="form-check style-check d-flex align-items-center gap-2" key={perm.code}>
                                     <input
                                       className="form-check-input"
                                       type="checkbox"

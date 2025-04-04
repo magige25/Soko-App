@@ -112,7 +112,7 @@ const UsersDetailsLayer = () => {
               <div className="mt-5">
                 <h6 className="mb-3 fs-5">Module Permissions</h6>
                 {userToView.userModelModulePermissions && userToView.userModelModulePermissions.length > 0 ? (
-                  <table className="table table-bordered">
+                  <table className="table table-borderless">
                     <thead>
                       <tr>
                         <th>Module</th>

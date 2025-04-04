@@ -146,7 +146,7 @@ const MasterLayout = ({ children }) => {
       childRoutes: [],
     },
     orderManagement: {
-      paths: ["/pending-orders", "/pending-deliveries", "/settled-orders"],
+      paths: ["/orders", "/pending-deliveries", "/settled-orders"],
       childRoutes: [],
     },
     salespersonOperation: {
@@ -305,7 +305,7 @@ const MasterLayout = ({ children }) => {
                 <ul className="sidebar-submenu">
                   <li>
                     <NavLink
-                      to="/pending-orders"
+                      to="/orders"
                       className={(navData) => (navData.isActive ? "active-page" : "")}
                     >
                       Pending Orders
@@ -973,7 +973,7 @@ const MasterLayout = ({ children }) => {
                         alt="image_user"
                         className="object-fit-cover rounded-circle"
                       />
-                      <span className="position-absolute bottom-0 end-0 bg-success-main w-8-px h-8-px rounded-circle"></span>
+                      <span className="position-absolute bottom-0 end-0 background-success-main w-8-px h-8-px rounded-circle"></span>
                     </button>
                     <div className="dropdown-menu to-top dropdown-menu-sm">
                       <div className="d-flex align-items-center gap-2">
@@ -1068,7 +1068,7 @@ const MasterLayout = ({ children }) => {
             <div className="row align-items-center justify-content-between">
               <div className="col-auto">
                 <p className="mb-0" style={{ fontSize: "13px" }}>
-                  © 2025 Bizchain System. All Rights Reserved.
+                  © 2025 Logistify System. All Rights Reserved.
                 </p>
               </div>
               <div className="col-auto">

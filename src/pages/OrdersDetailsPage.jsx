@@ -1,20 +1,20 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import CurrenciesLayer from "../components/CurrenciesLayer";
+import OrdersDetailsLayer from "../components/OrdersDetailsLayer";
 
 
-const CurrenciesPage = () => {
+const OrdersDetailsPage = () => {
   return (
     <>
       {/* MasterLayout */}
       <MasterLayout>
 
         {/* Breadcrumb */}
-        <Breadcrumb title="Settings - Currencies" />
+        <Breadcrumb title="Order Details" />
 
-        {/* CurrenciesLayer */}
-        <CurrenciesLayer />
+        {/* OrdersDetailsLayer */}
+        <OrdersDetailsLayer />
 
 
       </MasterLayout>
@@ -22,4 +22,4 @@ const CurrenciesPage = () => {
   );
 };
 
-export default CurrenciesPage;
+export default OrdersDetailsPage;

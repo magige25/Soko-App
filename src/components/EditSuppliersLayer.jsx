@@ -271,7 +271,7 @@ const EditSuppliersLayer = () => {
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="card-body">
         <form onSubmit={handleSubmit}>
-          <div className="row gx-3" style={{ fontSize: "14px" }}>
+          <div className="row gx-3">
             {/* First Column */}
             <div className="col-md-4 mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">
@@ -455,16 +455,15 @@ const EditSuppliersLayer = () => {
                 Has Expansion Space
               </label>
               <div 
-                className="form-control radius-8 d-flex align-items-center"
+                className="form-control radius-4 d-flex align-items-center"
                 style={{ border: 'none', background: 'transparent', height: '38px', padding: '0' }}
               >
                 <input
                   type="checkbox"
-                  className="form-check-input me-2"
+                  className="form-check-input style-check border me-2" style={{ width: "24px", height: "24px" }}
                   id="expansionSpace"
                   checked={formData.expansionSpace}
                   onChange={(e) => handleInputChange("expansionSpace", e.target.checked)}
-                  style={{ width: "30px", height: "30px" }}
                 />
                 <label className="form-check-label text-primary-light" htmlFor="expansionSpace" style={{ cursor: 'pointer' }}></label>
               </div>

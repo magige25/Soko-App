@@ -270,41 +270,43 @@ const SubCategoryLayer = () => {
                     <td className="text-start py-3 px-4">{subCategory.categoryName}</td>
                     <td className="text-start py-3 px-4">{formatDate(subCategory.dateCreated)}</td>
                     <td className="text-start py-3 px-4">
-                      <div className="dropdown">
-                        <button
-                          className="btn btn-outline-secondary btn-sm dropdown-toggle"
-                          type="button"
-                          data-bs-toggle="dropdown"
-                        >
-                          Actions
-                        </button>
-                        <ul className="dropdown-menu">
-                          <li>
-                            <Link
-                              className="dropdown-item"
-                              to={`/sub-category/${subCategory.id}`}
-                              state={{ subCategory }}
-                            >
-                              View
-                            </Link>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item"
-                              onClick={() => handleEditClick(subCategory)}
-                            >
-                              Edit
-                            </button>
-                          </li>
-                          <li>
-                            <button
-                              className="dropdown-item text-danger"
-                              onClick={() => handleDeleteClick(subCategory)}
-                            >
-                              Delete
-                            </button>
-                          </li>
-                        </ul>
+                      <div className="action-dropdown">
+                        <div className="dropdown">
+                          <button
+                            className="btn btn-outline-secondary btn-sm dropdown-toggle"
+                            type="button"
+                            data-bs-toggle="dropdown"
+                          >
+                            Actions
+                          </button>
+                          <ul className="dropdown-menu">
+                            <li>
+                              <Link
+                                className="dropdown-item"
+                                to={`/sub-category/${subCategory.id}`}
+                                state={{ subCategory }}
+                              >
+                                View
+                              </Link>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item"
+                                onClick={() => handleEditClick(subCategory)}
+                              >
+                                Edit
+                              </button>
+                            </li>
+                            <li>
+                              <button
+                                className="dropdown-item text-danger"
+                                onClick={() => handleDeleteClick(subCategory)}
+                              >
+                                Delete
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
                       </div>
                     </td>
                   </tr>

@@ -1,20 +1,20 @@
 import React from "react";
 import MasterLayout from "../masterLayout/MasterLayout";
 import Breadcrumb from "../components/Breadcrumb";
-import CreateRoleLayer from "../components/CreateRoleLayer";
+import AddOrdersLayer from "../components/AddOrdersLayer";
 
 
-const CreateRolePage = () => {
+const AddOrdersPage = () => {
   return (
     <>
       {/* MasterLayout */}
       <MasterLayout>
 
         {/* Breadcrumb */}
-        <Breadcrumb title="Create Role" />
+        <Breadcrumb title="Add Orders" />
 
-        {/* CreateRoleLayer */}
-        <CreateRoleLayer />
+        {/* AddOrdersLayer */}
+        <AddOrdersLayer />
 
 
       </MasterLayout>
@@ -22,4 +22,4 @@ const CreateRolePage = () => {
   );
 };
 
-export default CreateRolePage;
+export default AddOrdersPage;

@@ -4,9 +4,11 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { DatePicker } from "antd"; 
+import dayjs from "dayjs"; 
 
-const API_URL = "https://api.bizchain.co.ke/v1/drawing/product-in-progress"; // Endpoint for fetching products
-const SUBMIT_API_URL = "https://api.bizchain.co.ke/v1/stock"; // Endpoint for submitting stock
+const API_URL = "https://api.bizchain.co.ke/v1/drawing/product-in-progress"; 
+const SUBMIT_API_URL = "https://api.bizchain.co.ke/v1/stock";
 
 const AddStockLayer = () => {
   const [drawCode, setDrawCode] = useState("");
@@ -19,7 +21,6 @@ const AddStockLayer = () => {
   const [isDrawCodeValid, setIsDrawCodeValid] = useState(false);
   const navigate = useNavigate();
 
-  // Utility function to format date from YYYY-MM-DD to DD/MM/YYYY
   const formatDateToServer = (dateString) => {
     if (!dateString) return "";
     const date = new Date(dateString);
@@ -29,11 +30,10 @@ const AddStockLayer = () => {
     return `${day}/${month}/${year}`;
   };
 
-  // Utility function to validate if a date is in the future
   const isFutureDate = (dateString) => {
     if (!dateString) return false;
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset time for comparison
+    today.setHours(0, 0, 0, 0);
     const inputDate = new Date(dateString);
     return inputDate > today;
   };
@@ -124,23 +124,23 @@ const AddStockLayer = () => {
     }));
   };
 
-  const handleExpiryDateChange = (productId, value) => {
-    if (!isFutureDate(value)) {
+  const handleExpiryDateChange = (productId, date, dateString) => {
+    if (!isFutureDate(dateString)) {
       toast.error("Expiry date must be a future date.");
       return;
     }
     setExpiryDates((prev) => ({
       ...prev,
-      [productId]: value,
+      [productId]: dateString,
     }));
   };
 
-  const handleProductionDateChange = (value) => {
-    if (value && new Date(value) > new Date()) {
+  const handleProductionDateChange = (date, dateString) => {
+    if (dateString && new Date(dateString) > new Date()) {
       toast.error("Production date cannot be in the future.");
       return;
     }
-    setProductionDate(value);
+    setProductionDate(dateString);
   };
 
   const handleSubmit = async (e) => {
@@ -273,7 +273,6 @@ const AddStockLayer = () => {
               </div>
             </div>
 
-            {/* Conditional Rendering of Form Fields */}
             {isDrawCodeValid && (
               <>
                 {/* Products Table */}
@@ -304,12 +303,13 @@ const AddStockLayer = () => {
                             />
                           </td>
                           <td className="text-start small-text py-12 px-16">
-                            <input
-                              type="date"
-                              className="form-control bg-base h-40-px radius-8"
-                              value={expiryDates[product.id] || ""}
-                              onChange={(e) => handleExpiryDateChange(product.id, e.target.value)}
+                            <DatePicker
+                              value={expiryDates[product.id] ? dayjs(expiryDates[product.id]) : null}
+                              format="YYYY-MM-DD"
+                              onChange={(date, dateString) => handleExpiryDateChange(product.id, date, dateString)}
+                              className="bg-base h-40-px radius-8"
                               disabled={isLoading}
+                              style={{ width: "100%" }}
                               required
                             />
                           </td>
@@ -320,14 +320,15 @@ const AddStockLayer = () => {
                 </div>
 
                 {/* Production Date */}
-                <div className="col-4 mb-24">
+                <div className="col-3 mb-24">
                   <label className="form-label fw-semibold mb-8">Production Date</label>
-                  <input
-                    type="date"
-                    className="form-control bg-base h-40-px radius-8"
-                    value={productionDate}
-                    onChange={(e) => handleProductionDateChange(e.target.value)}
+                  <DatePicker
+                    value={productionDate ? dayjs(productionDate) : null}
+                    format="YYYY-MM-DD"
+                    onChange={(date, dateString) => handleProductionDateChange(date, dateString)}
+                    className="bg-base h-40-px radius-8"
                     disabled={isLoading}
+                    style={{ width: "100%" }}
                     required
                   />
                 </div>

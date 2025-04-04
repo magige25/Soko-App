@@ -69,7 +69,7 @@ const LatestRegisteredOne = () => {
                             tabIndex={0}
                         >
                             <div className="table-responsive scroll-sm">
-                                <table className="table bordered-table sm-table mb-0">
+                                <table className="table table-borderless sm-table mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">Users </th>
@@ -223,7 +223,7 @@ const LatestRegisteredOne = () => {
                             tabIndex={0}
                         >
                             <div className="table-responsive scroll-sm">
-                                <table className="table bordered-table sm-table mb-0">
+                                <table className="table table-borderless sm-table mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col">Users </th>

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/storage-facilities";
 
@@ -87,23 +88,6 @@ const StorageFacilityLayer = () => {
     setCurrentPage(pageNumber);
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
-  };
-
   return (
     <div className="card h-100 p-0 radius-12">
       <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
@@ -113,7 +97,7 @@ const StorageFacilityLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search by name or location"
+              placeholder="Search name or location"
               value={query}
               onChange={handleSearchInputChange}
             />
@@ -140,7 +124,7 @@ const StorageFacilityLayer = () => {
                 <th scope="col" className="text-start py-3 px-4">Location</th>
                 <th scope="col" className="text-start py-3 px-4">Capacity (L)</th>
                 <th scope="col" className="text-start py-3 px-4">Stock Volume (L)</th>
-                <th scope="col" className="text-start py-3 px-4">Overflow (L)</th>
+                {/* <th scope="col" className="text-start py-3 px-4">Overflow (L)</th> */}
                 <th scope="col" className="text-start py-3 px-4">Last Refilled</th>
                 <th scope="col" className="text-start py-3 px-4">Last Drawn</th>
                 <th scope="col" className="text-start py-3 px-4">Action</th>
@@ -163,13 +147,13 @@ const StorageFacilityLayer = () => {
                     <td className="text-start small-text py-3 px-4">{facility.location || '-'}</td>
                     <td className="text-start small-text py-3 px-4">{facility.capacity.toLocaleString()}</td>
                     <td className="text-start small-text py-3 px-4">{facility.stockVolume?.toLocaleString() || '-'}</td>
-                    <td className="text-start small-text py-3 px-4">
+                    {/* <td className="text-start small-text py-3 px-4">
                       {facility.overflow !== undefined && facility.overflow !== null
                         ? facility.overflow === 0
                           ? '0'
                           : facility.overflow.toLocaleString()
                         : '-'}
-                    </td>
+                    </td> */}
                     <td className="text-start small-text py-3 px-4">
                       {formatDate(facility.dateLastRefilled) || '-'}
                     </td>

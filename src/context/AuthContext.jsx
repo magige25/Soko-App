@@ -36,8 +36,6 @@ export const AuthProvider = ({ children }) => {
         }
       );
 
-      console.log("User Data Response:", response.data);
-
       if (response.status === 200 && response.data.status?.code === 0) {
         const userData = response.data.data;
         setUser({
