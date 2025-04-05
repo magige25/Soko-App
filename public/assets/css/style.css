@@ -13087,6 +13087,12 @@ select option {
   color: var(--text-secondary-light);
 }
 
+.half-width-card {
+  width: 50%;
+  margin-left: 0;
+}
+
+
 .left-line::before {
   position: absolute;
   content: "";

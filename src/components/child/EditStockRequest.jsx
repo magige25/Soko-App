@@ -165,7 +165,7 @@ const EditStockRequest = () => {
       </div>
       <div className="card-body p-24">
         <div className="mb-5">
-          {/* <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Requested Products</h6> */}
+          {/* <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Products</h6> */}
           {productList.length > 0 ? (
             <div className="table-responsive">
               <table className="table table-borderless sm-table mb-0">

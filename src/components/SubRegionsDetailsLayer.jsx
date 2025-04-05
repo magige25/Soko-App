@@ -1,6 +1,7 @@
 import { Icon } from "@iconify/react";
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
+import { formatCurrency } from "../hook/format-utils";
 
 const SubRegionDetails = () => {
   const location = useLocation();
@@ -110,7 +111,7 @@ const SubRegionDetails = () => {
                 <tr key={order.id}>
                   <td className="text-start small-text">{order.id}</td>
                   <td className="text-start small-text">{order.orderId}</td>
-                  <td className="text-start small-text">${order.amount}</td>
+                  <td className="text-start small-text">{formatCurrency(order.amount)}</td>
                   <td className="text-start small-text">{order.status}</td>
                 </tr>
               ))}

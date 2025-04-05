@@ -24,12 +24,13 @@ const EditProduct = () => {
           name: product.name || "",
           description: product.description || "",
           brand: product.brand?.id || "",
-          discountPrice: product.discountPrice || "",
           wholesalePrice: product.wholesalePrice || "",
           distributorPrice: product.distributorPrice || "",
           retailPrice: product.retailPrice || "",
           category: product.category?.id || "",
           subCategory: product.subCategory?.id || "",
+          customerPrice: product.customerPrice || "",
+          superMarketPrice: product.supermarketPrice || "",
         }
       : {
           imageFile: null,
@@ -38,9 +39,10 @@ const EditProduct = () => {
           name: "",
           description: "",
           brand: "",
-          discountPrice: "",
           wholesalePrice: "",
           distributorPrice: "",
+          customerPrice: "",
+          superMarketPrice: "",
           retailPrice: "",
           category: "",
           subCategory: "",
@@ -105,12 +107,22 @@ const EditProduct = () => {
 
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([fetchBrands(), fetchCategories(), fetchSubCategories()]);
-      setLoading(false);
+      try {
+        await Promise.all([fetchBrands(), fetchCategories(), fetchSubCategories()]);
+      } catch (err) {
+        console.error("Error in fetchData:", err);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchData();
   }, [product, navigate, fetchBrands, fetchCategories, fetchSubCategories]);
+
+  const getFilteredSubCategories = (categoryId) => {
+    if (!categoryId) return [];
+    return subCategories.filter((subCat) => subCat.category.id === parseInt(categoryId, 10));
+  };
 
   const handleImageSelect = (file, previewURL) => {
     setEditProduct({ ...editProduct, imageFile: file, imageURL: previewURL });
@@ -118,17 +130,25 @@ const EditProduct = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setEditProduct({ ...editProduct, [name]: value });
+    setEditProduct(prev => {
+      const newData = { ...prev, [name]: value };
+      if (name === "category") {
+        newData.subCategory = ""; // Reset subcategory when category changes
+      }
+      return newData;
+    });
   };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    const prices = [      
+    const prices = [
       editProduct.wholesalePrice,
       editProduct.distributorPrice,
       editProduct.retailPrice,
+      editProduct.customerPrice,
+      editProduct.superMarketPrice,
     ];
 
     if (
@@ -149,10 +169,11 @@ const EditProduct = () => {
       name: editProduct.name,
       description: editProduct.description,
       brand: editProduct.brand,
-      discountPrice: parseFloat(editProduct.discountPrice),
       wholesalePrice: parseFloat(editProduct.wholesalePrice),
       distributorPrice: parseFloat(editProduct.distributorPrice),
       retailPrice: parseFloat(editProduct.retailPrice),
+      customerPrice: parseFloat(editProduct.customerPrice),
+      superMarketPrice: parseFloat(editProduct.superMarketPrice),
       category: editProduct.category,
       subCategory: editProduct.subCategory,
     };
@@ -164,7 +185,6 @@ const EditProduct = () => {
 
       let response;
       if (editProduct.imageFile) {
-        // Submit with image
         const formData = new FormData();
         for (const [key, value] of Object.entries(data)) {
           formData.append(key, value);
@@ -179,7 +199,6 @@ const EditProduct = () => {
           },
         });
       } else {
-        // Submit without image
         console.log("Submitting without image...");
         response = await axios.put(`${API_URL}/${product.id}`, data, {
           headers: {
@@ -274,7 +293,8 @@ const EditProduct = () => {
                       name="name"
                       value={editProduct.name}
                       onChange={handleChange}
-                      disabled
+                      required
+                      disabled={loading}
                     />
                   </div>
                   <div>
@@ -297,7 +317,7 @@ const EditProduct = () => {
                       value={editProduct.category}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || !categories.length}
                     >
                       <option value="">Select Category</option>
                       {categories.map((category) => (
@@ -332,7 +352,7 @@ const EditProduct = () => {
                       value={editProduct.brand}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || !brands.length}
                     >
                       <option value="">Select Brand</option>
                       {brands.map((brand) => (
@@ -352,10 +372,10 @@ const EditProduct = () => {
                       value={editProduct.subCategory}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || !editProduct.category || !subCategories.length}
                     >
                       <option value="">Select Subcategory</option>
-                      {subCategories.map((subCategory) => (
+                      {getFilteredSubCategories(editProduct.category).map((subCategory) => (
                         <option key={subCategory.id} value={subCategory.id}>
                           {subCategory.name}
                         </option>
@@ -403,6 +423,36 @@ const EditProduct = () => {
                     className="form-control"
                     name="retailPrice"
                     value={editProduct.retailPrice}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="row mb-3 align-items-center">
+                <div className="col-md-4">
+                  <label className="form-label">
+                    Customer Price <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="form-control"
+                    name="customerPrice"
+                    value={editProduct.customerPrice}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+                <div className="col-md-4">
+                  <label className="form-label">
+                    Supermarket Price <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="form-control"
+                    name="superMarketPrice"
+                    value={editProduct.superMarketPrice}
                     onChange={handleChange}
                     required
                   />

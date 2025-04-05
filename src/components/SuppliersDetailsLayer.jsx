@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate, formatCurrency } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/suppliers";
 
@@ -91,10 +92,6 @@ const SuppliersDetailsLayer = () => {
     loadSupplierDetails();
   }, [supplierId, navigate]);
 
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(value || 0);
-  };
-
   // Always return valid JSX
   if (isLoading) {
     return (
@@ -178,7 +175,7 @@ const SuppliersDetailsLayer = () => {
                 </div>
                 <div className="mb-3">
                   <label className="form-label fw-semibold text-primary-light">Date Created</label>
-                  <p className="text-muted">{viewSupplier.dateCreated}</p>
+                  <p className="text-muted">{formatDate(viewSupplier.dateCreated)}</p>
                 </div>
                 <div className="mb-3">
                   <label className="form-label fw-semibold text-primary-light">Contact Person Name</label>

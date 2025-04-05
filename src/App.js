@@ -119,6 +119,8 @@ import EditSalespersonsPage from "./pages/EditSalespersonsPage";
 import SalespersonsDetailsPage from "./pages/SalespersonsDetailsPage";
 import CustomersPage from "./pages/CustomersPage";
 import CustomerTypePage from "./pages/CustomerTypePage";
+import CustomerCategoryPage from "./pages/CustomerCategoryPage";
+import CustomerPricingCategoryPage from "./pages/CustomerPricingCategoryPage";
 import PricingCategoriesPage from "./pages/PricingCategoriesPage";
 import CreditorsRequestPage from "./pages/CreditorsRequestPage";
 import PendingOrdersPage from "./pages/PendingOrdersPage";
@@ -275,6 +277,8 @@ function App() {
             <Route path="/customers/edit" element={<EditCustomerPage />} />
             <Route path="/customers/details" element={<CustomerDetailsPage />} />
             <Route path="/customer-type" element={<CustomerTypePage />} />
+            <Route path="/customer-category" element={<CustomerCategoryPage />} />
+            <Route path="/customer-pricing" element={<CustomerPricingCategoryPage />} />
             <Route path="/pricing-categories" element={<PricingCategoriesPage />} />
             <Route path="/creditors-request" element={<CreditorsRequestPage />} />
             <Route path="/pending-orders" element={<PendingOrdersPage />} />

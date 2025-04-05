@@ -4,6 +4,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate, formatCurrency } from "../hook/format-utils";
+
 
 const API_URL = "https://api.bizchain.co.ke/v1/supplier-deliveries";
 
@@ -115,26 +117,6 @@ const DeliveriesLayer = () => {
   };
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
-  };
 
   const handleAddDeliveryClick = () => {
     navigate("/deliveries/add-delivery");

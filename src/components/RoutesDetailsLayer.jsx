@@ -1,71 +1,187 @@
 import { Icon } from "@iconify/react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import axios from "axios";
+import { formatCurrency } from "../hook/format-utils";
 
 const RouteDetails = () => {
   const location = useLocation();
-  // Default route object with all necessary properties
-  const defaultRoute = {
-    name: "Default Route",
-    salesAgents: 0,
-    customers: 0,
-    country: "N/A",
-    dateCreated: null,
-  };
-
-  // Safely extract route from location.state, falling back to defaultRoute
-  const route = location.state?.route || defaultRoute;
-  console.log("location.state:", location.state);
-  console.log("Route data:", route);
+  const [route, setRoute] = useState(null);
+  const [customers, setCustomers] = useState([]);
+  const [salesPersons, setSalesPersons] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  
+  const [page, setPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const [selectedTable, setSelectedTable] = useState("customers");
   const [selectedStatus, setSelectedStatus] = useState("All");
   const [selectedDateFilter, setSelectedDateFilter] = useState("");
 
-  // Define stats after route is safely initialized
-  const stats = [
-    { title: "Total Employees", count: route.salesAgents || 1007, icon: "mdi:account-group", color: "bg-dark" },
-    { title: "Active", count: route.salesAgents || 1007, icon: "mdi:account-check", color: "bg-success" },
-    { title: "Inactive", count: 0, icon: "mdi:account-off", color: "bg-danger" },
-    { title: "New Joiners", count: 67, icon: "mdi:account-plus", color: "bg-info" },
-  ];
+  const API_BASE_URL = "https://api.bizchain.co.ke/v1";
+  const token = sessionStorage.getItem("token");
 
-  if (!route) {
-    return <div>No route data found</div>;
-  }
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!token) {
+        setError("Please login!");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        setLoading(true);
+
+        // Fetch route data
+        const routeId = location.state?.route?.id;
+        const routeResponse = routeId
+          ? await axios.get(`${API_BASE_URL}/routes/${routeId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            })
+          : { data: null };
+        setRoute(routeResponse.data || {
+          name: "Default Route",
+          numberSalesPerson: 0,
+          numberCustomer: 0,
+          country: { name: "N/A" },
+          dateCreated: null,
+        });
+        console.log("Route Response:", routeResponse.data);
+
+        // Fetch customers
+        const customersResponse = await axios.get(`${API_BASE_URL}/customers`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: {
+            page: page - 1,
+            size: itemsPerPage,
+            searchValue: searchQuery,
+          },
+        });
+        console.log("Customers Response:", customersResponse.data);
+        const customersData = customersResponse.data.data || [];
+        if (customersData.length === 0) {
+          console.warn("No customers data found in response");
+        }
+        setCustomers(customersData);
+
+        // Fetch sales persons
+        const salesResponse = await axios.get(`${API_BASE_URL}/salesperson`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: {
+            page: page - 1,
+            size: itemsPerPage,
+            searchValue: searchQuery,
+          },
+        });
+        console.log("SalesPersons Response:", salesResponse.data);
+        const salesData = salesResponse.data.data || [];
+        setSalesPersons(salesData);
+
+        // Fetch orders
+        const ordersResponse = await axios.get(`${API_BASE_URL}/orders`, {
+          headers: { Authorization: `Bearer ${token}` },
+          params: {
+            page: page - 1,
+            size: itemsPerPage,
+            searchValue: searchQuery,
+          },
+        });
+        console.log("Orders Response:", ordersResponse.data);
+        const ordersData = ordersResponse.data.data || [];
+        setOrders(ordersData);
+
+      } catch (err) {
+        console.error("Fetch Error:", err);
+        setError(err.message || "Failed to fetch data");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [location.state, page, searchQuery]);
+
+  const stats = route ? [
+    { 
+      title: "Total Employees", 
+      count: route.numberSalesPerson || 0, 
+      icon: "mdi:account-group", 
+      color: "bg-dark" 
+    },
+    { 
+      title: "Active", 
+      count: route.numberSalesPerson || 0, 
+      icon: "mdi:account-check", 
+      color: "bg-success" 
+    },
+    { 
+      title: "Inactive", 
+      count: 0, 
+      icon: "mdi:account-off", 
+      color: "bg-danger" 
+    },
+    { 
+      title: "New Joiners", 
+      count: Array.isArray(customers) && customers.length > 0 
+        ? customers.filter(c => c.dateCreated && new Date(c.dateCreated) > new Date(Date.now() - 7*24*60*60*1000)).length 
+        : 0,
+      icon: "mdi:account-plus", 
+      color: "bg-info" 
+    },
+  ] : [];
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
+  if (!route) return <div>No route data found</div>;
 
   const tables = {
-    customers: [
-      { id: 1, name: "Customer A", phoneNO: 746779784, email: "customerA@example.com", salesAgents: "James", totalOrders: 12, pendingOrders: 4, pendingPayments: 2000 },
-      { id: 2, name: "Customer B", phoneNO: 746779784, email: "customerB@example.com", salesAgents: "Leah", totalOrders: 22, pendingOrders: 8, pendingPayments: 1200 },
-      { id: 3, name: "Customer C", phoneNO: 746779784, email: "customerC@example.com", salesAgents: "Steve", totalOrders: 16, pendingOrders: 7, pendingPayments: 10500 },
-    ],
-    orders: [
-      { id: 1, orderId: "ORD123", amount: 100, status: "Completed" },
-      { id: 2, orderId: "ORD124", amount: 200, status: "Pending" },
-      { id: 3, orderId: "ORD125", amount: 200, status: "Defaulted" },
-    ],
-    salesAgents: [
-      { id: 1, name: "Agent X", route: route.name || "Nyanza" },
-      { id: 2, name: "Agent Y", route: route.name || "Coastal" },
-      { id: 3, name: "Agent Z", route: route.name || "Nairobi" },
-    ],
+    customers: (Array.isArray(customers) ? customers : []).map(c => {
+      const customerOrders = orders.filter(o => o.customer?.id === c.id);
+      console.log(`Mapping customer ${c.id}: Orders found = ${customerOrders.length}`);
+      return {
+        id: c.id || "",
+        name: `${c.firstName || ""} ${c.lastName || ""}`.trim() || "Unknown",
+        phoneNo: c.phoneNo || "",
+        email: c.email || "",
+        outletName: c.outletName || "",
+        salesPersons: customerOrders[0]?.salesperson?.name || "",
+        totalOrders: customerOrders.length,
+        pendingOrders: customerOrders.filter(o => o.orderStatus?.code === "PEND").length,
+        pendingPayments: customerOrders.reduce((sum, o) => 
+          o.paymentStatus?.code === "NPD" ? sum + (o.amount || 0) : sum, 0),
+      };
+    }),
+    orders: (Array.isArray(orders) ? orders : []).map(o => ({
+      id: o.id || "",
+      orderId: o.orderCode || "",
+      amount: o.amount || 0,
+      status: o.orderStatus?.name || "",
+    })),
+    salesPersons: (Array.isArray(salesPersons) ? salesPersons : []).map(s => ({
+      id: s.id || "",
+      name: `${s.firstName || ""} ${s.lastName || ""}`.trim() || "Unknown",
+      route: s.route?.name || route.name || "",
+      region: s.region?.name || "",
+    })),
   };
+
+  console.log("Tables Customers:", tables.customers);
 
   const filterOptions = [
     "Today", "Yesterday", "Last 7 Days", "Last 30 Days", "This Month", "Last Month", "Custom Range"
   ];
 
-  const tableOptions = ["customers", "orders", "salesAgents"];
-  const statusOptions = ["All", "Completed", "Pending", "Defaulted"];
+  const tableOptions = ["customers", "orders", "salesPersons"];
+  const statusOptions = ["All", "Completed", "Pending", "Not Paid"];
 
   const filteredOrders = selectedStatus === "All"
     ? tables.orders
     : tables.orders.filter((order) => order.status === selectedStatus);
 
   const renderTable = () => {
-    console.log("Selected table:", selectedTable);
-    console.log("Table data:", tables[selectedTable]);
     switch (selectedTable) {
       case "customers":
         return (
@@ -74,27 +190,35 @@ const RouteDetails = () => {
               <tr>
                 <th className="text-start">#</th>
                 <th className="text-start">Name</th>
-                <th className="text-start">Phone NO.</th>
+                <th className="text-start">Phone No.</th>
                 <th className="text-start">Email</th>
-                <th className="text-start">Sales Agent</th>
+                <th className="text-start">Outlet Name</th>
+                <th className="text-start">Sales Person</th>
                 <th className="text-start">Total Orders</th>
                 <th className="text-start">Pending Orders</th>
                 <th className="text-start">Pending Payments</th>
               </tr>
             </thead>
             <tbody>
-              {tables.customers.map((customer) => (
-                <tr key={customer.id}>
-                  <td className="text-start small-text">{customer.id}</td>
-                  <td className="text-start small-text">{customer.name}</td>
-                  <td className="text-start small-text">{customer.phoneNO}</td>
-                  <td className="text-start small-text">{customer.email}</td>
-                  <td className="text-start small-text">{customer.salesAgents}</td>
-                  <td className="text-start small-text">{customer.totalOrders}</td>
-                  <td className="text-start small-text">{customer.pendingOrders}</td>
-                  <td className="text-start small-text">{customer.pendingPayments}</td>
+              {tables.customers.length > 0 ? (
+                tables.customers.map((customer) => (
+                  <tr key={customer.id}>
+                    <td className="text-start small-text">{customer.id}</td>
+                    <td className="text-start small-text">{customer.name}</td>
+                    <td className="text-start small-text">{customer.phoneNo}</td>
+                    <td className="text-start small-text">{customer.email}</td>
+                    <td className="text-start small-text">{customer.outletName}</td>
+                    <td className="text-start small-text">{customer.salesPersons}</td>
+                    <td className="text-start small-text">{customer.totalOrders}</td>
+                    <td className="text-start small-text">{customer.pendingOrders}</td>
+                    <td className="text-start small-text">{formatCurrency(customer.pendingPayments)}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="9" className="text-start small-text">No customers found</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         );
@@ -103,25 +227,29 @@ const RouteDetails = () => {
           <table className="table table-borderless text-start small-text">
             <thead className="table-light text-start small-text">
               <tr>
-                <th className="text-start">#</th>
                 <th className="text-start">Order ID</th>
                 <th className="text-start">Amount</th>
                 <th className="text-start">Status</th>
               </tr>
             </thead>
             <tbody>
-              {filteredOrders.map((order) => (
-                <tr key={order.id}>
-                  <td className="text-start small-text">{order.id}</td>
-                  <td className="text-start small-text">{order.orderId}</td>
-                  <td className="text-start small-text">${order.amount}</td>
-                  <td className="text-start small-text">{order.status}</td>
+              {filteredOrders.length > 0 ? (
+                filteredOrders.map((order) => (
+                  <tr key={order.id}>
+                    <td className="text-start small-text">{order.orderId}</td>
+                    <td className="text-start small-text">{formatCurrency(order.amount)}</td>
+                    <td className="text-start small-text">{order.status}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="3" className="text-start small-text">No orders found</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         );
-      case "salesAgents":
+      case "salesPersons":
         return (
           <table className="table table-borderless text-start small-text">
             <thead className="table-light text-start small-text">
@@ -129,16 +257,24 @@ const RouteDetails = () => {
                 <th className="text-start">#</th>
                 <th className="text-start">Name</th>
                 <th className="text-start">Route</th>
+                <th className="text-start">Region</th>
               </tr>
             </thead>
             <tbody>
-              {tables.salesAgents.map((agent) => (
-                <tr key={agent.id}>
-                  <td className="text-start small-text">{agent.id}</td>
-                  <td className="text-start small-text">{agent.name}</td>
-                  <td className="text-start small-text">{agent.route}</td>
+              {tables.salesPersons.length > 0 ? (
+                tables.salesPersons.map((person) => (
+                  <tr key={person.id}>
+                    <td className="text-start small-text">{person.id}</td>
+                    <td className="text-start small-text">{person.name}</td>
+                    <td className="text-start small-text">{person.route}</td>
+                    <td className="text-start small-text">{person.region}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="4" className="text-start small-text">No sales persons found</td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         );

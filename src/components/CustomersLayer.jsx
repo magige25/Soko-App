@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/customers";
 
@@ -66,19 +67,6 @@ const CustomersLayer = () => {
   useEffect(() => {
     fetchCustomers(currentPage, debouncedQuery);
   }, [currentPage, debouncedQuery, fetchCustomers]);
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      (day % 10 === 1 && day !== 11) ? "st" :
-      (day % 10 === 2 && day !== 12) ? "nd" :
-      (day % 10 === 3 && day !== 13) ? "rd" : "th";
-    return `${day}${suffix} ${month} ${year}`;
-  };
 
   const handleDeleteClick = (customer) => {
     setCustomerToDelete(customer);
@@ -159,7 +147,7 @@ const CustomersLayer = () => {
                 <th scope="col" className="text-start py-3 px-4">Pricing Category</th>
                 <th scope="col" className="text-start py-3 px-4">Customer Type</th>
                 <th scope="col" className="text-start py-3 px-4">Route</th>
-                <th scope="col" className="text-start py-3 px-4">Salesperson</th>
+                <th scope="col" className="text-start py-3 px-4">Outlet</th>
                 <th scope="col" className="text-start py-3 px-4">Date Created</th>
                 <th scope="col" className="text-start py-3 px-4">Action</th>
               </tr>
@@ -177,12 +165,12 @@ const CustomersLayer = () => {
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{customer.name}</td>
+                    <td className="text-start small-text py-3 px-4">{customer.firstName}</td>
                     <td className="text-start small-text py-3 px-4">{customer.phoneNo}</td>
-                    <td className="text-start small-text py-3 px-4">{customer.pricingCategory}</td>
-                    <td className="text-start small-text py-3 px-4">{customer.customerType}</td>
-                    <td className="text-start small-text py-3 px-4">{customer.route}</td>
-                    <td className="text-start small-text py-3 px-4">{customer.salesperson}</td>
+                    <td className="text-start small-text py-3 px-4">{customer.pricingCategory.name}</td>
+                    <td className="text-start small-text py-3 px-4">{customer.customerType.name}</td>
+                    <td className="text-start small-text py-3 px-4">{customer.route.name}</td>
+                    <td className="text-start small-text py-3 px-4">{customer.outletName}</td>
                     <td className="text-start small-text py-3 px-4">
                       {formatDate(customer.dateCreated)}
                     </td>
@@ -199,7 +187,7 @@ const CustomersLayer = () => {
                           <ul className="dropdown-menu">
                             <li>
                               <button
-                                className="dropdown-item"// navigate(`/customers/${customer.id}`, { state: { customer } })
+                                className="dropdown-item"
                                 onClick={() => navigate("/customers/details", { state: { customerId: customer.id } })}
                               >
                                 View

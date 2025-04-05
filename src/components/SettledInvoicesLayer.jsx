@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate, formatCurrency } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/invoice";
 
@@ -10,7 +11,7 @@ const SettledInvoicesLayer = () => {
   const [invoices, setInvoices] = useState([]);
   const [query, setQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10); // Fixed at 10 items per page
+  const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -23,8 +24,8 @@ const SettledInvoicesLayer = () => {
       const response = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
-          page: page - 1, // API expects 0-based indexing
-          limit: itemsPerPage, // Request 10 items per page
+          page: page - 1,
+          limit: itemsPerPage,
           searchValue: searchQuery,
           _t: new Date().getTime(),
         },
@@ -61,26 +62,6 @@ const SettledInvoicesLayer = () => {
   const handleSearchInputChange = (e) => {
     setQuery(e.target.value);
     setCurrentPage(1);
-  };
-
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
   };
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);

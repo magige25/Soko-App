@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/salesperson";
 const REGIONS_API = "https://api.bizchain.co.ke/v1/regions";
@@ -156,7 +157,7 @@ const SalespersonsDetailsLayer = () => {
                 </div>
                 <div className="mb-3">
                   <label className="form-label fw-semibold text-primary-light">Date Created</label>
-                  <p className="text-muted">{viewSalesperson.dateCreated}</p>
+                  <p className="text-muted">{formatDate(viewSalesperson.dateCreated)}</p>
                 </div>
               </div>
               <div className="col-md-6">

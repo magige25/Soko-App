@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
+import { formatDate } from "../hook/format-utils";
 
 const SettledOrdersLayer = () => {
   const [settledOrders, setSettledOrders] = useState([
@@ -40,16 +41,6 @@ const SettledOrdersLayer = () => {
 
   const handleViewClick = (settledOrder) => {
     setSettledOrderToView(settledOrder);
-  };
-
-  const formatDate = (dateString) => {
-    if (dateString === "TBD") return "TBD";
-    const date = new Date(dateString);
-    const day = String(date.getDate()).padStart(2, '0');
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const month = monthNames[date.getMonth()];
-    const year = date.getFullYear();
-    return `${day} ${month} ${year}`;
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
