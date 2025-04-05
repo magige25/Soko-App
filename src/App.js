@@ -97,7 +97,6 @@ import SubRegionsDetailsPage from "./pages/SubRegionsDetailsPage";
 import RoutesDetailsPage from "./pages/RoutesDetailsPage";
 import AddUsersPage from "./pages/AddUsersPage";
 import RolesListPage from "./pages/RolesListPage";
-import CreateRolePage from "./pages/CreateRolePage";
 import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
 import InvoiceRegisterPage from "./pages/InvoiceRegisterPage";
@@ -123,7 +122,9 @@ import CustomerCategoryPage from "./pages/CustomerCategoryPage";
 import CustomerPricingCategoryPage from "./pages/CustomerPricingCategoryPage";
 import PricingCategoriesPage from "./pages/PricingCategoriesPage";
 import CreditorsRequestPage from "./pages/CreditorsRequestPage";
-import PendingOrdersPage from "./pages/PendingOrdersPage";
+import OrdersPage from "./pages/OrdersPage";
+import AddOrdersPage from "./pages/AddOrdersPage";
+import OrdersDetailsPage from "./pages/OrdersDetailsPage";
 import PendingDeliveriesPage from "./pages/PendingDeliveriesPage";
 import SettledOrdersPage from "./pages/SettledOrdersPage";
 import UnitsOfMeasurePage from "./pages/UnitsOfMeasurePage";
@@ -157,6 +158,7 @@ import AddBrandPage from "./pages/AddBrandPage";
 import EditBrandPage from "./pages/EditBrandPage";
 import EditCustomerPage from "./pages/EditCustomerPage";
 import CustomerDetailsPage from "./pages/CustomerDetailsPage";
+import CustomerDetailsViewPage from "./pages/CustomerDetailsViewPage";
 import DepotPage from "./pages/DepotPage";
 import AddDepotPage from "./pages/AddDepotPage";
 import EditDepotPage from "./pages/EditDepotPage";
@@ -173,8 +175,8 @@ function App() {
   return (
     <BrowserRouter
       future={{
-        v7_startTransition: true, // Opt into React.startTransition
-        v7_relativeSplatPath: true, // Opt into new splat route behavior
+        v7_startTransition: true,
+        v7_relativeSplatPath: true, 
       }}
     >
       <AuthProvider>
@@ -242,7 +244,6 @@ function App() {
             <Route path="/delivered-order" element={<DeliveredOrderPage />} />
             <Route path="/batch" element={<BatchPage />} />
             <Route path="/roles-list" element={<RolesListPage />} />
-            <Route path="/create-role" element={<CreateRolePage />} />
             <Route path="/suppliers" element={<SuppliersPage />} />
             <Route path="/suppliers/add-supplier" element={<AddSuppliersPage />} />
             <Route path="/suppliers/details" element={<SuppliersDetailsPage />} />
@@ -275,13 +276,16 @@ function App() {
             <Route path="/salespersons/details" element={<SalespersonsDetailsPage />} />
             <Route path="/customers" element={<CustomersPage />} />
             <Route path="/customers/edit" element={<EditCustomerPage />} />
-            <Route path="/customers/details" element={<CustomerDetailsPage />} />
+            <Route path="/customers/orders" element={<CustomerDetailsPage />} />
+            <Route path="/customers/orders/products" element={<CustomerDetailsViewPage />} />
             <Route path="/customer-type" element={<CustomerTypePage />} />
             <Route path="/customer-category" element={<CustomerCategoryPage />} />
             <Route path="/customer-pricing" element={<CustomerPricingCategoryPage />} />
             <Route path="/pricing-categories" element={<PricingCategoriesPage />} />
             <Route path="/creditors-request" element={<CreditorsRequestPage />} />
-            <Route path="/pending-orders" element={<PendingOrdersPage />} />
+            <Route path="/orders" element={<OrdersPage />} />
+            <Route path="/orders/add-order" element={<AddOrdersPage />} />
+            <Route path="/orders/order-items" element={<OrdersDetailsPage />} />
             <Route path="/pending-deliveries" element={<PendingDeliveriesPage />} />
             <Route path="/settled-orders" element={<SettledOrdersPage />} />
             <Route path="/units-of-measure" element={<UnitsOfMeasurePage />} />

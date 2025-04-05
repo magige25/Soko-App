@@ -83,7 +83,6 @@ const AddSuppliersLayer = () => {
       return errors;
     }
 
-    // Phone number validation
     if ((field === "phoneNumber" || field === "contactPersonPhoneNumber" || field === "disbursementPhoneNumber") && value) {
       const digitsOnly = value.replace(/\D/g, '');
       if (digitsOnly.length < 9) {
@@ -97,7 +96,6 @@ const AddSuppliersLayer = () => {
       }
     }
 
-    // Numeric field validation
     if ((field === "productionQuantity" || field === "numberCattle" || field === "disbursementLitresTarget" || field === "expansionCapacity") && value) {
       if (isNaN(value)) {
         errors[field] = `${field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, " $1")} must be a number`;
@@ -425,16 +423,15 @@ const AddSuppliersLayer = () => {
                 Has Expansion Space
               </label>
               <div 
-                className="form-control radius-8 d-flex align-items-center"
+                className="form-control radius-4 d-flex align-items-center"
                 style={{ border: 'none', background: 'transparent', height: '38px', padding: '0' }}
               >
                 <input
                   type="checkbox"
-                  className="form-check-input me-2"
+                  className="form-check-input style-check" style={{ width: "24px", height: "24px"}}
                   id="expansionSpace"
                   checked={formData.expansionSpace}
                   onChange={(e) => handleInputChange("expansionSpace", e.target.checked)}
-                  style={{ width: "30px", height: "30px" }}
                 />
                 <label className="form-check-label text-primary-light" htmlFor="expansionSpace" style={{ cursor: 'pointer' }}></label>
               </div>

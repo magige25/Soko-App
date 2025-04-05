@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Spinner } from "../hook/spinner-utils";
 
 const ForgotPasswordLayer = () => {
     const [emailError, setEmailError] = useState("");
@@ -168,7 +169,7 @@ const ForgotPasswordLayer = () => {
             <div className="auth-left d-lg-block d-none">
                 <div className="d-flex align-items-center flex-column h-100 justify-content-center">
                     <img
-                        src="assets/images/auth/reset-forgot-img.png"
+                        src="/assets/images/auth/reset-forgot-img.png"
                         alt="Forgot Password"
                     />
                 </div>
@@ -178,7 +179,7 @@ const ForgotPasswordLayer = () => {
                     <div className="text-center">
                         <Link to="/" className="mb-40 max-w-290-px">
                             <img
-                                src="assets/images/logo.png"
+                                src="/assets/images/logo.png"
                                 alt="Logo"
                                 style={{ width: "100%", maxWidth: "350px", margin: "0 auto" }}
                             />
@@ -245,7 +246,7 @@ const ForgotPasswordLayer = () => {
                                 lineHeight: "1",
                             }}
                         >
-                            {loading ? <div className="spinner"></div> : "Send Reset Link"}
+                            {loading ? <div className=""> <Spinner /> </div> : "Send Reset Link"}
                         </button>
                         <div className="text-sm fs-6 mt-10" style={{ maxWidth: "350px", margin: "0 auto"}}>
                             <p className="mb-0" style={{ fontSize: "13px", textAlign: "right" }}>

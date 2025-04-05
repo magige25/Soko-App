@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import { Spinner } from "../hook/spinner-utils";
-import { formatDate } from '../hook/format-utils';
+import { formatDate } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/storage-facilities";
 
@@ -97,7 +97,7 @@ const StorageFacilityLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search by name or location"
+              placeholder="Search name or location"
               value={query}
               onChange={handleSearchInputChange}
             />
@@ -124,6 +124,7 @@ const StorageFacilityLayer = () => {
                 <th scope="col" className="text-start py-3 px-4">Location</th>
                 <th scope="col" className="text-start py-3 px-4">Capacity (L)</th>
                 <th scope="col" className="text-start py-3 px-4">Stock Volume (L)</th>
+                {/* <th scope="col" className="text-start py-3 px-4">Overflow (L)</th> */}
                 <th scope="col" className="text-start py-3 px-4">Last Refilled</th>
                 <th scope="col" className="text-start py-3 px-4">Last Drawn</th>
                 <th scope="col" className="text-start py-3 px-4">Action</th>

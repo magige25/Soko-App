@@ -134,7 +134,7 @@ const SalespersonsLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search Name, Region or Route"
+              placeholder="Search name, region or route"
               value={query}
               onChange={handleSearchInputChange}
             />

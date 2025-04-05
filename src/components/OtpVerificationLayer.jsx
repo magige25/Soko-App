@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext"; 
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Spinner } from "../hook/spinner-utils";
 
 const OtpVerificationLayer = () => {
   const [formData, setFormData] = useState({
@@ -78,6 +79,41 @@ const OtpVerificationLayer = () => {
     }
   };
 
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData("text").trim();
+    if (!/^\d{0,5}$/.test(pastedData)) return;
+
+    const newOtp = ["", "", "", "", ""];
+    pastedData.split("").forEach((char, i) => {
+      if (i < 5) newOtp[i] = char;
+    });
+
+    setFormData((prevData) => ({
+      ...prevData,
+      otp: newOtp,
+    }));
+
+    const lastFilledIndex = Math.min(pastedData.length - 1, 4);
+    if (inputRefs.current[lastFilledIndex]) {
+      inputRefs.current[lastFilledIndex].focus();
+    }
+  };
+
+  const parseJwt = (token) => {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    } catch (e) {
+      console.error("Error parsing JWT:", e);
+      return null;
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -134,11 +170,18 @@ const OtpVerificationLayer = () => {
         });
 
         const token = response.data.data?.accessToken;
-        if (token) {
-          signIn(token);
+        let userId = response.data.data?.userId || response.data.data?.id || location.state?.userId;
+
+        if (!userId && token) {
+          const tokenPayload = parseJwt(token);
+          userId = tokenPayload?.account?.id;
+        }
+
+        if (token && userId) {
+          signIn(token, userId);
         } else {
-          console.error("No access token found in response!");
-          toast.error("Authentication failed: No token received.", {
+          console.error("Missing token or userId in response!", { token, userId });
+          toast.error("Authentication failed: Missing token or user ID.", {
             position: "top-right",
             autoClose: 2000,
           });
@@ -328,7 +371,7 @@ const OtpVerificationLayer = () => {
       <div className="auth-left d-lg-block d-none">
         <div className="d-flex align-items-center flex-column h-100 justify-content-center">
           <img
-            src="assets/images/auth/otp-img.png"
+            src="/assets/images/auth/otp-img.png"
             alt="Authentication"
           />
         </div>
@@ -338,7 +381,7 @@ const OtpVerificationLayer = () => {
           <div className="text-center">
             <Link to="/" className="mb-40 max-w-290-px">
               <img
-                src="assets/images/logo.png"
+                src="/assets/images/logo.png"
                 alt="otp"
                 style={{ width: "100%", maxWidth: "350px", margin: "0 auto" }}
               />
@@ -373,13 +416,14 @@ const OtpVerificationLayer = () => {
                       maxLength="1"
                       onChange={(e) => handleOtpChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
+                      onPaste={index === 0 ? handlePaste : null}
                       ref={(el) => (inputRefs.current[index] = el)}
                       style={{
                         height: "40px",
                         boxSizing: "border-box",
-                        width: "20%", 
+                        width: "20%",
                         textAlign: "center",
-                        padding: "0", 
+                        padding: "0",
                         fontSize: "16px",
                         fontWeight: "800",
                       }}
@@ -396,8 +440,8 @@ const OtpVerificationLayer = () => {
               disabled={formData.otp.includes("") || loading}
               style={{ 
                 height: "40px",
-                maxWidth: "350px", 
-                margin: "0 auto", 
+                maxWidth: "350px",
+                margin: "0 auto",
                 display: "block",
                 width: "100%",
                 border: "1px solid #ccc",
@@ -405,7 +449,7 @@ const OtpVerificationLayer = () => {
                 lineHeight: "1",
               }}
             >
-              {loading ? <div className="spinner"></div> : "Confirm OTP"}
+              {loading ? <div className=""> <Spinner /> </div> : "Confirm OTP"}
             </button>
 
             <div style={{ maxWidth: "350px", margin: "0 auto" }}>

@@ -1,190 +1,156 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
-import toast, { Toaster } from "react-hot-toast";
 import { Spinner } from "../hook/spinner-utils";
 import { formatDate } from "../hook/format-utils";
 
-const API_URL = "https://api.bizchain.co.ke/v1/customers";
-const CUSTOMER_CATEGORY_API = "https://api.bizchain.co.ke/v1/customer-categories";
-const PRICING_CATEGORY_API = "https://api.bizchain.co.ke/v1/customer-pricing-categories";
+const API_URL = "https://api.bizchain.co.ke/v1/orders";
 
 const useDebounce = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
+
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedValue(value), delay);
     return () => clearTimeout(timer);
   }, [value, delay]);
+
   return debouncedValue;
 };
 
-const CustomersLayer = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [customers, setCustomers] = useState([]);
+const OrdersLayer = () => {
+  const [allOrders, setAllOrders] = useState([]);
+  const [displayedOrders, setDisplayedOrders] = useState([]);
   const [query, setQuery] = useState("");
-  const [customerToDelete, setCustomerToDelete] = useState(null);
+  const [orderToDelete, setOrderToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(10); // Fixed at 10 items per page
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const debouncedQuery = useDebounce(query, 300);
 
-  const fetchCustomers = useCallback(
-    async (page = 1, searchQuery = "") => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const token = sessionStorage.getItem("token");
-        if (!token) {
-          throw new Error("Please login!");
-        }
-
-        // Fetch customers, customer categories, and pricing categories in parallel
-        const [customerResponse, categoryResponse, pricingResponse] = await Promise.all([
-          axios.get(`${API_URL}?t=${Date.now()}`, {
-            headers: { Authorization: `Bearer ${token}` },
-            params: {
-              page: page - 1,
-              size: itemsPerPage,
-              searchValue: searchQuery,
-            },
-          }),
-          axios.get(CUSTOMER_CATEGORY_API, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-          axios.get(PRICING_CATEGORY_API, {
-            headers: { Authorization: `Bearer ${token}` },
-          }),
-        ]);
-
-        // Validate customer response
-        const customerData = Array.isArray(customerResponse.data.data) ? customerResponse.data.data : [];
-        const total = customerResponse.data.totalElements || customerData.length;
-
-        // Validate category response
-        if (categoryResponse.data.status.code !== 0 || !Array.isArray(categoryResponse.data.data)) {
-          throw new Error("Failed to fetch customer categories");
-        }
-        const customerCategories = categoryResponse.data.data;
-
-        // Validate pricing response
-        if (pricingResponse.data.status.code !== 0 || !Array.isArray(pricingResponse.data.data)) {
-          throw new Error("Failed to fetch pricing categories");
-        }
-        const pricingCategories = pricingResponse.data.data;
-
-        // Map customer data with category and pricing names
-        const formattedCustomers = customerData.map((customer) => ({
-          id: customer.id,
-          name: `${customer.firstName} ${customer.lastName}`.trim(),
-          phoneNo: customer.phoneNo,
-          customerCategory: (
-            customer.customerCategory?.code &&
-            customerCategories.find((cat) => cat.code === customer.customerCategory?.code)?.name
-          ) || "",
-          pricingCategory: (
-            customer.customerPricingCategory?.code &&
-            pricingCategories.find((pc) => pc.code === customer.customerPricingCategory?.code)?.name
-          ) || "",
-          route: customer.route?.name || "",
-          dateCreated: customer.dateCreated,
-        }));
-
-        setCustomers(formattedCustomers);
-        setTotalItems(total);
-      } catch (error) {
-        console.error("Error fetching customers:", error);
-        const message = error.message || "Failed to fetch customers";
-        setError(message);
-        toast.error(message);
-        setCustomers([]);
-        setTotalItems(0);
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [itemsPerPage]
-  );
-
-  useEffect(() => {
-    fetchCustomers(currentPage, debouncedQuery);
-  }, [currentPage, debouncedQuery, fetchCustomers]);
-
-  useEffect(() => {
-    if (location.state?.refresh) {
-      fetchCustomers(currentPage, debouncedQuery);
-      navigate("/customers", { state: {}, replace: true });
+  const fetchOrders = useCallback(async (searchQuery = "") => {
+    setIsLoading(true);
+    setError(null);
+    const token = sessionStorage.getItem("token");
+    if (!token || token.trim() === "") {
+      setError("No authentication token found. Please log in.");
+      setIsLoading(false);
+      return;
     }
-  }, [location.state, currentPage, debouncedQuery, fetchCustomers, navigate]);
+    try {
+      const response = await axios.get(API_URL, {
+        headers: { Authorization: `Bearer ${token}` },
+        params: {
+          searchValue: searchQuery,
+        },
+      });
+      const result = response.data;
+      if (result.status.code === 0) {
+        const mappedOrders = result.data.map((order) => ({
+          id: order.id,
+          customerId: order.customer?.id || "N/A",
+          customerName: order.customer?.name || "N/A",
+          orderCode: order.orderCode || "N/A",
+          itemsQty: order.itemsQty || "0",
+          amount: order.amount || "N/A",
+          orderStatus: order.orderStatus?.name || order.orderStatus || "N/A",
+          paymentStatus: order.paymentStatus?.name || order.paymentStatus || "N/A",
+          dateCreated: order.dateCreated || "N/A",
+        }));
+        setAllOrders(mappedOrders);
+        setTotalItems(result.totalElements || mappedOrders.length);
+      } else {
+        setError(`Failed to fetch orders: ${result.status.message}`);
+        setAllOrders([]);
+        setTotalItems(0);
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+      setError(`Error fetching orders: ${error.response?.data?.message || error.message}`);
+      setAllOrders([]);
+      setTotalItems(0);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  const handleDeleteClick = (customer) => {
-    setCustomerToDelete(customer);
+  useEffect(() => {
+    fetchOrders(debouncedQuery);
+  }, [debouncedQuery, fetchOrders]);
+
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedOrders = allOrders.slice(startIndex, endIndex);
+    setDisplayedOrders(paginatedOrders);
+  }, [currentPage, allOrders, itemsPerPage]);
+
+  const handleDeleteClick = (order) => {
+    setOrderToDelete(order);
   };
 
   const handleDeleteConfirm = async () => {
-    if (!customerToDelete) return;
     setIsLoading(true);
     setError(null);
+    const token = sessionStorage.getItem("token");
+    if (!token) {
+      setError("No authentication token found. Please log in.");
+      setIsLoading(false);
+      return;
+    }
     try {
-      const token = sessionStorage.getItem("token");
-      if (!token) {
-        throw new Error("Please log in");
-      }
-      await axios.delete(`${API_URL}/${customerToDelete.id}`, {
+      await axios.delete(`${API_URL}/${orderToDelete.orderCode}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setCustomerToDelete(null);
-      fetchCustomers(currentPage, debouncedQuery);
-      toast.success("Customer deleted successfully!");
+      setOrderToDelete(null);
+      fetchOrders(debouncedQuery);
     } catch (error) {
-      console.error("Error deleting customer:", error);
-      const message = error.response?.data?.message || "Delete Failed";
-      setError(message);
-      toast.error(message);
+      console.error("Error deleting order:", error);
+      setError(error.response?.data?.message || "Failed to delete order.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSearchInputChange = (e) => {
-    setQuery(e.target.value);
+    const searchQuery = e.target.value;
+    setQuery(searchQuery);
     setCurrentPage(1);
   };
 
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage + 1;
+  const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
 
   return (
     <div className="card h-100 p-0 radius-12">
-      <Toaster
-        position="top-center"
-        reverseOrder={false}
-        toastOptions={{
-          success: { style: { background: "#d4edda", color: "#155724" } },
-          error: { style: { background: "#f8d7da", color: "#721c24" } },
-        }}
-      />
       <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
         <div className="d-flex align-items-center flex-wrap gap-3">
-          <form className="navbar-search" onSubmit={(e) => e.preventDefault()}>
+          <form className="navbar-search">
             <input
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search name or phone"
+              placeholder="Search customer"
               value={query}
               onChange={handleSearchInputChange}
-              disabled={isLoading}
             />
             <Icon icon="ion:search-outline" className="icon" />
           </form>
         </div>
+        <Link
+          to="/orders/add-order"
+          className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
+        >
+          <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
+          Add New Order
+        </Link>
       </div>
 
       <div className="card-body p-24">
@@ -194,11 +160,12 @@ const CustomersLayer = () => {
             <thead>
               <tr>
                 <th scope="col" className="text-center py-3 px-6">#</th>
-                <th scope="col" className="text-start py-3 px-4">Name</th>
-                <th scope="col" className="text-start py-3 px-4">Phone No.</th>
-                <th scope="col" className="text-start py-3 px-4">Pricing Category</th>
-                <th scope="col" className="text-start py-3 px-4">Customer Category</th>
-                <th scope="col" className="text-start py-3 px-4">Route</th>
+                <th scope="col" className="text-start py-3 px-4">Customer</th>
+                <th scope="col" className="text-start py-3 px-4">Order Code</th>
+                <th scope="col" className="text-start py-3 px-4">Amount</th>
+                <th scope="col" className="text-start py-3 px-4">Item Quantity</th>
+                <th scope="col" className="text-start py-3 px-4">Order Status</th>
+                <th scope="col" className="text-start py-3 px-4">Payment Status</th>
                 <th scope="col" className="text-start py-3 px-4">Date Created</th>
                 <th scope="col" className="text-start py-3 px-4">Action</th>
               </tr>
@@ -206,24 +173,23 @@ const CustomersLayer = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan="8" className="text-center py-3">
+                  <td colSpan="9" className="text-center py-3">
                     <Spinner />
                   </td>
                 </tr>
-              ) : customers.length > 0 ? (
-                customers.map((customer, index) => (
-                  <tr key={customer.id} style={{ transition: "background-color 0.2s" }}>
+              ) : displayedOrders.length > 0 ? (
+                displayedOrders.map((order, index) => (
+                  <tr key={order.orderCode} style={{ transition: "background-color 0.2s" }}>
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{customer.firstName}</td>
-                    <td className="text-start small-text py-3 px-4">{customer.phoneNo}</td>
-                    <td className="text-start small-text py-3 px-4">{customer.pricingCategory}</td>
-                    <td className="text-start small-text py-3 px-4">{customer.customerCategory}</td>
-                    <td className="text-start small-text py-3 px-4">{customer.route}</td>
-                    <td className="text-start small-text py-3 px-4">
-                      {formatDate(customer.dateCreated)}
-                    </td>
+                    <td className="text-start small-text py-3 px-4">{order.customerName}</td>
+                    <td className="text-start small-text py-3 px-4">{order.orderCode}</td>
+                    <td className="text-start small-text py-3 px-4">{order.amount}</td>
+                    <td className="text-start small-text py-3 px-4">{order.itemsQty}</td>
+                    <td className="text-start small-text py-3 px-4">{order.orderStatus}</td>
+                    <td className="text-start small-text py-3 px-4">{order.paymentStatus}</td>
+                    <td className="text-start small-text py-3 px-4">{formatDate(order.dateCreated)}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">
@@ -238,25 +204,16 @@ const CustomersLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to="/customers/orders"
-                                state={{ customerId: customer.id }}
+                                to="/orders/order-items"
+                                state={{ orderId: order.id }}
                               >
                                 View
                               </Link>
                             </li>
                             <li>
-                              <Link
-                                className="dropdown-item"
-                                to="/customers/edit"
-                                state={{ customerId: customer.id }}
-                              >
-                                Edit
-                              </Link>
-                            </li>
-                            <li>
                               <button
                                 className="dropdown-item text-danger"
-                                onClick={() => handleDeleteClick(customer)}
+                                onClick={() => handleDeleteClick(order)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
@@ -271,20 +228,20 @@ const CustomersLayer = () => {
                 ))
               ) : (
                 <tr>
-                  <td colSpan="8" className="text-center py-3">
-                    No customers found
+                  <td colSpan="9" className="text-center py-3">
+                    No orders found
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
+
         {!isLoading && (
           <div className="d-flex justify-content-between align-items-center mt-3">
             <div className="text-muted" style={{ fontSize: "13px" }}>
               <span>
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+                Showing {startIndex} to {endIndex} of {totalItems} entries
               </span>
             </div>
             <nav aria-label="Page navigation">
@@ -335,17 +292,18 @@ const CustomersLayer = () => {
         )}
       </div>
 
+      {/* Delete Confirmation Modal */}
       <div className="modal fade" id="deleteModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body pt-3 ps-18 pe-18">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h6 className="modal-title fs-6">Delete Customer</h6>
+                <h6 className="modal-title fs-6">Delete Order</h6>
                 <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
               </div>
               <p className="pb-3 mb-0">
-                Are you sure you want to delete the <strong>{customerToDelete?.name}</strong>{" "}
-                customer permanently? This action cannot be undone.
+                Are you sure you want to delete the order{" "}
+                <strong>{orderToDelete?.orderCode}</strong> permanently? This action cannot be undone.
               </p>
             </div>
             <div className="d-flex justify-content-end gap-2 px-12 pb-3">
@@ -357,9 +315,8 @@ const CustomersLayer = () => {
                 className="btn btn-danger"
                 data-bs-dismiss="modal"
                 onClick={handleDeleteConfirm}
-                disabled={isLoading}
               >
-                {isLoading ? "Deleting..." : "Delete"}
+                Delete
               </button>
             </div>
           </div>
@@ -369,4 +326,4 @@ const CustomersLayer = () => {
   );
 };
 
-export default CustomersLayer;
+export default OrdersLayer;

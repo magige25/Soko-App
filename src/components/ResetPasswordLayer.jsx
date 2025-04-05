@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom"; // Add useParams
+import { Link, useNavigate, useParams } from "react-router-dom"; 
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Spinner } from "../hook/spinner-utils";
 
 const ResetPasswordLayer = () => {
   const navigate = useNavigate();
-  const { token } = useParams(); // Extract token from URL
+  const { token } = useParams(); 
   const [loading, setLoading] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState({
     password: false,
@@ -85,7 +86,7 @@ const ResetPasswordLayer = () => {
 
     try {
       const response = await axios.post(
-        `https://api.bizchain.co.ke/v1/auth/reset-password/${token}`, // Use dynamic token
+        `https://api.bizchain.co.ke/v1/auth/reset-password/${token}`, 
         {
           newPassword: formData.password,
         },
@@ -114,7 +115,6 @@ const ResetPasswordLayer = () => {
       }
     } catch (error) {
       console.error("Reset Password Error:", error.message, error.response?.data);
-      // Error handling remains the same as in your original code
       if (!navigator.onLine) {
         toast.error("Network disconnected. Please check your connection.", {
           position: "top-right",
@@ -171,7 +171,6 @@ const ResetPasswordLayer = () => {
     }
   };
 
-  // Rest of your JSX remains unchanged
   return (
     <section className="auth bg-base d-flex flex-wrap">
       <ToastContainer position="top-right" autoClose={2000} />
@@ -284,7 +283,7 @@ const ResetPasswordLayer = () => {
                 lineHeight: "1",
               }}
             >
-              {loading ? <div className="spinner"></div> : "Reset Password"}
+              {loading ? <div className=""> <Spinner /> </div> : "Reset Password"}
             </button>
           </form>
         </div>

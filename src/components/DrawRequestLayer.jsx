@@ -260,7 +260,7 @@ const DrawRequestLayer = () => {
                   )}
                 </div>
                 <select
-                  className={`form-control radius-8 ${errors[`categoryId${index}`] ? "is-invalid" : ""}`}
+                  className={`form-control radius-8 form-select${errors[`categoryId${index}`] ? "is-invalid" : ""}`}
                   value={req.categoryId}
                   onChange={(e) => handleInputChange(index, "categoryId", e.target.value)}
                   disabled={isFetchingData || isSubmitting}
@@ -282,7 +282,7 @@ const DrawRequestLayer = () => {
                   Subcategory <span className="text-danger">*</span>
                 </label>
                 <select
-                  className={`form-control radius-8 ${errors[`subCategoryId${index}`] ? "is-invalid" : ""}`}
+                  className={`form-control radius-8 form-select ${errors[`subCategoryId${index}`] ? "is-invalid" : ""}`}
                   value={req.subCategoryId}
                   onChange={(e) => handleInputChange(index, "subCategoryId", e.target.value)}
                   disabled={!req.categoryId || isFetchingData || isSubmitting}
@@ -304,7 +304,7 @@ const DrawRequestLayer = () => {
                   Product <span className="text-danger">*</span>
                 </label>
                 <select
-                  className={`form-control radius-8 ${errors[`productId${index}`] ? "is-invalid" : ""}`}
+                  className={`form-control radius-8 form-select ${errors[`productId${index}`] ? "is-invalid" : ""}`}
                   value={req.productId}
                   onChange={(e) => handleInputChange(index, "productId", e.target.value)}
                   disabled={!req.subCategoryId || isFetchingData || isSubmitting}

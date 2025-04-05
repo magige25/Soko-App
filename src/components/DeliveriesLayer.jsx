@@ -5,7 +5,8 @@ import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { Spinner } from "../hook/spinner-utils";
 import { formatDate, formatCurrency } from "../hook/format-utils";
-
+import { DatePicker } from "antd"; 
+import dayjs from "dayjs"; 
 
 const API_URL = "https://api.bizchain.co.ke/v1/supplier-deliveries";
 
@@ -22,8 +23,8 @@ const DeliveriesLayer = () => {
   const navigate = useNavigate();
   const [deliveries, setDeliveries] = useState([]);
   const [query, setQuery] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
+  const [startDate, setStartDate] = useState(""); // Will store date as string or null
+  const [endDate, setEndDate] = useState(""); // Will store date as string or null
   const [deliveryToDelete, setDeliveryToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -102,12 +103,12 @@ const DeliveriesLayer = () => {
     setCurrentPage(1);
   };
 
-  const handleDateChange = (e, type) => {
-    const value = e.target.value;
+  // Handle DatePicker change
+  const handleDateChange = (date, dateString, type) => {
     if (type === "start") {
-      setStartDate(value);
+      setStartDate(dateString); // dateString is in 'YYYY-MM-DD' format
     } else {
-      setEndDate(value);
+      setEndDate(dateString);
     }
     setCurrentPage(1);
   };
@@ -146,18 +147,20 @@ const DeliveriesLayer = () => {
             <Icon icon="ion:search-outline" className="icon" />
           </form>
           <div className="d-flex align-items-center gap-2">
-            <input
-              type="date"
-              className="form-control h-40-px"
-              value={startDate}
-              onChange={(e) => handleDateChange(e, "start")}
+            <DatePicker
+              value={startDate ? dayjs(startDate) : null} 
+              format="YYYY-MM-DD"
+              onChange={(date, dateString) => handleDateChange(date, dateString, "start")}
+              className="h-40-px" 
+              style={{ width: "150px" }} 
             />
             <span>to</span>
-            <input
-              type="date"
-              className="form-control h-40-px"
-              value={endDate}
-              onChange={(e) => handleDateChange(e, "end")}
+            <DatePicker
+              value={endDate ? dayjs(endDate) : null} 
+              format="YYYY-MM-DD"
+              onChange={(date, dateString) => handleDateChange(date, dateString, "end")}
+              className="h-40-px" 
+              style={{ width: "150px" }} 
             />
           </div>
         </div>
@@ -267,60 +270,115 @@ const DeliveriesLayer = () => {
         </div>
 
         {!isLoading && (
-          <div className="d-flex justify-content-between align-items-center mt-3">
-            <div className="text-muted" style={{ fontSize: "13px" }}>
-              <span>
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
-              </span>
-            </div>
-            <nav aria-label="Page navigation">
-              <ul className="pagination mb-0" style={{ gap: "6px" }}>
-                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+  <div className="d-flex justify-content-between align-items-center mt-3">
+    <div className="text-muted" style={{ fontSize: "13px" }}>
+      <span>
+        Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
+        {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+      </span>
+    </div>
+    <nav aria-label="Page navigation">
+      <ul className="pagination mb-0" style={{ gap: "6px" }}>
+        {/* Previous Button */}
+        <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+          <button
+            className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+            style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+          >
+            <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
+          </button>
+        </li>
+
+        {/* Page Numbers */}
+        {totalPages > 6 ? (
+          <>
+            {/* First Page */}
+            <li className={`page-item ${currentPage === 1 ? "active" : ""}`}>
+              <button
+                className={`page-link btn ${currentPage === 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle`}
+                style={{ width: "30px", height: "30px", fontSize: "10px" }}
+                onClick={() => handlePageChange(1)}
+              >
+                1
+              </button>
+            </li>
+
+            {/* Left "..." if needed */}
+            {currentPage > 3 && (
+              <li className="page-item disabled">
+                <span className="page-link">...</span>
+              </li>
+            )}
+
+            {/* Middle Pages */}
+            {Array.from(
+              { length: 5 }, 
+              (_, i) => currentPage - 2 + i
+            )
+              .filter(page => page > 1 && page < totalPages)
+              .map(page => (
+                <li key={page} className={`page-item ${currentPage === page ? "active" : ""}`}>
                   <button
-                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
+                    className={`page-link btn ${currentPage === page ? "btn-primary" : "btn-outline-primary"} rounded-circle`}
+                    style={{ width: "30px", height: "30px", fontSize: "10px" }}
+                    onClick={() => handlePageChange(page)}
                   >
-                    <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
+                    {page}
                   </button>
                 </li>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-                    <button
-                      className={`page-link btn ${
-                        currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
-                      } rounded-circle d-flex align-items-center justify-content-center`}
-                      style={{
-                        width: "30px",
-                        height: "30px",
-                        padding: "0",
-                        transition: "all 0.2s",
-                        fontSize: "10px",
-                        color: currentPage === i + 1 ? "#fff" : "",
-                      }}
-                      onClick={() => handlePageChange(i + 1)}
-                    >
-                      {i + 1}
-                    </button>
-                  </li>
-                ))}
-                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                  <button
-                    className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
-                    style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                  >
-                    <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
-                  </button>
-                </li>
-              </ul>
-            </nav>
-          </div>
+              ))}
+
+            {/* Right "..." if needed */}
+            {currentPage < totalPages - 2 && (
+              <li className="page-item disabled">
+                <span className="page-link">...</span>
+              </li>
+            )}
+
+            {/* Last Page */}
+            <li className={`page-item ${currentPage === totalPages ? "active" : ""}`}>
+              <button
+                className={`page-link btn ${currentPage === totalPages ? "btn-primary" : "btn-outline-primary"} rounded-circle`}
+                style={{ width: "30px", height: "30px", fontSize: "10px" }}
+                onClick={() => handlePageChange(totalPages)}
+              >
+                {totalPages}
+              </button>
+            </li>
+          </>
+        ) : (
+          // If total pages are small, show all numbers
+          Array.from({ length: totalPages }, (_, i) => (
+            <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+              <button
+                className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle`}
+                style={{ width: "30px", height: "30px", fontSize: "10px" }}
+                onClick={() => handlePageChange(i + 1)}
+              >
+                {i + 1}
+              </button>
+            </li>
+          ))
         )}
-      </div>
+
+        {/* Next Button */}
+        <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+          <button
+            className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+            style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+          >
+            <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+)}
+</div>
 
       <div className="modal fade" id="deleteModal" tabIndex={-1} aria-hidden="true">
         <div className="modal-dialog modal-md modal-dialog-centered">

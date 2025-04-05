@@ -285,7 +285,7 @@ const RolesLayer = () => {
           </form>
         </div>
         <button
-          className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
+          className="btn btn-primary text-sm btn-sm px-10 py-10 radius-4 d-flex align-items-center gap-2"
           data-bs-toggle="modal"
           data-bs-target="#createRoleModal"
         >
@@ -439,7 +439,7 @@ const RolesLayer = () => {
 
       {/* Create Role Modal */}
       <div className="modal fade" id="createRoleModal" tabIndex="-1" aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
+        <div className="modal-dialog modal-lg modal-dialog-centered">
           <div className="modal-content" ref={addModalRef}>
             <div className="modal-body pt-3 ps-18 pe-18">
               <div className="d-flex justify-content-between align-items-center mb-3">
@@ -480,7 +480,7 @@ const RolesLayer = () => {
               </div>
               {newRole.entityType && (
                 <div className="mb-3">
-                  <h6>Modules and Permissions</h6>
+                  <h6 className="fs-6">Modules and Permissions</h6>
                   <table className="table table-borderless">
                     <thead>
                       <tr>
@@ -494,7 +494,7 @@ const RolesLayer = () => {
                           <td>{module.name}</td>
                           <td>
                             {module.permissions.map((perm) => (
-                              <div className="form-check form-check-inline" key={perm.code}>
+                              <div className="form-check style-check form-check-inline" key={perm.code}>
                                 <input
                                   type="checkbox"
                                   className="form-check-input"
@@ -539,7 +539,7 @@ const RolesLayer = () => {
 
       {/* Edit Role Modal */}
       <div className="modal fade" id="editRoleModal" tabIndex="-1" aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
+        <div className="modal-dialog modal-lg modal-dialog-centered">
           <div className="modal-content">
             <div className="modal-body pt-3 ps-18 pe-18">
               <div className="d-flex justify-content-between align-items-center mb-3">
@@ -578,7 +578,7 @@ const RolesLayer = () => {
                   </div>
                   {editRole.entityType && (
                     <div className="mb-3">
-                      <h6>Modules and Permissions</h6>
+                      <h6 className="fs-6">Modules and Permissions</h6>
                       <table className="table table-borderless">
                         <thead>
                           <tr>
@@ -592,7 +592,7 @@ const RolesLayer = () => {
                               <td>{module.name}</td>
                               <td>
                                 {module.permissions.map((perm) => (
-                                  <div className="form-check form-check-inline" key={perm.code}>
+                                  <div className="form-check style-check form-check-inline" key={perm.code}>
                                     <input
                                       type="checkbox"
                                       className="form-check-input"

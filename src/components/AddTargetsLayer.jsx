@@ -157,7 +157,7 @@ const AddTargetsLayer = () => {
                 Salesperson <span className="text-danger">*</span>
               </label>
               <select
-                className={`form-control radius-8 form-select ${errors.salesperson ? "is-invalid" : ""}`}
+                className={`form-control radius-4 form-select ${errors.salesperson ? "is-invalid" : ""}`}
                 value={formData.salesperson}
                 onChange={(e) => handleInputChange("salesperson", e.target.value)}
               >
@@ -178,7 +178,7 @@ const AddTargetsLayer = () => {
               <input
                 type="number"
                 step="0.01"
-                className={`form-control radius-8 ${errors.target ? "is-invalid" : ""}`}
+                className={`form-control radius-4 ${errors.target ? "is-invalid" : ""}`}
                 placeholder="Enter Target Amount"
                 value={formData.target}
                 onChange={(e) => handleInputChange("target", e.target.value)}
@@ -191,7 +191,7 @@ const AddTargetsLayer = () => {
                 Target Type <span className="text-danger">*</span>
               </label>
               <select
-                className={`form-control radius-8 form-select ${errors.targetType ? "is-invalid" : ""}`}
+                className={`form-control radius-4 form-select ${errors.targetType ? "is-invalid" : ""}`}
                 value={formData.targetType}
                 onChange={(e) => handleInputChange("targetType", e.target.value)}
               >
@@ -212,7 +212,7 @@ const AddTargetsLayer = () => {
               </label>
               <input
                 type="date"
-                className={`form-control radius-8 ${errors.startDate ? "is-invalid" : ""}`}
+                className={`form-control radius-4 ${errors.startDate ? "is-invalid" : ""}`}
                 value={formData.startDate}
                 onChange={(e) => handleInputChange("startDate", e.target.value)}
               />
