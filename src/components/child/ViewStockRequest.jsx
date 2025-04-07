@@ -19,6 +19,7 @@ const ViewStockRequest = () => {
 
   const requestId = location.state?.requestId;
 
+  // Fetch stock request data
   useEffect(() => {
     if (!requestId) {
       setError("No pending stock request ID provided.");
@@ -60,6 +61,41 @@ const ViewStockRequest = () => {
 
     fetchPendingStockData();
   }, [requestId, navigate]);
+
+  // Approve stock request handler
+  const handleApproveClick = async () => {
+    if (!pendingStock?.id) return;
+
+    setIsLoading(true);
+    try {
+      const token = sessionStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found. Please log in.");
+      }
+
+      const response = await axios.put(
+        `${PENDING_STOCK_API_URL}/approve/${pendingStock.id}`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (response.data && response.data.status && response.data.status.code === 0) {
+        toast.success("Stock request approved successfully!");
+        // Update the local state to reflect the approval
+        setPendingStock(prev => ({
+          ...prev,
+          status: { ...prev.status, name: "APPROVED", code: "APPR" }
+        }));
+      } else {
+        throw new Error(response.data.status?.message || "Approval failed on server");
+      }
+    } catch (error) {
+      console.error("Error approving stock request:", error);
+      toast.error(error.message || "Failed to approve stock request.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const renderBatch = (batchStockAllocationModels) => {
     if (!batchStockAllocationModels || batchStockAllocationModels.length === 0) return "N/A";
@@ -150,19 +186,30 @@ const ViewStockRequest = () => {
 
   return (
     <div className="card h-100 p-0 radius-12">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={3000} />
       <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
         <h6 className="mb-0 fs-5">Stock: {pendingStock?.orderCode || "N/A"}</h6>
         <div className="d-flex gap-2">
+          {pendingStock?.status?.code === "PEND" && (
+            <button
+              onClick={handleApproveClick}
+              className="btn btn-sm btn-success radius-8 d-flex align-items-center gap-1"
+              disabled={isLoading}
+            >
+              <Icon icon="mdi:check" className="text-xl" /> Approve
+            </button>
+          )}
           <button
             onClick={handleDownload}
             className="btn btn-sm btn-success radius-8 d-flex align-items-center gap-1"
+            disabled={isLoading}
           >
             <Icon icon="solar:download-linear" className="text-xl" /> Download
           </button>
           <button
             onClick={handlePrint}
             className="btn btn-sm btn-danger radius-8 d-flex align-items-center gap-1"
+            disabled={isLoading}
           >
             <Icon icon="basil:printer-outline" className="text-xl" /> Print
           </button>
@@ -181,7 +228,9 @@ const ViewStockRequest = () => {
             <div className="col-md-6">
               <p>
                 <strong>Status:</strong>
-                <span className="badge bg-success ms-2">{pendingStock?.status?.name || "N/A"}</span>
+                <span className={`badge ${pendingStock?.status?.code === "PEND" ? "bg-warning" : "bg-success"} ms-2`}>
+                  {pendingStock?.status?.name || "N/A"}
+                </span>
               </p>
               <p><strong>Created By:</strong> {pendingStock?.createdBy?.name || "N/A"}</p>
             </div>

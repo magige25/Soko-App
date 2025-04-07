@@ -4,7 +4,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
 import { Spinner } from "../hook/spinner-utils";
-import { formatDate } from "../hook/format-utils";
+import { formatDate, formatCurrency } from "../hook/format-utils";
 import { DatePicker } from "antd"; 
 import dayjs from "dayjs"; 
 
@@ -118,9 +118,6 @@ const DeliveriesLayer = () => {
   };
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
 
   const handleAddDeliveryClick = () => {
     navigate("/deliveries/add-delivery");

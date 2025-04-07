@@ -216,7 +216,7 @@ const CustomersLayer = () => {
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{customer.name}</td>
+                    <td className="text-start small-text py-3 px-4">{customer.firstName}</td>
                     <td className="text-start small-text py-3 px-4">{customer.phoneNo}</td>
                     <td className="text-start small-text py-3 px-4">{customer.pricingCategory}</td>
                     <td className="text-start small-text py-3 px-4">{customer.customerCategory}</td>

@@ -15,25 +15,26 @@ const AddProduct = () => {
 
   const [productData, setProductData] = useState({
     imageFile: null,
-    imageURL: null, // Renamed from imagePreview for consistency
+    imageURL: null,
     sku: "",
     name: "",
     description: "",
     brand: "",
-    wholesalePrice: "", // Renamed from wPrice
-    distributorPrice: "", // Renamed from dPrice
-    retailPrice: "", // Renamed from rPrice
+    wholesalePrice: "",
+    distributorPrice: "",
+    retailPrice: "",
     category: "",
     subCategory: "",
+    customerPrice: "",
+    superMarketPrice: "",
   });
 
   const [brands, setBrands] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [subCategories, setSubCategories] = useState([]);  
+  const [subCategories, setSubCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Memoized fetch functions
   const fetchBrands = useCallback(async () => {
     try {
       const token = sessionStorage.getItem("token");
@@ -76,16 +77,24 @@ const AddProduct = () => {
     }
   }, []);
 
-  // Fetch data on mount
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
-      await Promise.all([fetchBrands(), fetchCategories(), fetchSubCategories()]);
-      setLoading(false);
+      try {
+        await Promise.all([fetchBrands(), fetchCategories(), fetchSubCategories()]);
+      } catch (err) {
+        console.error("Error in fetchData:", err);
+      } finally {
+        setLoading(false);
+      }
     };
-
     fetchData();
   }, [fetchBrands, fetchCategories, fetchSubCategories]);
+
+  const getFilteredSubCategories = (categoryId) => {
+    if (!categoryId) return [];
+    return subCategories.filter((subCat) => subCat.category.id === parseInt(categoryId, 10));
+  };
 
   const handleImageSelect = (file, previewURL) => {
     setProductData({ ...productData, imageFile: file, imageURL: previewURL });
@@ -93,7 +102,13 @@ const AddProduct = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setProductData({ ...productData, [name]: value });
+    setProductData(prev => {
+      const newData = { ...prev, [name]: value };
+      if (name === "category") {
+        newData.subCategory = ""; // Reset subcategory when category changes
+      }
+      return newData;
+    });
   };
 
   const handleAddProduct = async (e) => {
@@ -103,16 +118,17 @@ const AddProduct = () => {
     const prices = [
       productData.wholesalePrice,
       productData.distributorPrice,
-      productData.retailPrice,      
+      productData.retailPrice,
+      productData.customerPrice,
+      productData.superMarketPrice,
     ];
 
     if (
-      //!productData.imageFile ||
       !productData.sku ||
       !productData.name ||
       !productData.brand ||
       !productData.category ||
-      !productData.subCategory ||      
+      !productData.subCategory ||
       prices.some((price) => !price || parseFloat(price) <= 0)
     ) {
       setError("Please fill in all required fields with valid positive prices.");
@@ -128,8 +144,10 @@ const AddProduct = () => {
       wholesalePrice: parseFloat(productData.wholesalePrice),
       distributorPrice: parseFloat(productData.distributorPrice),
       retailPrice: parseFloat(productData.retailPrice),
+      customerPrice: parseFloat(productData.customerPrice),
+      superMarketPrice: parseFloat(productData.superMarketPrice),
       category: productData.category,
-      subCategory: productData.subCategory,      
+      subCategory: productData.subCategory,
     };
 
     setLoading(true);
@@ -144,8 +162,6 @@ const AddProduct = () => {
           formData.append(key, value);
         }
         formData.append("image", productData.imageFile);
-
-        console.log("Submitting with image...");
         response = await axios.post(API_URL, formData, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -153,7 +169,6 @@ const AddProduct = () => {
           },
         });
       } else {
-        console.log("Submitting without image...");
         response = await axios.post(API_URL, data, {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -174,8 +189,10 @@ const AddProduct = () => {
           wholesalePrice: "",
           distributorPrice: "",
           retailPrice: "",
+          customerPrice: "",
+          superMarketPrice: "",
           category: "",
-          subCategory: "",        
+          subCategory: "",
         });
         navigate("/products");
       }
@@ -283,7 +300,7 @@ const AddProduct = () => {
                       value={productData.category}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || !categories.length}
                     >
                       <option value="">Select Category</option>
                       {categories.map((category) => (
@@ -318,7 +335,7 @@ const AddProduct = () => {
                       value={productData.brand}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || !brands.length}
                     >
                       <option value="">Select Brand</option>
                       {brands.map((brand) => (
@@ -338,10 +355,10 @@ const AddProduct = () => {
                       value={productData.subCategory}
                       onChange={handleChange}
                       required
-                      disabled={loading}
+                      disabled={loading || !productData.category || !subCategories.length}
                     >
                       <option value="">Select Subcategory</option>
-                      {subCategories.map((subCategory) => (
+                      {getFilteredSubCategories(productData.category).map((subCategory) => (
                         <option key={subCategory.id} value={subCategory.id}>
                           {subCategory.name}
                         </option>
@@ -350,7 +367,7 @@ const AddProduct = () => {
                   </div>
                 </div>
               </div>
-              <div className="row mb-3 align-items-center">                
+              <div className="row mb-3 align-items-center">
                 <div className="col-md-4">
                   <label className="form-label">
                     Wholesale Price <span className="text-danger">*</span>
@@ -394,22 +411,36 @@ const AddProduct = () => {
                   />
                 </div>
               </div>
-              {/* <div className="row mb-3 align-items-center">
-              <div className="col-md-4">
+              <div className="row mb-3 align-items-center">
+                <div className="col-md-4">
                   <label className="form-label">
-                    Discount Price <span className="text-danger">*</span>
+                    Customer Price <span className="text-danger">*</span>
                   </label>
                   <input
                     type="number"
                     step="0.01"
                     className="form-control"
-                    name="discountPrice"
-                    value={productData.discountPrice}
+                    name="customerPrice"
+                    value={productData.customerPrice}
                     onChange={handleChange}
                     required
                   />
                 </div>
-              </div>         */}
+                <div className="col-md-4">
+                  <label className="form-label">
+                    Supermarket Price <span className="text-danger">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    className="form-control"
+                    name="superMarketPrice"
+                    value={productData.superMarketPrice}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
+              </div>
               {error && <div className="text-danger mb-3">{error}</div>}
               <div className="d-flex justify-content-end gap-2">
                 <button type="button" className="btn btn-secondary" onClick={handleCancel} disabled={loading}>

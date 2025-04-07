@@ -136,7 +136,7 @@ const TopCountries = () => {
                                             <div className="flex-grow-1">
                                                 <h6 className="text-sm mb-0">Japan</h6>
                                                 <span className="text-xs text-secondary-light fw-medium">
-                                                    1,240 Users
+                                                    1,440 Users
                                                 </span>
                                             </div>
                                         </div>

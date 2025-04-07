@@ -3,6 +3,7 @@ import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link } from "react-router-dom";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/supplier-residence";
 
@@ -51,7 +52,7 @@ const SupplyResidenceLayer = () => {
           tarmacked: item.tarmacked,
           storageFacility: item.storageFacility,
           dateCreated: item.dateCreated,
-          suppliers: item.suppliers, // Number of suppliers
+          suppliers: item.suppliers,
           createdBy: item.createdBy?.name || "Unknown",
         }));
         setResidence(cleanData);
@@ -143,16 +144,6 @@ const SupplyResidenceLayer = () => {
   const handleSearchInputChange = (e) => {
     setQuery(e.target.value);
     setCurrentPage(1);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "N/A";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix = day % 10 === 1 && day !== 11 ? "st" : day % 10 === 2 && day !== 12 ? "nd" : day % 10 === 3 && day !== 13 ? "rd" : "th";
-    return `${day}${suffix} ${month} ${year}`;
   };
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { formartDate } from "../hook/format-utils";
 
 // Mapping of module names to IDs as per your API
 const moduleMapping = {
@@ -230,7 +231,7 @@ const RolesLayer = () => {
                   {currentItems.map((role, index) => (
                     <tr key={role.roleId || index}>
                       <td>{role.roleName}</td>
-                      <td>{role.dateCreated}</td>
+                      <td>{formartDate(role.dateCreated)}</td>
                       <td>{role.entityType.name}</td>
                       <td>
                         <div className="dropdown">

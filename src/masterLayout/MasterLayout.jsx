@@ -14,7 +14,6 @@ const MasterLayout = ({ children }) => {
   const sidebarRef = useRef(null);
   const location = useLocation();
   const { signOut, user, loading } = useAuth(); 
-
   const sidebarControl = () => {
     setSidebarActive((prev) => !prev);
   };
@@ -194,7 +193,7 @@ const MasterLayout = ({ children }) => {
       childRoutes: [],
     },
     settings: {
-      paths: ["/customer-type", "/pricing-categories", "/currencies", "/units-of-measure", "/countries"],
+      paths: ["/customer-type", "/customer-category", "/customer-pricing", "/pricing-categories", "/currencies", "/units-of-measure", "/countries"],
       childRoutes: [],
     },
     invoice: {
@@ -677,6 +676,22 @@ const MasterLayout = ({ children }) => {
                       className={(navData) => (navData.isActive ? "active-page" : "")}
                     >
                       Customer Type
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/customer-category"
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
+                    >
+                      Customer Category
+                    </NavLink>
+                  </li>
+                  <li>
+                    <NavLink
+                      to="/customer-pricing"
+                      className={(navData) => (navData.isActive ? "active-page" : "")}
+                    >
+                      Customer Pricing
                     </NavLink>
                   </li>
                   <li>

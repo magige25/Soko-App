@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import { Spinner } from "../hook/spinner-utils";
+import { formatCurrency } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/products";
 
@@ -110,9 +111,6 @@ const ProductsLayer = () => {
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
-
   const handleAddProductClick = () => {
     navigate("/products/add-product");
   };
@@ -164,10 +162,11 @@ const ProductsLayer = () => {
                 <th scope="col" className="text-start py-3 px-4">Category</th>
                 <th scope="col" className="text-start py-3 px-4">Sub-Category</th>
                 <th scope="col" className="text-start py-3 px-4">Brand</th>
-                <th scope="col" className="text-start py-3 px-4">Discount Price</th>
                 <th scope="col" className="text-start py-3 px-4">Wholesale Price</th>
                 <th scope="col" className="text-start py-3 px-4">Distributor Price</th>
                 <th scope="col" className="text-start py-3 px-4">Retail Price</th>
+                <th scope="col" className="text-start py-3 px-4">Customer Price</th>
+                <th scope="col" className="text-start py-3 px-4">Supermarket Price</th>
                 <th scope="col" className="text-start py-3 px-4">Actions</th>
               </tr>
             </thead>
@@ -196,10 +195,11 @@ const ProductsLayer = () => {
                     <td className="text-start small-text py-3 px-4">{product.category.name}</td>
                     <td className="text-start small-text py-3 px-4">{product.subCategory.name}</td>
                     <td className="text-start small-text py-3 px-4">{product.brand.name}</td>
-                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.discountPrice)}</td>
                     <td className="text-start small-text py-3 px-4">{formatCurrency(product.wholesalePrice || 0)}</td>
                     <td className="text-start small-text py-3 px-4">{formatCurrency(product.distributorPrice || 0)}</td>
                     <td className="text-start small-text py-3 px-4">{formatCurrency(product.retailPrice || 0)}</td>
+                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.customerPrice || 0)}</td>
+                    <td className="text-start small-text py-3 px-4">{formatCurrency(product.supermarketPrice || 0)}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/routes";
 const SUBREGIONS_API_URL = "https://api.bizchain.co.ke/v1/sub-regions";
@@ -74,7 +75,7 @@ const RoutesLayer = () => {
         region: route.region?.name || "Unknown",
         regionId: route.region?.id,
         customers: route.numberCustomer || 0,
-        salesAgents: route.numberSalesPerson || 0,
+        salesPersons: route.numberSalesPerson || 0,
         dateCreated: route.dateCreated,
         createdBy: route.createdBy?.name || "Unknown",
       }));
@@ -241,23 +242,6 @@ const RoutesLayer = () => {
     setCurrentPage(1);
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
-  };
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredRoutes.slice(indexOfFirstItem, indexOfLastItem);
@@ -302,7 +286,7 @@ const RoutesLayer = () => {
                 <th scope="col" className="text-start py-3 px-4">Sub-Region</th>
                 <th scope="col" className="text-start py-3 px-4">Region</th>
                 <th scope="col" className="text-start py-3 px-4">Customers</th>
-                <th scope="col" className="text-start py-3 px-4">Sales Agents</th>
+                <th scope="col" className="text-start py-3 px-4">Sales Persons</th>
                 <th scope="col" className="text-start py-3 px-4">Date Created</th>
                 <th scope="col" className="text-start py-3 px-4">Action</th>
               </tr>
@@ -324,7 +308,7 @@ const RoutesLayer = () => {
                     <td className="text-start small-text py-3 px-4">{route.subRegion}</td>
                     <td className="text-start small-text py-3 px-4">{route.region}</td>
                     <td className="text-start small-text py-3 px-4">{route.customers}</td>
-                    <td className="text-start small-text py-3 px-4">{route.salesAgents}</td>
+                    <td className="text-start small-text py-3 px-4">{route.salesPersons}</td>
                     <td className="text-start small-text py-3 px-4">
                       {route.dateCreated ? formatDate(route.dateCreated) : ""}
                     </td>

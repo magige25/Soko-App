@@ -13133,6 +13133,12 @@ select option {
   border-radius: 8px;
 }
 
+.half-width-card {
+  width: 50%;
+  margin-left: 0;
+}
+
+
 .left-line::before {
   position: absolute;
   content: "";
