@@ -179,8 +179,8 @@ const TargetsLayer = () => {
               <tr>
                 <th scope="col" className="text-center py-3 px-6">#</th>
                 <th scope="col" className="text-start py-3 px-4">Salesperson</th>
-                <th scope="col" className="text-start py-3 px-4">Target</th>
                 <th scope="col" className="text-start py-3 px-4">Target Type</th>
+                <th scope="col" className="text-start py-3 px-4">Target</th>
                 <th scope="col" className="text-start py-3 px-4">Achieved</th>
                 <th scope="col" className="text-start py-3 px-4">Start Date</th>
                 <th scope="col" className="text-start py-3 px-4">End Date</th>
@@ -202,8 +202,8 @@ const TargetsLayer = () => {
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="text-start small-text py-3 px-4">{target.salesperson}</td>
-                    <td className="text-start small-text py-3 px-4">{formatValue(target.target, target.targetType)}</td>
                     <td className="text-start small-text py-3 px-4">{target.targetType}</td>
+                    <td className="text-start small-text py-3 px-4">{formatValue(target.target, target.targetType)}</td>
                     <td className="text-start small-text py-3 px-4">{formatValue(target.achieved, target.targetType)}</td>
                     <td className="text-start small-text py-3 px-4">{formatDate(target.startDate)}</td>
                     <td className="text-start small-text py-3 px-4">{formatDate(target.endDate)}</td>

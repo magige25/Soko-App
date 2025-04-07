@@ -23,8 +23,8 @@ const DeliveriesLayer = () => {
   const navigate = useNavigate();
   const [deliveries, setDeliveries] = useState([]);
   const [query, setQuery] = useState("");
-  const [startDate, setStartDate] = useState(""); // Will store date as string or null
-  const [endDate, setEndDate] = useState(""); // Will store date as string or null
+  const [startDate, setStartDate] = useState(""); 
+  const [endDate, setEndDate] = useState(""); 
   const [deliveryToDelete, setDeliveryToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -103,10 +103,9 @@ const DeliveriesLayer = () => {
     setCurrentPage(1);
   };
 
-  // Handle DatePicker change
   const handleDateChange = (date, dateString, type) => {
     if (type === "start") {
-      setStartDate(dateString); // dateString is in 'YYYY-MM-DD' format
+      setStartDate(dateString); 
     } else {
       setEndDate(dateString);
     }

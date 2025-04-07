@@ -208,7 +208,7 @@ function App() {
             <Route path="/card" element={<CardPage />} />
             <Route path="/carousel" element={<CarouselPage />} />
             <Route path="/chat-empty" element={<ChatEmptyPage />} />
-            <Route path="/chat-message" element={<ChatMessagePage />} />
+            <Route path="/chat" element={<ChatMessagePage />} />
             <Route path="/chat-profile" element={<ChatProfilePage />} />
             <Route path="/code-generator" element={<CodeGeneratorPage />} />
             <Route path="/regions" element={<RegionsPage />} />

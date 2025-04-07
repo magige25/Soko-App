@@ -315,7 +315,7 @@ const InvoiceRegisterLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/invoices/${invoice.id}`}
+                                to={`/invoices-/${invoice.id}`}
                                 state={{ invoice }}
                               >
                                 View

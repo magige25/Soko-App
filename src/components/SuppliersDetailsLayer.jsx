@@ -122,7 +122,6 @@ const SuppliersDetailsLayer = () => {
 
   return (
     <div className="page-wrapper">
-      <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
             <div className="row">
@@ -203,7 +202,6 @@ const SuppliersDetailsLayer = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
