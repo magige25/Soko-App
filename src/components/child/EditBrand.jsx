@@ -71,10 +71,8 @@ const EditBrand = () => {
   const handleCancel = () => navigate("/brands");
 
   return (
-    <div className="page-wrapper">
-      <Toaster position="top-center" reverseOrder={false} />
-      <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
+          <Toaster position="top-center" reverseOrder={false} />
           <div className="card-body">
             <h6 className="fs-6 mb-4">Edit Brand</h6>
             {error && <div className="alert alert-danger">{error}</div>}
@@ -111,8 +109,6 @@ const EditBrand = () => {
             </form>
           </div>
         </div>
-      </div>
-    </div>
   );
 };
 

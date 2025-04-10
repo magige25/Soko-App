@@ -126,7 +126,7 @@ const StorageFacilityLayer = () => {
                 <th scope="col" className="text-start py-3 px-4">Stock Volume (L)</th>
                 {/* <th scope="col" className="text-start py-3 px-4">Overflow (L)</th> */}
                 <th scope="col" className="text-start py-3 px-4">Last Refilled</th>
-                <th scope="col" className="text-start py-3 px-4">Last Drawn</th>
+                {/* <th scope="col" className="text-start py-3 px-4">Last Drawn</th> */}
                 <th scope="col" className="text-start py-3 px-4">Action</th>
               </tr>
             </thead>
@@ -157,9 +157,9 @@ const StorageFacilityLayer = () => {
                     <td className="text-start small-text py-3 px-4">
                       {formatDate(facility.dateLastRefilled) || '-'}
                     </td>
-                    <td className="text-start small-text py-3 px-4">
+                    {/* <td className="text-start small-text py-3 px-4">
                       {formatDate(facility.dateLastDrawn) || '-'}
-                    </td>
+                    </td> */}
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
                         <div className="dropdown">
@@ -177,7 +177,7 @@ const StorageFacilityLayer = () => {
                                 to="/storage-facility/facility-details"
                                 state={{ facilityId: facility.id }}
                               >
-                                Details
+                                View
                               </Link>
                             </li>
                             <li>

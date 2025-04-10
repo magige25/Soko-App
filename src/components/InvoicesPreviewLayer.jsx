@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Icon } from '@iconify/react/dist/iconify.js';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { formatDate, formatCurrency } from "../hook/format-utils";
 import { Spinner } from "../hook/spinner-utils";
 
 const API_URL = 'https://api.bizchain.co.ke/v1/invoice';
@@ -28,24 +29,6 @@ const InvoicesPreviewLayer = () => {
     };
     if (invoiceId) fetchInvoice();
   }, [invoiceId]);
-
-  const formatCurrency = (amount) => new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES' }).format(amount);
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
-  };
 
   const handleDownload = () => {
     const invoiceElement = document.getElementById('invoice');
@@ -101,7 +84,7 @@ const InvoicesPreviewLayer = () => {
     });
   };
 
-  if (!invoice) return <Spinner />;
+  if (!invoice) return <div className="card d-flex p-0 radius-8 h-44-px justify-content-center align-items-center"><Spinner /> </div>;
 
   return (
     <div className="card">
@@ -145,7 +128,7 @@ const InvoicesPreviewLayer = () => {
               <div className="py-28 px-20">
                 <div className="d-flex justify-content-between align-items-end">
                   <div>
-                    <h6 className="text-md">Issued For:</h6>
+                    <h6 className="text-md">Issued To:</h6>
                     <table className="text-sm text-secondary-light">
                       <tbody>
                         <tr><td>Name:</td><td className="ps-8">{invoice.supplier.name}</td></tr>

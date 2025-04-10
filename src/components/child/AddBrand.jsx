@@ -8,8 +8,6 @@ const API_URL = "https://api.bizchain.co.ke/v1/brands";
 
 const AddBrand = () => {
   const navigate = useNavigate();
-
-  // State now holds an array of brand objects
   const [brands, setBrands] = useState([{ name: "" }]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -60,7 +58,7 @@ const AddBrand = () => {
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Brands added successfully!");
-        setBrands([{ name: "" }]); // Reset to single empty field
+        setBrands([{ name: "" }]); 
         navigate("/brands");
       }
     } catch (error) {
@@ -75,12 +73,9 @@ const AddBrand = () => {
   const handleCancel = () => navigate("/brands");
 
   return (
-    <div className="page-wrapper">
-      <Toaster position="top-center" reverseOrder={false} />
-      <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
+          <Toaster position="top-center" reverseOrder={false} />
           <div className="card-body">
-            <h6 className="fs-6 mb-4">Add Brands</h6>
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleAddBrands}>
               <div className="mb-3">
@@ -144,8 +139,6 @@ const AddBrand = () => {
             </form>
           </div>
         </div>
-      </div>
-    </div>
   );
 };
 

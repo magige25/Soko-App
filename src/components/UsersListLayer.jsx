@@ -185,7 +185,7 @@ const UsersListLayer = () => {
                                 to="/users/details"
                                 state={{ userId: user.id }}
                               >
-                                Details
+                                view
                               </Link>
                             </li>
                             <li>

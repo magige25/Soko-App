@@ -213,13 +213,13 @@ const StockRequestLayer = () => {
                                 to="/stock-request/view"
                                 state={{ requestId: request.id }}
                               >
-                                View Details
+                                View
                               </Link>
                             </li>
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to="/stock-request/edit"
+                                to="/stock-request/edit-product"
                                 state={{ requestId: request.id }}
                               >
                                 Edit

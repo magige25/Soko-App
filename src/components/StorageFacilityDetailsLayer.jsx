@@ -15,7 +15,7 @@ const StorageFacilityDetailsLayer = () => {
 
   useEffect(() => {
     if (!facilityId) {
-      navigate("/storage-facility"); // Adjust the route as needed
+      navigate("/storage-facility"); 
       return;
     }
 
@@ -40,10 +40,9 @@ const StorageFacilityDetailsLayer = () => {
     <div className="page-wrapper">
       <div className="card shadow-sm mt-3" style={{ width: "100%" }}>
         <div className="card-body">
-          <h6 className="mb-4">Details</h6>
           {error && <div className="alert alert-danger">{error}</div>}
           {facilityToView ? (
-            <div>
+            <div className="text-primary-light">
               <p className="mb-3">
                 <strong>Name:</strong> {facilityToView.name || 'N/A'}
               </p>

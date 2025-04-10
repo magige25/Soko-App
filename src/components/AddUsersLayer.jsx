@@ -290,7 +290,7 @@ const AddUsersLayer = ({ onUserAdded }) => {
   const isDepotManager = roles.find(r => r.roleId === parseInt(formData.roleId, 10))?.roleName === 'Depot Manager';
 
   return (
-    <div className="card h-100 p-0 radius-12">
+    <div className="card h-100 p-0 radius-8">
       <ToastContainer 
         position="top-right"
         autoClose={5000}

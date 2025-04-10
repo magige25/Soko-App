@@ -95,11 +95,9 @@ const SuppliersDetailsLayer = () => {
   // Always return valid JSX
   if (isLoading) {
     return (
-      <div className="page-wrapper">
-        <div className="row">
-          <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
-            <Spinner />
-          </div>
+      <div className="row">
+        <div className="card d-flex p-0 radius-8 h-44-px justify-content-center align-items-center">
+          <Spinner />
         </div>
       </div>
     );
@@ -121,7 +119,6 @@ const SuppliersDetailsLayer = () => {
   }
 
   return (
-    <div className="page-wrapper">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
             <div className="row">
@@ -201,7 +198,6 @@ const SuppliersDetailsLayer = () => {
             </div>
           </div>
         </div>
-      </div>
   );
 };
 

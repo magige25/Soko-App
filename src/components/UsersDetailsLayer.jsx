@@ -81,7 +81,6 @@ const UsersDetailsLayer = () => {
   };
 
   return (
-    <div className="page-wrapper">
       <div className="card shadow-sm mt-3" style={{ width: "100%" }}>
         <div className="card-body">
           {error && <div className="alert alert-danger">{error}</div>}
@@ -165,7 +164,6 @@ const UsersDetailsLayer = () => {
           )}
         </div>
       </div>
-    </div>
   );
 };
 

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate } from "../hook/format-utils"
 
 const API_URL = "https://api.bizchain.co.ke/v1/targets";
 
@@ -41,8 +42,8 @@ const TargetsLayer = () => {
       const response = await axios.get(API_URL, {
         headers: { Authorization: `Bearer ${token}` },
         params: {
-          page: page,
-          limit: itemsPerPage,
+          page: page - 1, 
+          size: itemsPerPage,
           searchValue: searchQuery,
         },
       });
@@ -64,7 +65,7 @@ const TargetsLayer = () => {
           };
         });
         setTargets(mappedTargets);
-        setTotalItems(result.totalElements);
+        setTotalItems(result.totalElements || mappedTargets.length);
       } else {
         setError(`Failed to fetch targets: ${result.status.message}`);
         setTargets([]);
@@ -122,23 +123,6 @@ const TargetsLayer = () => {
       return new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(value || 0);
     }
     return value || 0;
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
   };
 
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -284,6 +268,7 @@ const TargetsLayer = () => {
             </div>
             <nav aria-label="Page navigation">
               <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                {/* Previous Button */}
                 <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
                     className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
@@ -294,26 +279,69 @@ const TargetsLayer = () => {
                     <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
                   </button>
                 </li>
-                {Array.from({ length: totalPages }, (_, i) => (
-                  <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
-                    <button
-                      className={`page-link btn ${
-                        currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"
-                      } rounded-circle d-flex align-items-center justify-content-center`}
-                      style={{
-                        width: "30px",
-                        height: "30px",
-                        padding: "0",
-                        transition: "all 0.2s",
-                        fontSize: "10px",
-                        color: currentPage === i + 1 ? "#fff" : "",
-                      }}
-                      onClick={() => handlePageChange(i + 1)}
-                    >
-                      {i + 1}
-                    </button>
-                  </li>
-                ))}
+
+                {/* Page Numbers */}
+                {totalPages > 6 ? (
+                  <>
+                    <li className={`page-item ${currentPage === 1 ? "active" : ""}`}>
+                      <button
+                        className={`page-link btn ${currentPage === 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle`}
+                        style={{ width: "30px", height: "30px", fontSize: "10px" }}
+                        onClick={() => handlePageChange(1)}
+                      >
+                        1
+                      </button>
+                    </li>
+
+                    {currentPage > 3 && (
+                      <li className="page-item disabled">
+                        <span className="page-link">...</span>
+                      </li>
+                    )}
+
+                    {Array.from({ length: 5 }, (_, i) => currentPage - 2 + i)
+                      .filter(page => page > 1 && page < totalPages)
+                      .map(page => (
+                        <li key={page} className={`page-item ${currentPage === page ? "active" : ""}`}>
+                          <button
+                            className={`page-link btn ${currentPage === page ? "btn-primary" : "btn-outline-primary"} rounded-circle`}
+                            style={{ width: "30px", height: "30px", fontSize: "10px" }}
+                            onClick={() => handlePageChange(page)}
+                          >
+                            {page}
+                          </button>
+                        </li>
+                      ))}
+
+                    {currentPage < totalPages - 2 && (
+                      <li className="page-item disabled">
+                        <span className="page-link">...</span>
+                      </li>
+                    )}
+
+                    <li className={`page-item ${currentPage === totalPages ? "active" : ""}`}>
+                      <button
+                        className={`page-link btn ${currentPage === totalPages ? "btn-primary" : "btn-outline-primary"} rounded-circle`}
+                        style={{ width: "30px", height: "30px", fontSize: "10px" }}
+                        onClick={() => handlePageChange(totalPages)}
+                      >
+                        {totalPages}
+                      </button>
+                    </li>
+                  </>
+                ) : (
+                  Array.from({ length: totalPages }, (_, i) => (
+                    <li key={i} className={`page-item ${currentPage === i + 1 ? "active" : ""}`}>
+                      <button
+                        className={`page-link btn ${currentPage === i + 1 ? "btn-primary" : "btn-outline-primary"} rounded-circle`}
+                        style={{ width: "30px", height: "30px", fontSize: "10px" }}
+                        onClick={() => handlePageChange(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))
+                )}
                 <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                   <button
                     className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"

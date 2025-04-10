@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Spinner } from "../../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/stock-requests/product";
 const PRODUCTS_API = "https://api.bizchain.co.ke/v1/products";
@@ -26,7 +27,7 @@ const AddProductStockRequest = () => {
     const token = sessionStorage.getItem("token");
     if (!token) {
       toast.error("No authentication token found. Please log in.");
-      navigate("/login");
+      navigate("/sign-in");
       return;
     }
 
@@ -53,7 +54,7 @@ const AddProductStockRequest = () => {
     const token = sessionStorage.getItem("token");
     if (!token) {
       toast.error("No authentication token found. Please log in.");
-      navigate("/login");
+      navigate("/sign-in");
       return;
     }
 
@@ -79,7 +80,7 @@ const AddProductStockRequest = () => {
   useEffect(() => {
     if (!depotStockRequestId) {
       toast.error("No stock request ID provided. Please select a stock request to edit.");
-      navigate("/stock-request");
+      navigate("/edit-product");
       return;
     }
     fetchProducts();
@@ -93,7 +94,6 @@ const AddProductStockRequest = () => {
       .map((req) => parseInt(req.productId, 10))
       .filter((id) => !isNaN(id));
 
-    // Combine existing and selected product IDs to exclude them from the available options
     const excludedProductIds = [...existingProductIds, ...selectedProductIds];
 
     return products.filter((prod) => !excludedProductIds.includes(prod.id));
@@ -199,7 +199,7 @@ const AddProductStockRequest = () => {
 
       if (response.data.status.code === 0) {
         toast.success("Products added successfully!", {
-          onClose: () => navigate("/stock-request/edit", { state: { depotStockRequestId } }),
+          onClose: () => navigate("/stock-request/edit-product", { state: { depotStockRequestId } }),
           autoClose: 2000,
         });
         setStockRequests([{ productId: "", quantity: "" }]);
@@ -219,11 +219,11 @@ const AddProductStockRequest = () => {
   };
 
   return (
-    <div className="card h-100 p-0 radius-12">
+    <div className="card h-100 p-0 radius-8">
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="card-body">
         {isFetchingData && !products.length && (
-          <div className="text-center">Loading products...</div>
+          <div className="text-center"> <Spinner /> </div>
         )}
         <form onSubmit={handleFormSubmit}>
           {stockRequests.map((req, index) => (

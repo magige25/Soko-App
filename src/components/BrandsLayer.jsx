@@ -109,7 +109,7 @@ const BrandsLayer = () => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handleAddBrandClick = () => {
-    navigate("/brands/add");
+    navigate("/brands/add-brands");
   };
 
   return (

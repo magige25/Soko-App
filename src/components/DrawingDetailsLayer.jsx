@@ -99,7 +99,7 @@ const DrawingDetailsLayer = () => {
       const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgProps = pdf.getImageProperties(imgData);
       const imgWidth = imgProps.width;
-      const imgHeight = imgProps.height; // Fixed: defined before use
+      const imgHeight = imgProps.height; 
       const marginTop = 20;
       const marginLeft = 5;
       const availableWidth = pdfWidth - 2 * marginLeft;
@@ -165,34 +165,30 @@ const DrawingDetailsLayer = () => {
   return (
     <div className="card h-100 p-0 radius-12">
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
-        <h6 className="mb-0 fs-5">Drawing Details: {drawing?.drawCode || "N/A"}</h6>
-        <div className="d-flex gap-2">
-          <button
-            onClick={handleDownload}
-            className="btn btn-sm btn-success radius-8 d-flex align-items-center gap-1"
-          >
-            <Icon icon="solar:download-linear" className="text-xl" /> Download
-          </button>
-          <button
-            onClick={handlePrint}
-            className="btn btn-sm btn-danger radius-8 d-flex align-items-center gap-1"
-          >
-            <Icon icon="basil:printer-outline" className="text-xl" /> Print
-          </button>
-        </div>
+      <div className="card-header d-flex justify-content-center gap-2">
+        <button
+          onClick={handleDownload}
+          className="btn btn-sm btn-success radius-8 d-flex align-items-center gap-1"
+        >
+          <Icon icon="solar:download-linear" className="text-xl" /> Download
+        </button>
+        <button
+          onClick={handlePrint}
+          className="btn btn-sm btn-danger radius-8 d-flex align-items-center gap-1"
+        >
+          <Icon icon="basil:printer-outline" className="text-xl" /> Print
+        </button>
       </div>
       <div className="card-body p-24" id="drawing-details">
         {/* Basic Drawing Information */}
         <div className="mb-4">
-          <h6 className="fw-semibold text-primary-light mb-3">Basic Information</h6>
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-6 text-primary-light">
               <p><strong>Draw Code:</strong> {drawing?.drawCode || "N/A"}</p>
               <p><strong>Total Litres:</strong> {drawing?.totalLitres || 0} Litres</p>
               <p><strong>Number of Products:</strong> {drawing?.productQty || 0}</p>
             </div>
-            <div className="col-md-6">
+            <div className="col-md-6 text-primary-light">
               <p><strong>Total Items:</strong> {drawing?.itemQty || 0}</p>
               <p><strong>Date Created:</strong> {formatDate(drawing?.dateCreated)}</p>
               <p><strong>Created By:</strong> {drawing?.createdBy?.name || "N/A"}</p>
@@ -202,7 +198,7 @@ const DrawingDetailsLayer = () => {
 
         {/* Storage Facility Details */}
         <div className="mb-4">
-          <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Storage Facility Details</h6>
+          <h6 className="fw-semibold fs-16 text-primary-light mb-4 mt-3">Storage Details</h6>
           {drawingDetails?.storageFacilityDrawnModels?.length > 0 ? (
             <div className="table-responsive">
               <table className="table table-borderless sm-table mb-0">
@@ -237,7 +233,7 @@ const DrawingDetailsLayer = () => {
 
         {/* Product Draw Records */}
         <div className="mb-5">
-          <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Product Draw Records</h6>
+          <h6 className="fw-semibold fs-16 text-primary-light mb-4 mt-3">Product Draw Records</h6>
           {drawingDetails?.productDrawRecordModels?.length > 0 ? (
             <div className="table-responsive">
               <table className="table table-borderless sm-table mb-0">

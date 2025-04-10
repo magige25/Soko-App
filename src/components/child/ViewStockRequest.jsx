@@ -7,6 +7,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { formatDate } from "../../hook/format-utils";
+import { Spinner } from "../../hook/spinner-utils";
 
 const PENDING_STOCK_API_URL = "https://api.bizchain.co.ke/v1/stock-requests";
 
@@ -19,7 +20,6 @@ const ViewStockRequest = () => {
 
   const requestId = location.state?.requestId;
 
-  // Fetch stock request data
   useEffect(() => {
     if (!requestId) {
       setError("No pending stock request ID provided.");
@@ -62,7 +62,6 @@ const ViewStockRequest = () => {
     fetchPendingStockData();
   }, [requestId, navigate]);
 
-  // Approve stock request handler
   const handleApproveClick = async () => {
     if (!pendingStock?.id) return;
 
@@ -81,7 +80,6 @@ const ViewStockRequest = () => {
 
       if (response.data && response.data.status && response.data.status.code === 0) {
         toast.success("Stock request approved successfully!");
-        // Update the local state to reflect the approval
         setPendingStock(prev => ({
           ...prev,
           status: { ...prev.status, name: "APPROVED", code: "APPR" }
@@ -169,7 +167,7 @@ const ViewStockRequest = () => {
   if (isLoading) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24 text-center">Loading pending stock details...</div>
+        <div className="card-body p-24 text-center"> <Spinner /> </div>
       </div>
     );
   }
@@ -187,8 +185,7 @@ const ViewStockRequest = () => {
   return (
     <div className="card h-100 p-0 radius-12">
       <ToastContainer position="top-center" autoClose={3000} />
-      <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
-        <h6 className="mb-0 fs-5">Stock: {pendingStock?.orderCode || "N/A"}</h6>
+      <div className="card-header d-flex justify-content-center gap-2">
         <div className="d-flex gap-2">
           {pendingStock?.status?.code === "PEND" && (
             <button
@@ -217,8 +214,7 @@ const ViewStockRequest = () => {
       </div>
       <div className="card-body p-24" id="pending-stock-details">
         {/* Basic Pending Stock Information */}
-        <div className="mb-4">
-          <h6 className="fw-semibold text-primary-light mb-3">Basic Information</h6>
+        <div className="mb-4 text-primary-light">
           <div className="row">
             <div className="col-md-6">
               <p><strong>Order Code:</strong> {pendingStock?.orderCode || "N/A"}</p>
@@ -239,7 +235,7 @@ const ViewStockRequest = () => {
 
         {/* Product Details */}
         <div className="mb-5">
-          <h6 className="fw-semibold fs-5 text-primary-light mb-3 mt-3">Product Details</h6>
+          <h6 className="fw-semibold fs-5 text-primary-light mb-3 mt-3">Products</h6>
           {pendingStock?.productModelList?.length > 0 ? (
             <div className="table-responsive">
               <table className="table table-borderless sm-table mb-0">

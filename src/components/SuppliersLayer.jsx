@@ -142,7 +142,7 @@ const SuppliersLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search Name or Residence"
+              placeholder="Search name or residence"
               value={query}
               onChange={handleSearchInputChange}
             />
@@ -216,7 +216,7 @@ const SuppliersLayer = () => {
                                 to="/suppliers/details"
                                 state={{ supplierId: supplier.id }}
                               >
-                                Details
+                                View
                               </Link>
                             </li>
                             <li>

@@ -35,7 +35,6 @@ const SettledInvoicesLayer = () => {
       const responseData = response.data;
       if (responseData.status.code === 0) {
         const paidOnly = (responseData.data || []).filter(invoice => invoice.status.code === "PD");
-        // Calculate the correct slice based on current page and total items
         const startIndex = (page - 1) * itemsPerPage;
         const endIndex = Math.min(startIndex + itemsPerPage, paidOnly.length);
         const paginatedInvoices = paidOnly.slice(startIndex, endIndex);

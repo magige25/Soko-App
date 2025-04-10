@@ -213,16 +213,18 @@ const ProductsLayer = () => {
                           <ul className="dropdown-menu">
                           <li>
                               <button
-                                className="dropdown-item"//+ product.id, { state: { productId: product.id } }
-                                onClick={() => navigate("/products/view", { state: { productId: product.id } })}
+                                className="dropdown-item"
+                                onClick={() => navigate("/products/product-details", 
+                                { state: { productId: product.id } })}
                               >
-                                Details
+                                View
                               </button>
                             </li>
                             <li>
                               <button
                                 className="dropdown-item"
-                                onClick={() => navigate("/products/edit-product", { state: { product } })}
+                                onClick={() => navigate("/products/edit-product", 
+                                { state: { product } })}
                               >
                                 Edit
                               </button>

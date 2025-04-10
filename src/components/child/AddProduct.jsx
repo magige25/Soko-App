@@ -105,7 +105,7 @@ const AddProduct = () => {
     setProductData(prev => {
       const newData = { ...prev, [name]: value };
       if (name === "category") {
-        newData.subCategory = ""; // Reset subcategory when category changes
+        newData.subCategory = ""; 
       }
       return newData;
     });
@@ -208,10 +208,9 @@ const AddProduct = () => {
   const handleCancel = () => navigate("/products");
 
   return (
-    <div className="page-wrapper">
+    <div>
       <Toaster position="top-center" reverseOrder={false} />
-      <div className="row">
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
+        <div className="card border mt-2 full-width-card" style={{ width: "100%" }}>
           <div className="card-body">
             <h6 className="fs-6 mb-4">Add Product</h6>
             {error && <div className="alert alert-danger">{error}</div>}
@@ -295,7 +294,7 @@ const AddProduct = () => {
                       Category <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="form-control"
+                      className="form-control form-select"
                       name="category"
                       value={productData.category}
                       onChange={handleChange}
@@ -330,7 +329,7 @@ const AddProduct = () => {
                       Brand <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="form-control"
+                      className="form-control form-select"
                       name="brand"
                       value={productData.brand}
                       onChange={handleChange}
@@ -350,7 +349,7 @@ const AddProduct = () => {
                       Sub-category <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="form-control"
+                      className="form-control form-select"
                       name="subCategory"
                       value={productData.subCategory}
                       onChange={handleChange}
@@ -454,7 +453,6 @@ const AddProduct = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 

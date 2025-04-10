@@ -7,7 +7,7 @@ const API_URL = "https://api.bizchain.co.ke/v1/storage-facilities";
 
 const EditStorageFacilityLayer = () => {
   const location = useLocation();
-  const facilityId = location.state?.facilityId; // Get facilityId from route state
+  const facilityId = location.state?.facilityId; 
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -24,7 +24,7 @@ const EditStorageFacilityLayer = () => {
 
   useEffect(() => {
     if (!facilityId) {
-      navigate("/storage-facility"); // Adjust the route as needed
+      navigate("/storage-facility");
     }
 
     const fetchFacilityData = async () => {

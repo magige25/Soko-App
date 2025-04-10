@@ -204,7 +204,7 @@ const SalespersonsLayer = () => {
                                 to="/salespersons/details"
                                 state={{ salespersonId: salesperson.id }}
                               >
-                                Details
+                                View
                               </Link>
                             </li>
                             <li>

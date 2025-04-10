@@ -3,7 +3,6 @@ import { Icon } from "@iconify/react/dist/iconify.js";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import ThemeToggleButton from "../helper/ThemeToggleButton";
 import { useAuth } from "../context/AuthContext";
-import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import GroupAddOutlinedIcon from "@mui/icons-material/GroupAddOutlined";
 import { Spinner } from "../hook/spinner-utils";
 
@@ -200,7 +199,7 @@ const MasterLayout = ({ children }) => {
       childRoutes: [],
     },
     roles: {
-      paths: ["/roles-list"],
+      paths: ["/roles"],
       childRoutes: [],
     },
     settings: {
@@ -273,8 +272,8 @@ const MasterLayout = ({ children }) => {
                     navData.isActive ? "active-page" : ""
                   }
                 >
-                  <HomeOutlinedIcon className="menu-icon" />
-                  <span>Dashboards</span>
+                  <Icon icon="ri:home-4-line" className="menu-icon" />
+                  <span>Dashboard</span>
                 </NavLink>
               </li>
               <li
@@ -822,7 +821,7 @@ const MasterLayout = ({ children }) => {
                 }`}
               >
                 <Link to="#">
-                  <Icon icon="ri:shield-user-line" className="menu-icon" />
+                  <Icon icon="ri-key-line" className="menu-icon" />
                   <span>Authentication</span>
                 </Link>
                 <ul className="sidebar-submenu">
@@ -869,13 +868,13 @@ const MasterLayout = ({ children }) => {
                 }`}
               >
                 <Link to="#">
-                  <Icon icon="ri:user-settings-line" className="menu-icon" />
+                  <Icon icon="ri-shield-user-line" className="menu-icon" />
                   <span>Roles</span>
                 </Link>
                 <ul className="sidebar-submenu">
                   <li>
                     <NavLink
-                      to="/roles-list"
+                      to="/roles"
                       className={(navData) =>
                         navData.isActive ? "active-page" : ""
                       }
@@ -1072,7 +1071,7 @@ const MasterLayout = ({ children }) => {
                           className="text-primary-light text-xl"
                         />
                         {unreadMessages > 0 && (
-                          <span className="position-absolute top-0 end-0 w-12-px h-12-px bg-danger-main text-white fw-semibold fs-14 rounded-circle d-flex justify-content-center align-items-center">
+                          <span className="custom-badge position-absolute top-0 end-0 w-12-px h-12-px bg-primary text-white fw-semibold fs-14 rounded-circle d-flex justify-content-center align-items-center">
                             {unreadMessages}
                           </span>
                         )}
@@ -1209,7 +1208,7 @@ const MasterLayout = ({ children }) => {
                               <span className="text-secondary-light fw-sm text-sm mb-4">
                                 {user.email}
                               </span>
-                              <p className="text-secondary-light fw-bold text-sm mb-0">
+                              <p className="text-secondary-light fw-bold text-md mb-0">
                                 {user.role}
                               </p>
                             </>
