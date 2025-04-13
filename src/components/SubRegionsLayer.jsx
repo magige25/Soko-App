@@ -1,21 +1,17 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Spinner } from "../hook/spinner-utils";
 import { formatDate } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/sub-regions";
-const REGIONS_API_URL = "https://api.bizchain.co.ke/v1/regions";
 
 const SubRegionsLayer = () => {
+  const navigate = useNavigate();
   const [subRegions, setSubRegions] = useState([]);
   const [filteredSubRegions, setFilteredSubRegions] = useState([]);
-  const [newSubRegion, setNewSubRegion] = useState({ name: "", region: "" });
-  const [editSubRegion, setEditSubRegion] = useState({ id: null, name: "", region: "", regionName: "" });
   const [subRegionToDelete, setSubRegionToDelete] = useState(null);
-  const [regions, setRegions] = useState([]);
-  const [showRegionDropdown, setShowRegionDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,23 +20,7 @@ const SubRegionsLayer = () => {
 
   useEffect(() => {
     fetchSubRegions();
-    fetchRegions();
-  }, []); 
-
-  useEffect(() => {
-    const addModal = document.getElementById("addSubRegionModal");
-    const editModal = document.getElementById("editSubRegionModal");
-    const resetAddForm = () => !isLoading && setNewSubRegion({ name: "", region: "" });
-    const resetEditForm = () => !isLoading && setEditSubRegion({ id: null, name: "", region: "", regionName: "" });
-
-    addModal?.addEventListener("hidden.bs.modal", resetAddForm);
-    editModal?.addEventListener("hidden.bs.modal", resetEditForm);
-
-    return () => {
-      addModal?.removeEventListener("hidden.bs.modal", resetAddForm);
-      editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
-    };
-  }, [isLoading]);
+  }, []);
 
   const fetchSubRegions = async () => {
     setIsLoading(true);
@@ -67,111 +47,6 @@ const SubRegionsLayer = () => {
       setError("Failed to fetch sub-regions. Please try again.");
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const fetchRegions = async () => {
-    setIsLoading(true);
-    try {
-      const token = sessionStorage.getItem("token");
-      const response = await axios.get(REGIONS_API_URL, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setRegions(response.data.data || []);
-    } catch (error) {
-      console.error("Error fetching regions:", error);
-      setError("Failed to fetch regions. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddSubRegion = async (e) => {
-    e.preventDefault();
-    if (!newSubRegion.name.trim() || !newSubRegion.region) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-    try {
-      setIsLoading(true); 
-      setError(null);
-      const token = sessionStorage.getItem("token");
-      const payload = {
-        name: newSubRegion.name,
-        region: newSubRegion.region,
-      };
-      console.log("Sending payload:", payload);
-      const response = await axios.post(API_URL, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("API Response:", response.data);
-      await fetchSubRegions();
-      setNewSubRegion({ name: "", region: "" });
-      document.getElementById("addSubRegionModal").classList.remove("show");
-      document.body.classList.remove("modal-open");
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
-    } catch (error) {
-      console.error("Error adding sub-region:", error);
-      console.log("Server response data:", error.response?.data);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        JSON.stringify(error.response?.data) ||
-        "Failed to add sub-region. Please check the input and try again.";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false); 
-    }
-  };
-
-  const handleEditClick = (subRegion) => {
-    setEditSubRegion({
-      id: subRegion.id,
-      name: subRegion.name,
-      region: subRegion.region,
-      regionName: subRegion.regionName,
-    });
-  };
-
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    if (!editSubRegion.name.trim() || !editSubRegion.region) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-    try {
-      setIsLoading(true); 
-      setError(null);
-      const token = sessionStorage.getItem("token");
-      const payload = {
-        name: editSubRegion.name,
-        region: editSubRegion.region,
-      };
-      console.log("Sending edit payload:", payload);
-      await axios.put(`${API_URL}/${editSubRegion.id}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      await fetchSubRegions();
-      setEditSubRegion({ id: null, name: "", region: "", regionName: "" });
-      document.getElementById("editSubRegionModal").classList.remove("show");
-      document.body.classList.remove("modal-open");
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
-    } catch (error) {
-      console.error("Error updating sub-region:", error);
-      console.log("Server response data:", error.response?.data);
-      const errorMessage =
-        error.response?.data?.message ||
-        error.response?.data?.error ||
-        JSON.stringify(error.response?.data) ||
-        "Failed to update sub-region.";
-      setError(errorMessage);
-    } finally {
-      setIsLoading(false); 
     }
   };
 
@@ -220,7 +95,6 @@ const SubRegionsLayer = () => {
     setCurrentPage(1);
   };
 
-
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredSubRegions.slice(indexOfFirstItem, indexOfLastItem);
@@ -246,8 +120,7 @@ const SubRegionsLayer = () => {
         <button
           type="button"
           className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-          data-bs-toggle="modal"
-          data-bs-target="#addSubRegionModal"
+          onClick={() => navigate("/sub-regions/add")}
         >
           <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
           Add Sub-Region
@@ -312,10 +185,8 @@ const SubRegionsLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to="#"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editSubRegionModal"
-                                onClick={() => handleEditClick(subRegion)}
+                                to={`/sub-regions/edit/${subRegion.id}`}
+                                state={{ subRegionId: subRegion.id }}
                               >
                                 Edit
                               </Link>
@@ -401,166 +272,6 @@ const SubRegionsLayer = () => {
             </nav>
           </div>
         )}
-      </div>
-
-      {/* Add Sub-Region Modal */}
-      <div className="modal fade" id="addSubRegionModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Add Sub-Region
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
-              <form onSubmit={handleAddSubRegion}>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Sub-Region Name"
-                    value={newSubRegion.name}
-                    onChange={(e) => setNewSubRegion({ ...newSubRegion, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Region <span className="text-danger">*</span>
-                  </label>
-                  <div className="position-relative">
-                    <div
-                      className="form-control d-flex justify-content-between align-items-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setShowRegionDropdown(!showRegionDropdown)}
-                    >
-                      <span>
-                        {newSubRegion.region
-                          ? regions.find((r) => r.id === newSubRegion.region)?.name
-                          : "Select Region"}
-                      </span>
-                      <i className="dropdown-toggle ms-2" />
-                    </div>
-                    {showRegionDropdown && (
-                      <ul
-                        className="dropdown-menu w-100 show"
-                        style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}
-                      >
-                        {regions.map((region) => (
-                          <li key={region.id}>
-                            <button
-                              type="button"
-                              className="dropdown-item"
-                              onClick={() => {
-                                setNewSubRegion({ ...newSubRegion, region: region.id });
-                                setShowRegionDropdown(false);
-                              }}
-                            >
-                              {region.name}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-                <div className="text-muted small mt-3">
-                  Fields marked with <span className="text-danger">*</span> are required.
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit Sub-Region Modal */}
-      <div className="modal fade" id="editSubRegionModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Edit Sub-Region
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
-              <form onSubmit={handleEditSubmit}>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Sub-Region Name"
-                    value={editSubRegion.name}
-                    onChange={(e) => setEditSubRegion({ ...editSubRegion, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Region <span className="text-danger">*</span>
-                  </label>
-                  <div className="position-relative">
-                    <div
-                      className="form-control d-flex justify-content-between align-items-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setShowRegionDropdown(!showRegionDropdown)}
-                    >
-                      <span>
-                        {editSubRegion.region
-                          ? regions.find((r) => r.id === editSubRegion.region)?.name
-                          : "Select Region"}
-                      </span>
-                      <i className="dropdown-toggle ms-2" />
-                    </div>
-                    {showRegionDropdown && (
-                      <ul
-                        className="dropdown-menu w-100 show"
-                        style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}
-                      >
-                        {regions.map((region) => (
-                          <li key={region.id}>
-                            <button
-                              type="button"
-                              className="dropdown-item"
-                              onClick={() => {
-                                setEditSubRegion({
-                                  ...editSubRegion,
-                                  region: region.id,
-                                  regionName: region.name,
-                                });
-                                setShowRegionDropdown(false);
-                              }}
-                            >
-                              {region.name}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-                <div className="text-muted small mt-3">
-                  Fields marked with <span className="text-danger">*</span> are required.
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Delete Confirmation Modal */}

@@ -1,67 +1,30 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import toast from "react-hot-toast";
 import { Spinner } from "../hook/spinner-utils";
 import { formatDate } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/routes";
-const SUBREGIONS_API_URL = "https://api.bizchain.co.ke/v1/sub-regions";
 
 const RoutesLayer = () => {
+  const navigate = useNavigate();
   const [routes, setRoutes] = useState([]);
   const [filteredRoutes, setFilteredRoutes] = useState([]);
-  const [newRoute, setNewRoute] = useState({ name: "", subRegionId: "", regionId: "" });
-  const [editRoute, setEditRoute] = useState({
-    id: null,
-    name: "",
-    subRegionId: "",
-    regionId: "",
-    subRegion: "",
-    region: "",
-  });
   const [routeToDelete, setRouteToDelete] = useState(null);
-  const [subRegions, setSubRegions] = useState([]);
-  const [showSubRegionDropdown, setShowSubRegionDropdown] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch data once on mount
   useEffect(() => {
     fetchRoutes();
-    fetchSubRegions();
-  }, []); // Empty dependency array for initial fetch
-
-  // Handle modal event listeners with isLoading dependency
-  useEffect(() => {
-    const addModal = document.getElementById("addRouteModal");
-    const editModal = document.getElementById("editRouteModal");
-    const resetAddForm = () => !isLoading && setNewRoute({ name: "", subRegionId: "", regionId: "" });
-    const resetEditForm = () =>
-      !isLoading &&
-      setEditRoute({
-        id: null,
-        name: "",
-        subRegionId: "",
-        regionId: "",
-        subRegion: "",
-        region: "",
-      });
-
-    addModal?.addEventListener("hidden.bs.modal", resetAddForm);
-    editModal?.addEventListener("hidden.bs.modal", resetEditForm);
-
-    return () => {
-      addModal?.removeEventListener("hidden.bs.modal", resetAddForm);
-      editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
-    };
-  }, [isLoading]); 
+  }, []);
 
   const fetchRoutes = async () => {
-    setIsLoading(true); 
+    setIsLoading(true);
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
@@ -84,114 +47,15 @@ const RoutesLayer = () => {
       setError(null);
     } catch (error) {
       console.error("Error fetching routes:", error);
-      setError("Failed to fetch routes. Please try again.");
+      let errorMessage = "Failed to fetch routes. Please try again.";
+      if (error.response) {
+        if (error.response.status === 401) errorMessage = "Unauthorized. Please log in again.";
+        else if (error.response.status === 404) errorMessage = "Routes not found.";
+        else if (error.response.data?.message) errorMessage = error.response.data.message;
+      }
+      setError(errorMessage);
     } finally {
-      setIsLoading(false); 
-    }
-  };
-
-  const fetchSubRegions = async () => {
-    setIsLoading(true); 
-    try {
-      const token = sessionStorage.getItem("token");
-      const response = await axios.get(SUBREGIONS_API_URL, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setSubRegions(response.data.data || []);
-    } catch (error) {
-      console.error("Error fetching sub-regions:", error);
-      setError("Failed to fetch sub-regions. Please try again.");
-    } finally {
-      setIsLoading(false); 
-    }
-  };
-
-  const handleAddRoute = async (e) => {
-    e.preventDefault();
-    if (!newRoute.name.trim() || !newRoute.subRegionId) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-    try {
-      setIsLoading(true); 
-      setError(null);
-      const token = sessionStorage.getItem("token");
-      const payload = {
-        name: newRoute.name,
-        subRegion: newRoute.subRegionId,
-      };
-      console.log("Sending payload (Add):", payload);
-      const response = await axios.post(API_URL, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("API Response (Add):", response.data);
-      await fetchRoutes();
-      setNewRoute({ name: "", subRegionId: "", regionId: "" });
-      document.getElementById("addRouteModal").classList.remove("show");
-      document.body.classList.remove("modal-open");
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
-    } catch (error) {
-      console.error("Error adding route:", error);
-      console.log("Response data:", error.response?.data);
-      setError(error.response?.data?.message || "Failed to add route.");
-    } finally {
-      setIsLoading(false); 
-    }
-  };
-
-  const handleEditClick = (route) => {
-    setEditRoute({
-      id: route.id,
-      name: route.name,
-      subRegionId: route.subRegionId,
-      regionId: route.regionId,
-      subRegion: route.subRegion,
-      region: route.region,
-    });
-  };
-
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    if (!editRoute.name.trim() || !editRoute.subRegionId) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-    try {
-      setIsLoading(true); 
-      setError(null);
-      const token = sessionStorage.getItem("token");
-      const payload = {
-        name: editRoute.name,
-        subRegion: editRoute.subRegionId,
-      };
-      console.log("Sending payload (Edit):", payload);
-      const response = await axios.put(`${API_URL}/${editRoute.id}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("API Response (Edit):", response.data);
-      await fetchRoutes();
-      setEditRoute({
-        id: null,
-        name: "",
-        subRegionId: "",
-        regionId: "",
-        subRegion: "",
-        region: "",
-      });
-      document.getElementById("editRouteModal").classList.remove("show");
-      document.body.classList.remove("modal-open");
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
-    } catch (error) {
-      console.error("Error updating route:", error);
-      console.log("Response data:", error.response?.data);
-      setError(error.response?.data?.message || "Failed to update route.");
-    } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -199,23 +63,58 @@ const RoutesLayer = () => {
     setRouteToDelete(route);
   };
 
-  const handleDeleteConfirm = async () => {
-    try {
-      setIsLoading(true); 
-      const token = sessionStorage.getItem("token");
-      await axios.delete(`${API_URL}/${routeToDelete.id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+  // const handleDeleteConfirm = async () => {
+  //   try {
+  //     setIsLoading(true);
+  //     const token = sessionStorage.getItem("token");
+  //     await axios.delete(`${API_URL}/${routeToDelete.id}`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+
+  //     toast.success("Route deleted successfully!");
+
+  //     await fetchRoutes();
+  //     setRouteToDelete(null);
+  //   } catch (error) {
+  //     console.error("Error deleting route:", error);
+
+  //     const message =error.response?.data?.message || "Failed to delete route.";
+  //     setError(message);
+  //     toast.error(message);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+const handleDeleteConfirm = async () => {
+  setIsLoading(true);
+
+  const token = sessionStorage.getItem("token");
+
+  await toast.promise(
+    axios.delete(`${API_URL}/${routeToDelete.id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+    {
+      loading: "Deleting route...",
+      success: "Route deleted successfully!",
+      error: (err) =>
+        err?.response?.data?.message || "Failed to delete route.",
+    }
+  )
+    .then(async () => {
       await fetchRoutes();
       setRouteToDelete(null);
-    } catch (error) {
-      console.error("Error deleting route:", error);
-      console.log("Response data:", error.response?.data);
-      setError(error.response?.data?.message || "Failed to delete route.");
-    } finally {
+    })
+    .catch(() => {
+      setError("Failed to delete route. Please try again.");
+      toast.error("Failed to delete route. Please try again.");
+      setRouteToDelete(null);
+    })
+    .finally(() => {
       setIsLoading(false);
-    }
-  };
+    });
+};
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -236,7 +135,7 @@ const RoutesLayer = () => {
         route.subRegion.toLowerCase().includes(lowerQuery) ||
         route.region.toLowerCase().includes(lowerQuery) ||
         String(route.customers).includes(lowerQuery) ||
-        String(route.salesAgents).includes(lowerQuery)
+        String(route.salesPersons).includes(lowerQuery)
     );
     setFilteredRoutes(filtered);
     setCurrentPage(1);
@@ -267,8 +166,7 @@ const RoutesLayer = () => {
         <button
           type="button"
           className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-          data-bs-toggle="modal"
-          data-bs-target="#addRouteModal"
+          onClick={() => navigate("/routes/add-route")}
         >
           <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
           Add Route
@@ -294,10 +192,10 @@ const RoutesLayer = () => {
             <tbody>
               {isLoading ? (
                 <tr>
-                <td colSpan="8" className="text-center py-3">
-                  <Spinner />
-                </td>
-              </tr>
+                  <td colSpan="8" className="text-center py-3">
+                    <Spinner />
+                  </td>
+                </tr>
               ) : currentItems.length > 0 ? (
                 currentItems.map((route) => (
                   <tr key={route.id} style={{ transition: "background-color 0.2s" }}>
@@ -335,10 +233,8 @@ const RoutesLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to="#"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editRouteModal"
-                                onClick={() => handleEditClick(route)}
+                                to={`/routes/edit-route/${route.id}`}
+                                state={{ route }}
                               >
                                 Edit
                               </Link>
@@ -424,166 +320,6 @@ const RoutesLayer = () => {
             </nav>
           </div>
         )}
-      </div>
-
-      {/* Add Route Modal */}
-      <div className="modal fade" id="addRouteModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Add Route
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
-              <form onSubmit={handleAddRoute}>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Route Name"
-                    value={newRoute.name}
-                    onChange={(e) => setNewRoute({ ...newRoute, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Sub-Region <span className="text-danger">*</span>
-                  </label>
-                  <div className="position-relative">
-                    <div
-                      className="form-control d-flex justify-content-between align-items-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setShowSubRegionDropdown(!showSubRegionDropdown)}
-                    >
-                      <span>
-                        {newRoute.subRegionId
-                          ? subRegions.find((sr) => sr.id === newRoute.subRegionId)?.name
-                          : "Select Sub-Region"}
-                      </span>
-                      <i className="dropdown-toggle ms-2" />
-                    </div>
-                    {showSubRegionDropdown && (
-                      <ul
-                        className="dropdown-menu w-100 show"
-                        style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}
-                      >
-                        {subRegions.map((subRegion) => (
-                          <li key={subRegion.id}>
-                            <button
-                              type="button"
-                              className="dropdown-item"
-                              onClick={() => {
-                                setNewRoute({ ...newRoute, subRegionId: subRegion.id });
-                                setShowSubRegionDropdown(false);
-                              }}
-                            >
-                              {subRegion.name}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-                <div className="text-muted small mt-3">
-                  Fields marked with <span className="text-danger">*</span> are required.
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit Route Modal */}
-      <div className="modal fade" id="editRouteModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Edit Route
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
-              <form onSubmit={handleEditSubmit}>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Route Name"
-                    value={editRoute.name}
-                    onChange={(e) => setEditRoute({ ...editRoute, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Sub-Region <span className="text-danger">*</span>
-                  </label>
-                  <div className="position-relative">
-                    <div
-                      className="form-control d-flex justify-content-between align-items-center"
-                      style={{ cursor: "pointer" }}
-                      onClick={() => setShowSubRegionDropdown(!showSubRegionDropdown)}
-                    >
-                      <span>
-                        {editRoute.subRegionId
-                          ? subRegions.find((sr) => sr.id === editRoute.subRegionId)?.name
-                          : "Select Sub-Region"}
-                      </span>
-                      <i className="dropdown-toggle ms-2" />
-                    </div>
-                    {showSubRegionDropdown && (
-                      <ul
-                        className="dropdown-menu w-100 show"
-                        style={{ position: "absolute", top: "100%", left: 0, zIndex: 1000 }}
-                      >
-                        {subRegions.map((subRegion) => (
-                          <li key={subRegion.id}>
-                            <button
-                              type="button"
-                              className="dropdown-item"
-                              onClick={() => {
-                                setEditRoute({
-                                  ...editRoute,
-                                  subRegionId: subRegion.id,
-                                  subRegion: subRegion.name,
-                                });
-                                setShowSubRegionDropdown(false);
-                              }}
-                            >
-                              {subRegion.name}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
-                <div className="text-muted small mt-3">
-                  Fields marked with <span className="text-danger">*</span> are required.
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Delete Confirmation Modal */}

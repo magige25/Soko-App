@@ -27,7 +27,7 @@ const DeliveriesLayer = () => {
   const [endDate, setEndDate] = useState(""); // Will store date as string or null
   const [deliveryToDelete, setDeliveryToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(15);// Set items per page
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);

@@ -13,8 +13,7 @@ const MasterLayout = ({ children }) => {
   const dropdownRefs = useRef([]);
   const sidebarRef = useRef(null);
   const location = useLocation();
-  const { signOut, user, loading } = useAuth(); 
-  const sidebarControl = () => {
+  const { signOut, user, loading } = useAuth();  const sidebarControl = () => {
     setSidebarActive((prev) => !prev);
   };
 

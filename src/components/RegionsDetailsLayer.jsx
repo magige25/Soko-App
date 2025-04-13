@@ -5,8 +5,8 @@ import { useLocation } from "react-router-dom";
 const RegionDetails = () => {
   const location = useLocation();
   const defaultRegion = {
-    name: "Default Region",
-    salesAgents: 0,
+    name: "",
+    salesPersons: 0,
     customers: 0,
     country: "N/A",
     dateCreated: null,
@@ -21,8 +21,8 @@ const RegionDetails = () => {
   const [selectedDateFilter, setSelectedDateFilter] = useState("");
 
   const stats = [
-    { title: "Total Employees", count: region.salesAgents || 1007, icon: "mdi:account-group", color: "bg-dark" },
-    { title: "Active", count: region.salesAgents || 1007, icon: "mdi:account-check", color: "bg-success" },
+    { title: "Total Employees", count: region.salesPersons || 1007, icon: "mdi:account-group", color: "bg-dark" },
+    { title: "Active", count: region.salesPersons || 1007, icon: "mdi:account-check", color: "bg-success" },
     { title: "Inactive", count: 0, icon: "mdi:account-off", color: "bg-danger" },
     { title: "New Joiners", count: 67, icon: "mdi:account-plus", color: "bg-info" },
   ];
@@ -33,16 +33,16 @@ const RegionDetails = () => {
 
   const tables = {
     customers: [
-      { id: 1, name: "Customer A", phoneNO: 746779784, email: "customerA@example.com", salesAgents: "James", totalOrders: 12, pendingOrders: 4, pendingPayments: 2000 },
-      { id: 2, name: "Customer B", phoneNO: 746779784, email: "customerB@example.com", salesAgents: "Leah", totalOrders: 22, pendingOrders: 8, pendingPayments: 1200 },
-      { id: 3, name: "Customer C", phoneNO: 746779784, email: "customerC@example.com", salesAgents: "Steve", totalOrders: 16, pendingOrders: 7, pendingPayments: 10500 },
+      { id: 1, name: "Murimi", phoneNO: 746779784, email: "customerA@example.com", salesPersons: "James", totalOrders: 12, pendingOrders: 4, pendingPayments: 2000 },
+      { id: 2, name: "Mamboleo", phoneNO: 746779784, email: "customerB@example.com", salesPersons: "Leah", totalOrders: 22, pendingOrders: 8, pendingPayments: 1200 },
+      { id: 3, name: "Doktari", phoneNO: 746779784, email: "customerC@example.com", salesPersons: "Steve", totalOrders: 16, pendingOrders: 7, pendingPayments: 10500 },
     ],
     orders: [
       { id: 1, orderId: "ORD123", amount: 100, status: "Completed" },
       { id: 2, orderId: "ORD124", amount: 200, status: "Pending" },
       { id: 3, orderId: "ORD125", amount: 200, status: "Defaulted" },
     ],
-    salesAgents: [
+    salesPersons: [
       { id: 1, name: "Agent X", region: region.name || "Nyanza" },
       { id: 2, name: "Agent Y", region: region.name || "Coastal" },
       { id: 3, name: "Agent Z", region: region.name || "Nairobi" },
@@ -53,7 +53,7 @@ const RegionDetails = () => {
     "Today", "Yesterday", "Last 7 Days", "Last 30 Days", "This Month", "Last Month", "Custom Range"
   ];
 
-  const tableOptions = ["customers", "orders", "salesAgents"];
+  const tableOptions = ["customers", "orders", "salesPersons"];
   const statusOptions = ["All", "Completed", "Pending", "Defaulted"];
 
   const filteredOrders = selectedStatus === "All"
@@ -73,7 +73,7 @@ const RegionDetails = () => {
                 <th className="text-start">Name</th>
                 <th className="text-start">Phone NO.</th>
                 <th className="text-start">Email</th>
-                <th className="text-start">Sales Agent</th>
+                <th className="text-start">Sales Persons</th>
                 <th className="text-start">Total Orders</th>
                 <th className="text-start">Pending Orders</th>
                 <th className="text-start">Pending Payments</th>
@@ -86,7 +86,7 @@ const RegionDetails = () => {
                   <td className="text-start small-text">{customer.name}</td>
                   <td className="text-start small-text">{customer.phoneNO}</td>
                   <td className="text-start small-text">{customer.email}</td>
-                  <td className="text-start small-text">{customer.salesAgents}</td>
+                  <td className="text-start small-text">{customer.salesPersons}</td>
                   <td className="text-start small-text">{customer.totalOrders}</td>
                   <td className="text-start small-text">{customer.pendingOrders}</td>
                   <td className="text-start small-text">{customer.pendingPayments}</td>
@@ -118,7 +118,7 @@ const RegionDetails = () => {
             </tbody>
           </table>
         );
-      case "salesAgents":
+      case "salesPersons":
         return (
           <table className="table table-borderless text-start small-text">
             <thead className="table-light text-start small-text">
@@ -129,7 +129,7 @@ const RegionDetails = () => {
               </tr>
             </thead>
             <tbody>
-              {tables.salesAgents.map((agent) => (
+              {tables.salesPersons.map((agent) => (
                 <tr key={agent.id}>
                   <td className="text-start small-text">{agent.id}</td>
                   <td className="text-start small-text">{agent.name}</td>

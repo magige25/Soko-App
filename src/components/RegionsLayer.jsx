@@ -1,19 +1,18 @@
 import { Icon } from "@iconify/react/dist/iconify.js";
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate } from "../hook/format-utils";
+import toast, { Toaster } from "react-hot-toast";;
 
 const API_URL = "https://api.bizchain.co.ke/v1/regions";
-const COUNTRIES_API_URL = "https://api.bizchain.co.ke/v1/countries";
 
 const RegionsLayer = () => {
+  const navigate = useNavigate();
   const [regions, setRegions] = useState([]);
   const [filteredRegions, setFilteredRegions] = useState([]);
-  const [newRegion, setNewRegion] = useState({ name: "", countryCode: "" });
-  const [editRegion, setEditRegion] = useState({ id: null, name: "", countryCode: "", country: "" });
   const [regionToDelete, setRegionToDelete] = useState(null);
-  const [countries, setCountries] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,27 +21,10 @@ const RegionsLayer = () => {
 
   useEffect(() => {
     fetchRegions();
-    fetchCountries();
-  }, []); 
-  
-  useEffect(() => {
-    const addModal = document.getElementById("addRegionModal");
-    const editModal = document.getElementById("editRegionModal");
-    const resetAddForm = () => !isLoading && setNewRegion({ name: "", countryCode: "" });
-    const resetEditForm = () => !isLoading && setEditRegion({ id: null, name: "", countryCode: "", country: "" });
-
-    addModal?.addEventListener("hidden.bs.modal", resetAddForm);
-    editModal?.addEventListener("hidden.bs.modal", resetEditForm);
-
-    return () => {
-      addModal?.removeEventListener("hidden.bs.modal", resetAddForm);
-      editModal?.removeEventListener("hidden.bs.modal", resetEditForm);
-    };
-  }, [isLoading]);
+  }, []);
 
   const fetchRegions = async () => {
-    setIsLoading(true); 
-    
+    setIsLoading(true);
     try {
       const token = sessionStorage.getItem("token");
       const response = await axios.get(API_URL, {
@@ -54,7 +36,7 @@ const RegionsLayer = () => {
         country: region.country.name,
         countryCode: region.country.code,
         customers: region.numberCustomer || 0,
-        salesAgents: region.numberSalesPerson || 0,
+        salesPersons: region.numberSalesPerson || 0,
         subRegions: region.numberSubRegion || 0,
         dateCreated: region.dateCreated,
         createdBy: region.createdBy?.name || "Unknown",
@@ -65,104 +47,6 @@ const RegionsLayer = () => {
     } catch (error) {
       console.error("Error fetching regions:", error);
       setError("Failed to fetch regions. Please try again.");
-    } finally {
-      setIsLoading(false); 
-    }
-  };
-
-  const fetchCountries = async () => {
-    setIsLoading(true);
-    try {
-      const token = sessionStorage.getItem("token");
-      const response = await axios.get(COUNTRIES_API_URL, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCountries(response.data.data || []);
-    } catch (error) {
-      console.error("Error fetching countries:", error);
-      setError("Failed to fetch countries. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAddRegion = async (e) => {
-    e.preventDefault();
-    if (!newRegion.name.trim() || !newRegion.countryCode.trim()) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-    try {
-      setIsLoading(true);
-      setError(null);
-      const token = sessionStorage.getItem("token");
-      const payload = {
-        name: newRegion.name,
-        countryCode: newRegion.countryCode,
-      };
-      console.log("Sending payload (Add):", payload);
-      const response = await axios.post(API_URL, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-      console.log("API Response (Add):", response.data);
-      await fetchRegions();
-      setNewRegion({ name: "", countryCode: "" });
-      document.getElementById("addRegionModal").classList.remove("show");
-      document.body.classList.remove("modal-open");
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
-    } catch (error) {
-      console.error("Error adding region:", error);
-      setError(
-        error.response?.status === 403
-          ? "Permission denied. Please check your authentication."
-          : error.response?.data?.message || "Failed to add region."
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleEditClick = (region) => {
-    setEditRegion({
-      id: region.id,
-      name: region.name,
-      countryCode: region.countryCode,
-      country: region.country,
-    });
-  };
-
-  const handleEditSubmit = async (e) => {
-    e.preventDefault();
-    if (!editRegion.name.trim() || !editRegion.countryCode.trim()) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-    try {
-      setIsLoading(true);
-      setError(null);
-      const token = sessionStorage.getItem("token");
-      const payload = {
-        name: editRegion.name,
-        countryCode: editRegion.countryCode,
-      };
-      console.log("Sending payload (Edit):", payload);
-      const response = await axios.put(`${API_URL}/${editRegion.id}`, payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("API Response (Edit):", response.data);
-      await fetchRegions();
-      setEditRegion({ id: null, name: "", countryCode: "", country: "" });
-      document.getElementById("editRegionModal").classList.remove("show");
-      document.body.classList.remove("modal-open");
-      const backdrop = document.querySelector(".modal-backdrop");
-      if (backdrop) backdrop.remove();
-    } catch (error) {
-      console.error("Error updating region:", error);
-      setError(error.response?.data?.message || "Failed to update region.");
     } finally {
       setIsLoading(false);
     }
@@ -179,6 +63,10 @@ const RegionsLayer = () => {
       await axios.delete(`${API_URL}/${regionToDelete.id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      toast.success("Region deleted successfully", {
+        style: { background: "#fef2f2", color: "#b91c1c", border: "1px solid #fca5a5" },
+      });
+      
       await fetchRegions();
       setRegionToDelete(null);
     } catch (error) {
@@ -207,27 +95,10 @@ const RegionsLayer = () => {
         region.name.toLowerCase().includes(lowerQuery) ||
         region.country.toLowerCase().includes(lowerQuery) ||
         String(region.customers).includes(lowerQuery) ||
-        String(region.salesAgents).includes(lowerQuery)
+        String(region.salesPersons).includes(lowerQuery)
     );
     setFilteredRegions(filtered);
     setCurrentPage(1);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
   };
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -238,6 +109,7 @@ const RegionsLayer = () => {
 
   return (
     <div className="card h-100 p-0 radius-12">
+      <Toaster position="top-center" reverseOrder={false} />
       <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center flex-wrap gap-3 justify-content-between">
         <div className="d-flex align-items-center flex-wrap gap-3">
           <form className="navbar-search" onSubmit={handleSearch}>
@@ -255,8 +127,7 @@ const RegionsLayer = () => {
         <button
           type="button"
           className="btn btn-primary text-sm btn-sm px-12 py-12 radius-8 d-flex align-items-center gap-2"
-          data-bs-toggle="modal"
-          data-bs-target="#addRegionModal"
+          onClick={() => navigate("/regions/add")}
         >
           <Icon icon="ic:baseline-plus" className="icon text-xl line-height-1" />
           Add Region
@@ -273,7 +144,7 @@ const RegionsLayer = () => {
                 <th scope="col" className="text-start py-3 px-4">Name</th>
                 <th scope="col" className="text-start py-3 px-4">Country</th>
                 <th scope="col" className="text-start py-3 px-4">Customers</th>
-                <th scope="col" className="text-start py-3 px-4">Sales Agents</th>
+                <th scope="col" className="text-start py-3 px-4">Sales Persons</th>
                 <th scope="col" className="text-start py-3 px-4">Date Created</th>
                 <th scope="col" className="text-start py-3 px-4">Action</th>
               </tr>
@@ -294,7 +165,7 @@ const RegionsLayer = () => {
                     <td className="text-start small-text py-3 px-4">{region.name}</td>
                     <td className="text-start small-text py-3 px-4">{region.country}</td>
                     <td className="text-start small-text py-3 px-4">{region.customers}</td>
-                    <td className="text-start small-text py-3 px-4">{region.salesAgents}</td>
+                    <td className="text-start small-text py-3 px-4">{region.salesPersons}</td>
                     <td className="text-start small-text py-3 px-4">
                       {region.dateCreated ? formatDate(region.dateCreated) : ""}
                     </td>
@@ -317,14 +188,12 @@ const RegionsLayer = () => {
                               >
                                 View
                               </Link>
-                            </li>    
+                            </li>
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to="#"
-                                data-bs-toggle="modal"
-                                data-bs-target="#editRegionModal"
-                                onClick={() => handleEditClick(region)}
+                                to={`/regions/edit/${region.id}`}
+                                state={{ regionId: region.id }}
                               >
                                 Edit
                               </Link>
@@ -410,126 +279,6 @@ const RegionsLayer = () => {
             </nav>
           </div>
         )}
-      </div>
-
-      {/* Add Region Modal */}
-      <div className="modal fade" id="addRegionModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Add Region
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
-              <form onSubmit={handleAddRegion}>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Region Name"
-                    value={newRegion.name}
-                    onChange={(e) => setNewRegion({ ...newRegion, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label fw-semibold text-primary-light mb-2">
-                    Country <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    className="form-control rounded-lg form-select pr-4 bg-white"
-                    value={newRegion.countryCode || ""}
-                    onChange={(e) => setNewRegion({ ...newRegion, countryCode: e.target.value })}
-                  >
-                    <option value="" disabled>
-                      Select Country
-                    </option>
-                    {countries.map((country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="text-muted small mt-3">
-                  Fields marked with <span className="text-danger">*</span> are required.
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Edit Region Modal */}
-      <div className="modal fade" id="editRegionModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-6">
-                Edit Region
-                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </h6>
-              {error && <div className="alert alert-danger">{error}</div>}
-              <form onSubmit={handleEditSubmit}>
-                <div className="mb-3">
-                  <label className="form-label">
-                    Name <span className="text-danger">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Enter Region Name"
-                    value={editRegion.name}
-                    onChange={(e) => setEditRegion({ ...editRegion, name: e.target.value })}
-                    required
-                  />
-                </div>
-                <div className="mb-3">
-                  <label className="form-label fw-semibold text-primary-light mb-2">
-                    Country <span className="text-danger">*</span>
-                  </label>
-                  <select
-                    className="form-control rounded-lg form-select pr-4 bg-white"
-                    value={editRegion.countryCode || ""}
-                    onChange={(e) =>
-                      setEditRegion({
-                        ...editRegion,
-                        countryCode: e.target.value,
-                        country: countries.find((c) => c.code === e.target.value)?.name || "",
-                      })
-                    }
-                  >
-                    <option value="" disabled>
-                      Select Country
-                    </option>
-                    {countries.map((country) => (
-                      <option key={country.code} value={country.code}>
-                        {country.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="text-muted small mt-3">
-                  Fields marked with <span className="text-danger">*</span> are required.
-                </div>
-                <div className="d-flex justify-content-end gap-2">
-                  <button type="submit" className="btn btn-primary" disabled={isLoading}>
-                    {isLoading ? "Saving..." : "Save"}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Delete Confirmation Modal */}

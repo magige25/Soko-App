@@ -90,11 +90,17 @@ import BlankPagePage from "./pages/BlankPagePage";
 import OtpPage from "./pages/OtpPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import RegionsPage from "./pages/RegionsPage";
+import AddRegionPage from "./pages/AddRegionPage";
+import EditRegionPage from "./pages/EditRegionPage";
 import SubRegionsPage from "./pages/SubRegionsPage";
+import AddSubRegionPage from "./pages/AddSubRegionPage";
+import EditSubRegionPage from "./pages/EditSubRegionPage";
 import RoutesPage from "./pages/RoutesPage";
 import RegionsDetailsPage from "./pages/RegionsDetailsPage";
 import SubRegionsDetailsPage from "./pages/SubRegionsDetailsPage";
 import RoutesDetailsPage from "./pages/RoutesDetailsPage";
+import AddRoutePage from "./pages/AddRoutePage";
+import EditRoutePage from "./pages/EditRoutePage";
 import AddUsersPage from "./pages/AddUsersPage";
 import RolesListPage from "./pages/RolesListPage";
 import SuppliersPage from "./pages/SuppliersPage";
@@ -212,9 +218,15 @@ function App() {
             <Route path="/chat-profile" element={<ChatProfilePage />} />
             <Route path="/code-generator" element={<CodeGeneratorPage />} />
             <Route path="/regions" element={<RegionsPage />} />
+            <Route path="/regions/add" element={<AddRegionPage />} />
+            <Route path="/regions/edit/:id" element={<EditRegionPage />} />
             <Route path="/regions/details" element={<RegionsDetailsPage />} />
             <Route path="/sub-regions" element={<SubRegionsPage />} />
+            <Route path="/sub-regions/add" element={<AddSubRegionPage />} />
+            <Route path="/sub-regions/edit/:id" element={<EditSubRegionPage />} />
             <Route path="/routes" element={<RoutesPage />} />
+            <Route path="/routes/add-route" element={<AddRoutePage />} />
+            <Route path="/routes/edit-route/:id" element={<EditRoutePage />} />
             <Route path="/sub-regions/:sub-regionName" element={<SubRegionsDetailsPage />} />
             <Route path="/routes/:regionName" element={<RoutesDetailsPage />} />
             <Route path="/users" element={<UsersListPage />} />

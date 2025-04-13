@@ -10,11 +10,12 @@ const RouteDetails = () => {
   const [customers, setCustomers] = useState([]);
   const [salesPersons, setSalesPersons] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [totalItems, setTotalItems] = useState({ customers: 0, orders: 0, salesPersons: 0 }); // Total items from API
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const [page, setPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(getItemsPerPage()); // Dynamic items per page
   const [searchQuery, setSearchQuery] = useState("");
 
   const [selectedTable, setSelectedTable] = useState("customers");
@@ -23,6 +24,27 @@ const RouteDetails = () => {
 
   const API_BASE_URL = "https://api.bizchain.co.ke/v1";
   const token = sessionStorage.getItem("token");
+
+  // Function to determine items per page based on screen size
+  function getItemsPerPage() {
+    const width = window.innerWidth;
+    if (width < 576) return 5;   // Small screens (e.g., mobile)
+    if (width < 768) return 10;  // Medium screens (e.g., tablets)
+    if (width < 992) return 15;  // Large screens
+    return 20;                   // Extra-large screens (e.g., desktop)
+  }
+
+  // Update itemsPerPage when screen size changes
+  useEffect(() => {
+    const handleResize = () => {
+      const newItemsPerPage = getItemsPerPage();
+      setItemsPerPage(newItemsPerPage);
+      setPage(1); // Reset to first page when itemsPerPage changes
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,13 +57,27 @@ const RouteDetails = () => {
       try {
         setLoading(true);
 
-        // Fetch route data
         const routeId = location.state?.route?.id;
-        const routeResponse = routeId
-          ? await axios.get(`${API_BASE_URL}/routes/${routeId}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            })
-          : { data: null };
+        const [routeResponse, customersResponse, salesResponse, ordersResponse] = await Promise.all([
+          routeId
+            ? axios.get(`${API_BASE_URL}/routes/${routeId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+              })
+            : Promise.resolve({ data: null }),
+          axios.get(`${API_BASE_URL}/customers`, {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { page: page - 1, size: itemsPerPage, searchValue: searchQuery },
+          }),
+          axios.get(`${API_BASE_URL}/salesperson`, {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { page: page - 1, size: itemsPerPage, searchValue: searchQuery },
+          }),
+          axios.get(`${API_BASE_URL}/orders`, {
+            headers: { Authorization: `Bearer ${token}` },
+            params: { page: page - 1, size: itemsPerPage, searchValue: searchQuery },
+          }),
+        ]);
+
         setRoute(routeResponse.data || {
           name: "Default Route",
           numberSalesPerson: 0,
@@ -49,49 +85,21 @@ const RouteDetails = () => {
           country: { name: "N/A" },
           dateCreated: null,
         });
-        console.log("Route Response:", routeResponse.data);
 
-        // Fetch customers
-        const customersResponse = await axios.get(`${API_BASE_URL}/customers`, {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            page: page - 1,
-            size: itemsPerPage,
-            searchValue: searchQuery,
-          },
-        });
-        console.log("Customers Response:", customersResponse.data);
         const customersData = customersResponse.data.data || [];
-        if (customersData.length === 0) {
-          console.warn("No customers data found in response");
-        }
-        setCustomers(customersData);
-
-        // Fetch sales persons
-        const salesResponse = await axios.get(`${API_BASE_URL}/salesperson`, {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            page: page - 1,
-            size: itemsPerPage,
-            searchValue: searchQuery,
-          },
-        });
-        console.log("SalesPersons Response:", salesResponse.data);
         const salesData = salesResponse.data.data || [];
-        setSalesPersons(salesData);
-
-        // Fetch orders
-        const ordersResponse = await axios.get(`${API_BASE_URL}/orders`, {
-          headers: { Authorization: `Bearer ${token}` },
-          params: {
-            page: page - 1,
-            size: itemsPerPage,
-            searchValue: searchQuery,
-          },
-        });
-        console.log("Orders Response:", ordersResponse.data);
         const ordersData = ordersResponse.data.data || [];
+
+        setCustomers(customersData);
+        setSalesPersons(salesData);
         setOrders(ordersData);
+
+        // Assuming API returns total count in response (adjust based on actual API structure)
+        setTotalItems({
+          customers: customersResponse.data.total || customersData.length,
+          orders: ordersResponse.data.total || ordersData.length,
+          salesPersons: salesResponse.data.total || salesData.length,
+        });
 
       } catch (err) {
         console.error("Fetch Error:", err);
@@ -102,7 +110,7 @@ const RouteDetails = () => {
     };
 
     fetchData();
-  }, [location.state, page, searchQuery]);
+  }, [location.state, page, itemsPerPage, searchQuery, token]);
 
   const stats = route ? [
     { 
@@ -139,47 +147,45 @@ const RouteDetails = () => {
 
   const tables = {
     customers: (Array.isArray(customers) ? customers : []).map(c => {
-      const customerOrders = orders.filter(o => o.customer?.id === c.id);
-      console.log(`Mapping customer ${c.id}: Orders found = ${customerOrders.length}`);
-      return {
-        id: c.id || "",
-        name: `${c.firstName || ""} ${c.lastName || ""}`.trim() || "Unknown",
-        phoneNo: c.phoneNo || "",
-        email: c.email || "",
-        outletName: c.outletName || "",
-        salesPersons: customerOrders[0]?.salesperson?.name || "",
-        totalOrders: customerOrders.length,
-        pendingOrders: customerOrders.filter(o => o.orderStatus?.code === "PEND").length,
-        pendingPayments: customerOrders.reduce((sum, o) => 
-          o.paymentStatus?.code === "NPD" ? sum + (o.amount || 0) : sum, 0),
-      };
+        const customerOrders = orders.filter(o => o.customer?.id === c.id);
+        console.log(`Mapping customer ${c.id}: Orders found = ${customerOrders.length}`);
+        return {
+          id: c.id || "",
+          name: `${c.firstName || ""} ${c.lastName || ""}`.trim() || "Unknown",
+          phoneNo: c.phoneNo || "",
+          email: c.email || "",
+          outletName: c.outletName || "",
+          salesPersons: customerOrders[0]?.salesperson?.name || "",
+          totalOrders: customerOrders.length,
+          pendingOrders: customerOrders.filter(o => o.orderStatus?.code === "PEND").length,
+          pendingPayments: customerOrders.reduce((sum, o) => 
+            o.paymentStatus?.code === "NPD" ? sum + (o.amount || 0) : sum, 0),
+        };
     }),
     orders: (Array.isArray(orders) ? orders : []).map(o => ({
-      id: o.id || "",
-      orderId: o.orderCode || "",
-      amount: o.amount || 0,
-      status: o.orderStatus?.name || "",
+        id: o.id || "",
+        orderId: o.orderCode || "",
+        amount: o.amount || 0,
+        status: o.orderStatus?.name || "",
     })),
     salesPersons: (Array.isArray(salesPersons) ? salesPersons : []).map(s => ({
-      id: s.id || "",
-      name: `${s.firstName || ""} ${s.lastName || ""}`.trim() || "Unknown",
-      route: s.route?.name || route.name || "",
-      region: s.region?.name || "",
+        id: s.id || "",
+        name: `${s.firstName || ""} ${s.lastName || ""}`.trim() || "Unknown",
+        route: s.route?.name || route.name || "",
+        region: s.region?.name || "",
     })),
   };
 
-  console.log("Tables Customers:", tables.customers);
-
-  const filterOptions = [
-    "Today", "Yesterday", "Last 7 Days", "Last 30 Days", "This Month", "Last Month", "Custom Range"
-  ];
-
+  const filterOptions = ["Today", "Yesterday", "Last 7 Days", "Last 30 Days", "This Month", "Last Month", "Custom Range"];
   const tableOptions = ["customers", "orders", "salesPersons"];
   const statusOptions = ["All", "Completed", "Pending", "Not Paid"];
 
   const filteredOrders = selectedStatus === "All"
     ? tables.orders
     : tables.orders.filter((order) => order.status === selectedStatus);
+
+  // Calculate total pages based on selected table
+  const totalPages = Math.ceil(totalItems[selectedTable] / itemsPerPage);
 
   const renderTable = () => {
     switch (selectedTable) {
@@ -262,12 +268,12 @@ const RouteDetails = () => {
             </thead>
             <tbody>
               {tables.salesPersons.length > 0 ? (
-                tables.salesPersons.map((person) => (
-                  <tr key={person.id}>
-                    <td className="text-start small-text">{person.id}</td>
-                    <td className="text-start small-text">{person.name}</td>
-                    <td className="text-start small-text">{person.route}</td>
-                    <td className="text-start small-text">{person.region}</td>
+                tables.salesPersons.map((salesPerson) => (
+                  <tr key={salesPerson.id}>
+                    <td className="text-start small-text">{salesPerson.id}</td>
+                    <td className="text-start small-text">{salesPerson.name}</td>
+                    <td className="text-start small-text">{salesPerson.route}</td>
+                    <td className="text-start small-text">{salesPerson.region}</td>
                   </tr>
                 ))
               ) : (
@@ -310,7 +316,7 @@ const RouteDetails = () => {
           </ul>
         </div>
       </div>
-
+          
       <div className="row g-4 mb-3">
         {stats.map((item, index) => (
           <div className="col-lg-3 col-md-6 col-sm-12 d-flex" key={index}>
@@ -338,8 +344,17 @@ const RouteDetails = () => {
       </div>
       <div className="card shadow-sm mt-3 full-width-card">
         <div className="card-body">
+          <div className="mb-3">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
           <div className="d-flex align-items-center justify-content-between mb-3">
-            <div className="dropdown">
+          <div className="dropdown">
               <button
                 className="btn btn-primary-600 bg-primary-50 border-primary-50 text-primary-600 hover-text-primary not-active px-18 py-11 dropdown-toggle toggle-icon"
                 type="button"
@@ -387,6 +402,61 @@ const RouteDetails = () => {
             </div>
           </div>
           {renderTable()}
+          {/* Pagination Controls */}
+          {!loading && totalItems[selectedTable] > 0 && (
+            <div className="d-flex justify-content-between align-items-center mt-3">
+              <div className="text-muted" style={{ fontSize: "13px" }}>
+                <span>
+                  Showing {(page - 1) * itemsPerPage + 1} to {Math.min(page * itemsPerPage, totalItems[selectedTable])} of{" "}
+                  {totalItems[selectedTable]} entries
+                </span>
+              </div>
+              <nav aria-label="Page navigation">
+                <ul className="pagination mb-0" style={{ gap: "6px" }}>
+                  <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
+                    <button
+                      className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                      style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                      onClick={() => setPage(page - 1)}
+                      disabled={page === 1}
+                    >
+                      <Icon icon="ri-arrow-drop-left-line" style={{ fontSize: "12px" }} />
+                    </button>
+                  </li>
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <li key={i} className={`page-item ${page === i + 1 ? "active" : ""}`}>
+                      <button
+                        className={`page-link btn ${
+                          page === i + 1 ? "btn-primary" : "btn-outline-primary"
+                        } rounded-circle d-flex align-items-center justify-content-center`}
+                        style={{
+                          width: "30px",
+                          height: "30px",
+                          padding: "0",
+                          transition: "all 0.2s",
+                          fontSize: "10px",
+                          color: page === i + 1 ? "#fff" : "",
+                        }}
+                        onClick={() => setPage(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    </li>
+                  ))}
+                  <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
+                    <button
+                      className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"
+                      style={{ width: "24px", height: "24px", padding: "0", transition: "all 0.2s" }}
+                      onClick={() => setPage(page + 1)}
+                      disabled={page === totalPages}
+                    >
+                      <Icon icon="ri-arrow-drop-right-line" style={{ fontSize: "12px" }} />
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
+          )}
         </div>
       </div>
     </div>
