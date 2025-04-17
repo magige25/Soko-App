@@ -15,7 +15,7 @@ const StockRequestLayer = () => {
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
-  const [loadingRequests, setLoadingRequests] = useState({}); // Per-request loading state
+  const [loadingRequests, setLoadingRequests] = useState({});
   const [error, setError] = useState(null);
   const [requestToDelete, setRequestToDelete] = useState(null);
 

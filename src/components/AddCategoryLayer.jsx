@@ -103,16 +103,18 @@ const AddCategoryLayer = () => {
       });
 
       if (response.data.status.code === 0) {
-        toast.success("Categories saved successfully!", {
+        toast.success("Categories added successfully!", {
           position: "top-right",
           autoClose: 3000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
         });
         setCategories([{ name: "" }]);
+        setTimeout(() => {
         navigate('/category');
+        }, 3000);
       } else {
         toast.error(`Failed to save categories: ${response.data.status.message}`);
       }

@@ -41,6 +41,7 @@ const RegionDetails = () => {
       { id: 1, orderId: "ORD123", amount: 100, status: "Completed" },
       { id: 2, orderId: "ORD124", amount: 200, status: "Pending" },
       { id: 3, orderId: "ORD125", amount: 200, status: "Defaulted" },
+      { id: 3, orderId: "ORD125", amount: 200, status: "Defaulted" },
     ],
     salesPersons: [
       { id: 1, name: "Agent X", region: region.name || "Nyanza" },

@@ -144,15 +144,26 @@ const AddSubCategoryLayer = () => {
 
       if (response.data.status.code === 0) {
         toast.success("Subcategories saved successfully!", {
-          position: "top-right",
+          position: "top-center",
           autoClose: 3000,
-          hideProgressBar: false,
+          hideProgressBar: true,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
         });
         setSubCategories([{ categoryId: "", name: "" }]);
+        setTimeout(() => {
         navigate("/sub-category");
+        }, 3000);
+      } else if (response.data.status.code === 1) {
+        toast.error("Subcategories already exist!", {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: true,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       } else {
         toast.error(`Failed to save subcategories: ${response.data.status.message}`);
       }
@@ -166,7 +177,7 @@ const AddSubCategoryLayer = () => {
 
   return (
     <div className="card h-100 p-0 radius-12">
-      <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={3000} />
       <div className="card-body">
         <form onSubmit={handleSaveSubCategories}>
           {subCategories.map((subCategory, index) => (
