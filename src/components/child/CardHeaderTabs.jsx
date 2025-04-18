@@ -69,7 +69,7 @@ const CardHeaderTabs = () => {
                         </li>
                     </ul>
                 </div>
-                <div className="card-body p-24 pt-10">
+                <div className="card-body-table p-24 pt-10">
                     <div className="tab-content" id="pills-tabContent-six">
                         <div
                             className="tab-pane fade show active"

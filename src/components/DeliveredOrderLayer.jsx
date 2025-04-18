@@ -35,10 +35,9 @@ const DeliveredOrderLayer = () => {
       const responseData = response.data;
       if (responseData.status.code === 0) {
         const data = responseData.data || [];
-        // Filter for delivered requests only (assuming "DLVD" status code)
-        const deliveredData = data.filter(item => item.receivedBy !== null); // Temporary filter since "DLVD" isn't in response
+        const deliveredData = data.filter(item => item.receivedBy !== null); 
         setRequests(deliveredData);
-        setTotalItems(deliveredData.length); // Adjust if API provides filtered total
+        setTotalItems(deliveredData.length);
       } else {
         throw new Error(responseData.status.message);
       }
@@ -97,7 +96,7 @@ const DeliveredOrderLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search by depot or order code"
+              placeholder="Search depot or order code"
               value={query}
               onChange={handleSearchInputChange}
             />
@@ -106,13 +105,13 @@ const DeliveredOrderLayer = () => {
         </div>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Depot</th>
                 <th scope="col" className="text-start py-3 px-4">Order Code</th>
                 <th scope="col" className="text-start py-3 px-4">Number of Products</th>
@@ -164,7 +163,8 @@ const DeliveredOrderLayer = () => {
                                 to="/delivered-order/request-details"
                                 state={{ requestId: request.id }}
                               >
-                                Details
+                                <Icon icon="ri-eye-line" />
+                                View
                               </Link>
                             </li>
                             <li>
@@ -173,6 +173,7 @@ const DeliveredOrderLayer = () => {
                                 to="/delivered-order/edit-request"
                                 state={{ requestId: request.id }}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -183,6 +184,7 @@ const DeliveredOrderLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteRequestModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

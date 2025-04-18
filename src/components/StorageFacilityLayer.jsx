@@ -113,13 +113,13 @@ const StorageFacilityLayer = () => {
         </Link>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Name</th>
                 <th scope="col" className="text-start py-3 px-4">Location</th>
                 <th scope="col" className="text-start py-3 px-4">Capacity (L)</th>
@@ -177,6 +177,7 @@ const StorageFacilityLayer = () => {
                                 to="/storage-facility/facility-details"
                                 state={{ facilityId: facility.id }}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </Link>
                             </li>
@@ -186,6 +187,7 @@ const StorageFacilityLayer = () => {
                                 to="/storage-facility/edit-facility"
                                 state={{ facilityId: facility.id }}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -196,6 +198,7 @@ const StorageFacilityLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteFacilityModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

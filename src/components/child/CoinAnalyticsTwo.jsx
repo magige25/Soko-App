@@ -6,7 +6,7 @@ const CoinAnalyticsTwo = () => {
     return (
         <div className="col-xxl-6">
             <div className="card h-100 radius-8 border-0">
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between mb-20">
                         <h6 className="mb-2 fw-bold text-lg">Coin Analytics</h6>
                         <div className="border radius-4 px-3 py-2 pe-0 d-flex align-items-center gap-1 text-sm text-secondary-light">

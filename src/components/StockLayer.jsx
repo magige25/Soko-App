@@ -140,13 +140,13 @@ const StockLayer = () => {
         </Link>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Product</th>
                 <th scope="col" className="text-start py-3 px-4">Available Stock</th>
                 <th scope="col" className="text-start py-3 px-4">Date Last Updated</th>
@@ -186,7 +186,8 @@ const StockLayer = () => {
                                 to="/stock/details"
                                 state={{ stockId: item.id }}
                               >
-                                Details
+                                <Icon icon="ri-eye-line" />
+                                View
                               </Link>
                             </li>
                             <li>
@@ -195,6 +196,7 @@ const StockLayer = () => {
                                 to="/stock/edit-stock"
                                 state={{ stockId: item.id }}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -205,6 +207,7 @@ const StockLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteStockModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

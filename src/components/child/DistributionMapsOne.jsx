@@ -89,7 +89,7 @@ const DistributionMapsOne = () => {
                     </div>
                 </div>
                 <div id="world-map"><div id="map" /></div>
-                <div className="card-body p-24 max-h-266-px scroll-sm overflow-y-auto">
+                <div className="card-body-table p-24 max-h-266-px scroll-sm overflow-y-auto">
                     <div className="">
                         <div className="d-flex align-items-center justify-content-between gap-3 mb-12 pb-2">
                             <div className="d-flex align-items-center w-100">

@@ -7,7 +7,7 @@ const ClientPaymentOne = () => {
     return (
         <div className="col-xxl-4 col-sm-6">
             <div className="card h-100 radius-8 border-0">
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <h6 className="mb-2 fw-bold text-lg">Client Payment Status</h6>
                     <span className="text-sm fw-medium text-secondary-light">
                         Weekly Report

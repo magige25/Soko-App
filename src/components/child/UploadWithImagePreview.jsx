@@ -26,7 +26,7 @@ const UploadWithImagePreview = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Upload With Image Preview</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="upload-image-wrapper d-flex align-items-center gap-3 flex-wrap">
                         <div className="uploaded-imgs-container d-flex gap-3 flex-wrap">
                             {uploadedImages.map((image, index) => (

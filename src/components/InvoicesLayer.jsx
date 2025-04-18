@@ -42,7 +42,8 @@ const InvoicesLayer = () => {
           }));
         console.log("Invoiced Data with Total Litres:", invoicedOnly);
         setInvoices(invoicedOnly);
-        setTotalItems(responseData.totalElements || invoicedOnly.length);
+        // Set totalItems to the count of pending invoices only
+        setTotalItems(invoicedOnly.length);
       } else {
         throw new Error(responseData.status.message);
       }
@@ -65,8 +66,7 @@ const InvoicesLayer = () => {
     setCurrentPage(1);
   };
 
-
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -80,7 +80,7 @@ const InvoicesLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search by supplier, invoice number, etc."
+              placeholder="Search supplier, invoice number, etc."
               value={query}
               onChange={handleSearchInputChange}
             />
@@ -89,13 +89,13 @@ const InvoicesLayer = () => {
         </div>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Supplier</th>
                 <th scope="col" className="text-start py-3 px-4">Invoice Number</th>
                 <th scope="col" className="text-start py-3 px-4">Volume(Litres)</th>
@@ -162,6 +162,7 @@ const InvoicesLayer = () => {
                                 to="/pending-invoices/invoice"
                                 state={{ invoiceId: invoice.id }}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </Link>
                             </li>
@@ -186,12 +187,12 @@ const InvoicesLayer = () => {
           <div className="d-flex justify-content-between align-items-center mt-3">
             <div className="text-muted" style={{ fontSize: "13px" }}>
               <span>
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+                Showing {totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to{" "}
+                {totalItems === 0 ? 0 : Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
               </span>
             </div>
             <nav aria-label="Page navigation">
-              <ul className="pagination mb-0" style={{ gap: "6px" }}>
+              <ul personally className="pagination mb-0" style={{ gap: "6px" }}>
                 <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
                     className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"

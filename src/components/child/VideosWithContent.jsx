@@ -10,7 +10,7 @@ const VideosWithContent = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Videos With Content</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="row gy-4">
                         <div className="col-sm-6">
                             <div className="border bg-base radius-8 overflow-hidden ">

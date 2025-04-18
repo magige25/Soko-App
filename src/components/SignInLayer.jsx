@@ -204,6 +204,7 @@ const SignInLayer = () => {
                     value={formData.email}
                     onChange={handleEmailChange}
                     required
+                    disabled={loading}
                     style={{
                       paddingLeft: "20px",
                       paddingRight: "20px",
@@ -245,6 +246,7 @@ const SignInLayer = () => {
                     value={formData.password}
                     onChange={handlePasswordChange}
                     required
+                    disabled={loading}
                     style={{
                       paddingLeft: "20px",
                       paddingRight: "52px",

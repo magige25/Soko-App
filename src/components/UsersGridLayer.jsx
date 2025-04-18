@@ -44,7 +44,7 @@ const UsersGridLayer = () => {
                     Add New User
                 </Link>
             </div>
-            <div className="card-body p-24">
+            <div className="card-body-table p-24">
                 <div className="row gy-4">
                     <div className="col-xxl-3 col-md-6 user-grid-card   ">
                         <div className="position-relative border radius-16 overflow-hidden">

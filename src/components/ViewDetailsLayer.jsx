@@ -7,7 +7,7 @@ const ViewDetailsLayer = () => {
         <div className="row gy-4">
             <div className="col-xxl-3">
                 <div className="card h-100 p-0">
-                    <div className="card-body p-24">
+                    <div className="card-body-table p-24">
                         <button
                             type="button"
                             className="btn btn-primary text-sm btn-sm px-12 py-12 w-100 radius-8 d-flex align-items-center gap-2 mb-16"

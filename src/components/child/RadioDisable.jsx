@@ -7,7 +7,7 @@ const RadioDisable = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Radio Disable</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-center flex-wrap gap-28">
                         <div className="form-check checked-primary d-flex align-items-center gap-2">
                             <input

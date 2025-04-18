@@ -11,7 +11,7 @@ const StepLineChart = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Stepline Charts</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <ReactApexChart id="stepLineChart" options={stepLineChartOptions} series={stepLineChartSeries} type="line"
                         height={270} />
                 </div>

@@ -9,7 +9,7 @@ const Metrics = () => {
             <div className="card-header border-bottom bg-base py-16 px-24">
                 <h6 className="text-lg fw-semibold mb-0">Metrics</h6>
             </div>
-            <div className="card-body p-24">
+            <div className="card-body-table p-24">
                 <div className="row row-cols-xxxl-5 row-cols-lg-3 row-cols-sm-2 row-cols-1 gy-4">
                     <div className="col">
                         <div className="card shadow-none border bg-gradient-start-1">

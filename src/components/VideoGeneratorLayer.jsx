@@ -55,7 +55,7 @@ const VideoGeneratorLayer = () => {
         <div className="row gy-4">
             <div className="col-xxl-3 col-lg-4">
                 <div className="card h-100 p-0">
-                    <div className="card-body p-24">
+                    <div className="card-body-table p-24">
                         <div className="mb-20">
                             <label
                                 htmlFor="Title"

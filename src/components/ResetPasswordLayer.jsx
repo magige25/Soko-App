@@ -221,6 +221,7 @@ const ResetPasswordLayer = () => {
                       onChange={handlePasswordChange}
                       name={field}
                       required
+                      disabled={loading}
                       style={{
                         paddingLeft: "20px",
                         paddingRight: "52px",

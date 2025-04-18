@@ -3,7 +3,7 @@ import React from "react";
 const GalleryGridLayer = () => {
   return (
     <div className='card h-100 p-0 radius-12 overflow-hidden gallery-scale'>
-      <div className='card-body p-24'>
+      <div className='card-body-table p-24'>
         <div className='row gy-4'>
           <div className='col-xxl-3 col-md-4 col-sm-6'>
             <div className='hover-scale-img border radius-16 overflow-hidden p-8'>

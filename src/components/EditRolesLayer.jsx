@@ -178,7 +178,7 @@ const EditRolesLayer = () => {
   if (!role) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24">
+        <div className="card-body-table p-24">
           <p>No role selected for editing. Please go back to the roles list.</p>
           <button className="btn btn-primary" onClick={() => navigate("/roles")}>
             Back to Roles

@@ -13,9 +13,9 @@ const RouteDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   
-  const [page, setPage] = useState(1);
+  const [page] = useState(1);
   const [itemsPerPage] = useState(10);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery] = useState("");
 
   const [selectedTable, setSelectedTable] = useState("customers");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -102,7 +102,7 @@ const RouteDetails = () => {
     };
 
     fetchData();
-  }, [location.state, page, searchQuery]);
+  }, [location.state, page, searchQuery, itemsPerPage, token]);
 
   const stats = route ? [
     { 

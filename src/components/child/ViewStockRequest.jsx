@@ -167,7 +167,7 @@ const ViewStockRequest = () => {
   if (isLoading) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24 text-center"> <Spinner /> </div>
+        <div className="card-body-table p-24 text-center"> <Spinner /> </div>
       </div>
     );
   }
@@ -175,7 +175,7 @@ const ViewStockRequest = () => {
   if (error) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24">
+        <div className="card-body-table p-24">
           <div className="alert alert-danger">{error}</div>
         </div>
       </div>
@@ -212,7 +212,7 @@ const ViewStockRequest = () => {
           </button>
         </div>
       </div>
-      <div className="card-body p-24" id="pending-stock-details">
+      <div className="card-body-table p-24" id="pending-stock-details">
         {/* Basic Pending Stock Information */}
         <div className="mb-4 text-primary-light">
           <div className="row">

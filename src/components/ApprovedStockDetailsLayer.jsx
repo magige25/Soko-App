@@ -142,7 +142,7 @@ const ApprovedStockDetailsLayer = () => {
   if (isLoading) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24 text-center"> <Spinner /> </div>
+        <div className="card-body-table p-24 text-center"> <Spinner /> </div>
       </div>
     );
   }
@@ -150,7 +150,7 @@ const ApprovedStockDetailsLayer = () => {
   if (error) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24">
+        <div className="card-body-table p-24">
           <div className="alert alert-danger">{error}</div>
         </div>
       </div>
@@ -176,7 +176,7 @@ const ApprovedStockDetailsLayer = () => {
           </button>
         </div>
       </div>
-      <div className="card-body p-24" id="approved-stock-details">
+      <div className="card-body-table p-24" id="approved-stock-details">
         {/* Basic Approved Stock Information */}
         <div className="mb-4">
           <div className="row">

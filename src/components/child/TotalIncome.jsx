@@ -18,7 +18,7 @@ const TotalIncome = () => {
             </select>
           </div>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='position-relative'>
             <div
               id='statisticsDonutChart'

@@ -9,7 +9,7 @@ const CardTextIcon = () => {
             <div className="row gy-4">
                 <div className="col-xxl-3 col-sm-6">
                     <div className="card h-100 radius-12">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div className="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-gradient-purple text-lilac-600 mb-16 radius-12">
                                 <Icon
                                     icon="solar:medal-ribbons-star-bold"
@@ -36,7 +36,7 @@ const CardTextIcon = () => {
                 </div>
                 <div className="col-xxl-3 col-sm-6">
                     <div className="card h-100 radius-12 text-center">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div className="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-gradient-primary text-primary-600 mb-16 radius-12">
                                 <Icon icon="ri:computer-fill" className="h5 mb-0" />
                             </div>
@@ -60,7 +60,7 @@ const CardTextIcon = () => {
                 </div>
                 <div className="col-xxl-3 col-sm-6">
                     <div className="card h-100 radius-12 text-end">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div className="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-gradient-success text-success-600 mb-16 radius-12">
                                 <Icon
                                     icon="fluent:toolbox-20-filled"
@@ -87,7 +87,7 @@ const CardTextIcon = () => {
                 </div>
                 <div className="col-xxl-3 col-sm-6">
                     <div className="card h-100 radius-12 text-center">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div className="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-gradient-danger text-danger-600 mb-16 radius-12">
                                 <Icon icon="ph:code-fill" className="h5 mb-0" />
                             </div>

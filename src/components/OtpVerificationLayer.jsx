@@ -418,6 +418,8 @@ const OtpVerificationLayer = () => {
                       onKeyDown={(e) => handleKeyDown(index, e)}
                       onPaste={index === 0 ? handlePaste : null}
                       ref={(el) => (inputRefs.current[index] = el)}
+                      required
+                      disabled={loading}
                       style={{
                         height: "40px",
                         boxSizing: "border-box",

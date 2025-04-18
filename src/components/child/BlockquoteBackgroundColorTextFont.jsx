@@ -9,7 +9,7 @@ const BlockquoteBackgroundColorTextFont = () => {
                         Blockquote Background Color Text
                     </h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="row gy-4">
                         <div className="col-lg-4 col-sm-6">
                             <div className="p-16 bg-info-50 radius-8 border-start-width-3-px border-info border-top-0 border-end-0 border-bottom-0">

@@ -5,7 +5,7 @@ const TestimonialsLayer = () => {
     <div className='row gy-4'>
       <div className='col-xxl-4 col-md-6'>
         <div className='card rounded-3 overflow-hidden h-100'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='d-flex align-items-start justify-content-between gap-2'>
               <div className='d-flex align-items-center gap-12 flex-wrap'>
                 <div className='w-56-px h-56-px overflow-hidden flex-shrink-0'>
@@ -49,7 +49,7 @@ const TestimonialsLayer = () => {
       </div>
       <div className='col-xxl-4 col-md-6'>
         <div className='card rounded-3 overflow-hidden h-100'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='d-flex align-items-start justify-content-between gap-2'>
               <div className='d-flex align-items-center gap-12 flex-wrap'>
                 <div className='w-56-px h-56-px overflow-hidden flex-shrink-0'>
@@ -93,7 +93,7 @@ const TestimonialsLayer = () => {
       </div>
       <div className='col-xxl-4 col-md-6'>
         <div className='card rounded-3 overflow-hidden h-100'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='d-flex align-items-start justify-content-between gap-2'>
               <div className='d-flex align-items-center gap-12 flex-wrap'>
                 <div className='w-56-px h-56-px overflow-hidden flex-shrink-0'>
@@ -137,7 +137,7 @@ const TestimonialsLayer = () => {
       </div>
       <div className='col-xxl-4 col-md-6'>
         <div className='card rounded-3 overflow-hidden h-100'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='d-flex align-items-start justify-content-between gap-2'>
               <div className='d-flex align-items-center gap-12 flex-wrap'>
                 <div className='w-56-px h-56-px overflow-hidden flex-shrink-0'>
@@ -181,7 +181,7 @@ const TestimonialsLayer = () => {
       </div>
       <div className='col-xxl-4 col-md-6'>
         <div className='card rounded-3 overflow-hidden h-100'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='d-flex align-items-start justify-content-between gap-2'>
               <div className='d-flex align-items-center gap-12 flex-wrap'>
                 <div className='w-56-px h-56-px overflow-hidden flex-shrink-0'>
@@ -225,7 +225,7 @@ const TestimonialsLayer = () => {
       </div>
       <div className='col-xxl-4 col-md-6'>
         <div className='card rounded-3 overflow-hidden h-100'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='d-flex align-items-start justify-content-between gap-2'>
               <div className='d-flex align-items-center gap-12 flex-wrap'>
                 <div className='w-56-px h-56-px overflow-hidden flex-shrink-0'>
@@ -269,7 +269,7 @@ const TestimonialsLayer = () => {
       </div>
       <div className='col-xxl-4 col-md-6'>
         <div className='card rounded-3 overflow-hidden h-100'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='d-flex align-items-start justify-content-between gap-2'>
               <div className='d-flex align-items-center gap-12 flex-wrap'>
                 <div className='w-56-px h-56-px overflow-hidden flex-shrink-0'>
@@ -313,7 +313,7 @@ const TestimonialsLayer = () => {
       </div>
       <div className='col-xxl-4 col-md-6'>
         <div className='card rounded-3 overflow-hidden h-100'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='d-flex align-items-start justify-content-between gap-2'>
               <div className='d-flex align-items-center gap-12 flex-wrap'>
                 <div className='w-56-px h-56-px overflow-hidden flex-shrink-0'>
@@ -357,7 +357,7 @@ const TestimonialsLayer = () => {
       </div>
       <div className='col-xxl-4 col-md-6'>
         <div className='card rounded-3 overflow-hidden h-100'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='d-flex align-items-start justify-content-between gap-2'>
               <div className='d-flex align-items-center gap-12 flex-wrap'>
                 <div className='w-56-px h-56-px overflow-hidden flex-shrink-0'>

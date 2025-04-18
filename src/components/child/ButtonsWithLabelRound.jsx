@@ -8,7 +8,7 @@ const ButtonsWithLabelRound = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Buttons with Label Round</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex flex-wrap align-items-center gap-3">
                         <button
                             type="button"

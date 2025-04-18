@@ -8,7 +8,7 @@ const LeftBorderAlerts = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Left Border Alerts</h6>
                 </div>
-                <div className="card-body p-24 d-flex flex-column gap-4">
+                <div className="card-body-table p-24 d-flex flex-column gap-4">
                     <div
                         className="alert alert-primary bg-primary-50 text-primary-600 border-primary-600 border-start-width-4-px border-top-0 border-end-0 border-bottom-0 px-24 py-13 mb-0 fw-semibold text-lg radius-4 d-flex align-items-center justify-content-between"
                         role="alert"

@@ -17,7 +17,7 @@ const AddUserLayer = () => {
     };
     return (
         <div className="card h-100 p-0 radius-12">
-            <div className="card-body p-24">
+            <div className="card-body-table p-24">
                 <div className="row justify-content-center">
                     <div className="col-xxl-6 col-xl-8 col-lg-10">
                         <div className="card border">

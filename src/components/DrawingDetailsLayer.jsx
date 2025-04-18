@@ -155,7 +155,7 @@ const DrawingDetailsLayer = () => {
   if (error) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24">
+        <div className="card-body-table p-24">
           <div className="alert alert-danger">{error}</div>
         </div>
       </div>
@@ -179,7 +179,7 @@ const DrawingDetailsLayer = () => {
           <Icon icon="basil:printer-outline" className="text-xl" /> Print
         </button>
       </div>
-      <div className="card-body p-24" id="drawing-details">
+      <div className="card-body-table p-24" id="drawing-details">
         {/* Basic Drawing Information */}
         <div className="mb-4">
           <div className="row">

@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import PrivateRouteLayer from "./components/PrivateRouteLayer";
 import OtpRoutePage from "./pages/OtpRoutePage";
 import HomePageOne from "./pages/HomePageOne";
+import SuppliesPage from "./pages/SuppliesPage";
 import EmailPage from "./pages/EmailPage";
 import AddUserPage from "./pages/AddUserPage";
 import AlertPage from "./pages/AlertPage";
@@ -199,6 +200,7 @@ function App() {
           {/* Protected Routes */}
           <Route element={<PrivateRouteLayer />}>
             <Route path="/dashboard" element={<HomePageOne />} />
+            <Route path="/supplies" element={<SuppliesPage />} />
             <Route path="/add-user" element={<AddUserPage />} />
             <Route path="/alert" element={<AlertPage />} />
             <Route path="/assign-role" element={<AssignRolePage />} />

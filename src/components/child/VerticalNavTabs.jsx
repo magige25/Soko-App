@@ -7,7 +7,7 @@ const VerticalNavTabs = () => {
                 <div className="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
                     <h6 className="text-lg mb-0">Vertical Nav Tabs</h6>
                 </div>
-                <div className="card-body p-24 pt-10">
+                <div className="card-body-table p-24 pt-10">
                     <div className="d-flex align-items-start">
                         <ul
                             className="nav button-tab nav-pills mb-16"

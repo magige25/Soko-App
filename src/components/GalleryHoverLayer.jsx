@@ -7,7 +7,7 @@ const GalleryHoverLayer = () => {
         <div className='card-header'>
           <h6 className='mb-0'>Hover Effect 1</h6>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='row gy-4'>
             <div className='col-xxl-3 col-md-4 col-sm-6'>
               <div className='hover-scale-img border radius-16 overflow-hidden p-8'>
@@ -72,7 +72,7 @@ const GalleryHoverLayer = () => {
         <div className='card-header'>
           <h6 className='mb-0'>Hover Effect 2</h6>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='row gy-4'>
             <div className='col-xxl-3 col-md-4 col-sm-6'>
               <div className='hover-scale-img style-two border radius-16 overflow-hidden p-8'>
@@ -137,7 +137,7 @@ const GalleryHoverLayer = () => {
         <div className='card-header'>
           <h6 className='mb-0'>Hover Effect 3</h6>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='row gy-4'>
             <div className='col-xxl-3 col-md-4 col-sm-6'>
               <div className='hover-scale-img style-three border radius-16 overflow-hidden p-8'>
@@ -202,7 +202,7 @@ const GalleryHoverLayer = () => {
         <div className='card-header'>
           <h6 className='mb-0'>Hover Effect 4</h6>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='row gy-4'>
             <div className='col-xxl-3 col-md-4 col-sm-6'>
               <div className='hover-scale-img style-four border radius-16 overflow-hidden p-8'>
@@ -267,7 +267,7 @@ const GalleryHoverLayer = () => {
         <div className='card-header'>
           <h6 className='mb-0'>Hover Effect 5</h6>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='row gy-4'>
             <div className='col-xxl-3 col-md-4 col-sm-6'>
               <div className='hover-scale-img style-five border radius-16 overflow-hidden p-8'>
@@ -332,7 +332,7 @@ const GalleryHoverLayer = () => {
         <div className='card-header'>
           <h6 className='mb-0'>Hover Effect 6</h6>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='row gy-4'>
             <div className='col-xxl-3 col-md-4 col-sm-6'>
               <div className='hover-scale-img style-six border radius-16 overflow-hidden p-8'>
@@ -397,7 +397,7 @@ const GalleryHoverLayer = () => {
         <div className='card-header'>
           <h6 className='mb-0'>Hover Effect 7</h6>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='row gy-4'>
             <div className='col-xxl-3 col-md-4 col-sm-6'>
               <div className='hover-scale-img style-seven border radius-16 overflow-hidden p-8'>
@@ -462,7 +462,7 @@ const GalleryHoverLayer = () => {
         <div className='card-header'>
           <h6 className='mb-0'>Hover Effect 8</h6>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='row gy-4'>
             <div className='col-xxl-3 col-md-4 col-sm-6'>
               <div className='hover-scale-img style-eight border radius-16 overflow-hidden p-8'>
@@ -527,7 +527,7 @@ const GalleryHoverLayer = () => {
         <div className='card-header'>
           <h6 className='mb-0'>Hover Effect 9</h6>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='row gy-4'>
             <div className='col-xxl-3 col-md-4 col-sm-6'>
               <div className='hover-scale-img style-nine border radius-16 overflow-hidden p-8'>

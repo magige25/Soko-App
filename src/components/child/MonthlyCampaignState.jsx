@@ -4,7 +4,7 @@ const MonthlyCampaignState = () => {
   return (
     <div className='col-xxl-4'>
       <div className='card h-100'>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='d-flex align-items-start flex-column gap-2'>
             <h6 className='mb-2 fw-bold text-lg'>Monthly Campaign State</h6>
             <span className='text-secondary-light'>7.2k Social visitors</span>

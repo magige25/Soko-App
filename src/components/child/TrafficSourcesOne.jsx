@@ -7,7 +7,7 @@ const TrafficSourcesOne = () => {
     return (
         <div className="col-xxl-4 col-md-6">
             <div className="card h-100 radius-8 border-0">
-                <div className="card-body p-24 d-flex flex-column justify-content-between gap-8">
+                <div className="card-body-table p-24 d-flex flex-column justify-content-between gap-8">
                     <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between mb-20">
                         <h6 className="mb-2 fw-bold text-lg mb-0">Traffic Sources</h6>
                         <select className="form-select form-select-sm w-auto bg-base border text-secondary-light" defaultValue="Yearly">

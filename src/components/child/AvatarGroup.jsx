@@ -8,7 +8,7 @@ const AvatarGroup = () => {
                 <div className="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
                     <h6 className="text-lg mb-0">Avatar Group</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-center flex-wrap">
                         <img
                             src="assets/images/avatar/avatar-group1.png"

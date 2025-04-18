@@ -7,7 +7,7 @@ const UserActivatesTwo = () => {
     return (
         <div className="col-xxl-3">
             <div className="card h-100 radius-8 border-0">
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <h6 className="mb-2 fw-bold text-lg">My Portfolio</h6>
                     <div className="position-relative">
                         <span className="w-80-px h-80-px bg-base shadow text-primary-light fw-bold text-xxl d-flex justify-content-center align-items-center rounded-circle position-absolute end-0 top-0 z-1">

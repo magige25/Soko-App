@@ -215,7 +215,7 @@ const CountriesLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search by code, name, or currency"
+              placeholder="Search code, name, or currency"
               value={query}
               onChange={handleSearchInputChange}
             />
@@ -234,13 +234,13 @@ const CountriesLayer = () => {
         </button>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Code</th>
                 <th scope="col" className="text-start py-3 px-4">Name</th>
                 <th scope="col" className="text-start py-3 px-4">Currency</th>

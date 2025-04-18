@@ -7,7 +7,7 @@ const RecentOrdersTwo = () => {
     return (
         <div className="col-xxl-4">
             <div className="card h-100 radius-8 border">
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <h6 className="mb-12 fw-bold text-lg mb-0">Recent Orders</h6>
                     <div className="d-flex align-items-center gap-2">
                         <h6 className="fw-semibold mb-0">$27,200</h6>

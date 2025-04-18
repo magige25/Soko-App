@@ -90,7 +90,7 @@ const AddBlogLayer = () => {
           <div className='card-header border-bottom'>
             <h6 className='text-xl mb-0'>Add New Post</h6>
           </div>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <form action='#' className='d-flex flex-column gap-20'>
               <div>
                 <label

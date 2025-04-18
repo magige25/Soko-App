@@ -7,7 +7,7 @@ const AvatarWithContent = () => {
                 <div className="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
                     <h6 className="text-lg mb-0">Avatar With content</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-center flex-wrap gap-3">
                         <span className="w-24-px h-24-px rounded-circle object-fit-cover d-flex justify-content-center align-items-center fw-semibold text-xxs bg-primary-50 text-primary-600">
                             24

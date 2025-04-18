@@ -29,13 +29,11 @@ const RoutesLayer = () => {
   const [error, setError] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Fetch data once on mount
   useEffect(() => {
     fetchRoutes();
     fetchSubRegions();
-  }, []); // Empty dependency array for initial fetch
+  }, []); 
 
-  // Handle modal event listeners with isLoading dependency
   useEffect(() => {
     const addModal = document.getElementById("addRouteModal");
     const editModal = document.getElementById("editRouteModal");
@@ -257,7 +255,7 @@ const RoutesLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search by name, sub-region, region, or numbers"
+              placeholder="Search name, sub-region, region, or numbers"
               value={searchQuery}
               onChange={handleSearchInputChange}
             />
@@ -275,13 +273,13 @@ const RoutesLayer = () => {
         </button>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Name</th>
                 <th scope="col" className="text-start py-3 px-4">Sub-Region</th>
                 <th scope="col" className="text-start py-3 px-4">Region</th>
@@ -329,6 +327,7 @@ const RoutesLayer = () => {
                                 to={`/routes/${route.id}`}
                                 state={{ route }}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </Link>
                             </li>
@@ -340,6 +339,7 @@ const RoutesLayer = () => {
                                 data-bs-target="#editRouteModal"
                                 onClick={() => handleEditClick(route)}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -350,6 +350,7 @@ const RoutesLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteRouteModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

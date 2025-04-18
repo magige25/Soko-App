@@ -7,7 +7,7 @@ const ColoredLists = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Colored Lists</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <ul className="list-group radius-8">
                         <li className="list-group-item border text-secondary-light p-16 bg-success-100 text-success-600 border-bottom-0">
                             <div className="d-flex align-items-center gap-2">

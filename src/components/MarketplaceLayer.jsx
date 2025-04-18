@@ -48,7 +48,7 @@ const MarketplaceLayer = () => {
                     Portfolios
                 </Link>
             </div>
-            <div className="card-body p-24">
+            <div className="card-body-table p-24">
                 <div className="table-responsive scroll-sm">
                     <table className="table bordered-table sm-table mb-0">
                         <thead>

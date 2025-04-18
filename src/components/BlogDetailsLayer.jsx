@@ -71,7 +71,7 @@ const BlogDetailsLayer = () => {
           <div className='card-header border-bottom'>
             <h6 className='text-xl mb-0'>Comments</h6>
           </div>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <div className='comment-list d-flex flex-column'>
               <div className='comment-list__item'>
                 <div className='d-flex align-items-start gap-16'>
@@ -275,7 +275,7 @@ const BlogDetailsLayer = () => {
           <div className='card-header border-bottom'>
             <h6 className='text-xl mb-0'>Add A Comment</h6>
           </div>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <form action='#' className='d-flex flex-column gap-16'>
               <div>
                 <label className='form-label fw-semibold' htmlFor='username'>
@@ -327,7 +327,7 @@ const BlogDetailsLayer = () => {
             <div className='card-header border-bottom'>
               <h6 className='text-xl mb-0'>Search Here</h6>
             </div>
-            <div className='card-body p-24'>
+            <div className='card-body-table p-24'>
               <form className='position-relative'>
                 <input
                   type='text'
@@ -463,7 +463,7 @@ const BlogDetailsLayer = () => {
             <div className='card-header border-bottom'>
               <h6 className='text-xl mb-0'>Tags</h6>
             </div>
-            <div className='card-body p-24'>
+            <div className='card-body-table p-24'>
               <ul>
                 <li className='w-100 d-flex align-items-center justify-content-between flex-wrap gap-8 border-bottom border-dashed pb-12 mb-12'>
                   <Link
@@ -533,7 +533,7 @@ const BlogDetailsLayer = () => {
             <div className='card-header border-bottom'>
               <h6 className='text-xl mb-0'>Tags</h6>
             </div>
-            <div className='card-body p-24'>
+            <div className='card-body-table p-24'>
               <div className='d-flex align-items-center flex-wrap gap-8'>
                 <Link
                   to='/blog'

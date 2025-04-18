@@ -155,13 +155,13 @@ const TargetsLayer = () => {
         </Link>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Salesperson</th>
                 <th scope="col" className="text-start py-3 px-4">Target Type</th>
                 <th scope="col" className="text-start py-3 px-4">Target</th>
@@ -219,7 +219,8 @@ const TargetsLayer = () => {
                                 to="/targets/details"
                                 state={{ targetId: target.id }}
                               >
-                                Details
+                                <Icon icon="ri-eye-line" />
+                                View
                               </Link>
                             </li>
                             <li>
@@ -228,6 +229,7 @@ const TargetsLayer = () => {
                                 to="/targets/edit-target"
                                 state={{ targetId: target.id }}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -238,6 +240,7 @@ const TargetsLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteTargetModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>
