@@ -4,6 +4,8 @@ import axios from 'axios';
 import { Icon } from '@iconify/react';
 import { Spinner } from "../hook/spinner-utils";
 import { formatDate } from "../hook/format-utils";
+import { useDateRange } from '../hook/useDateRange'; // Import useDateRange
+import moment from 'moment'; // For formatting dates
 
 const API_URL = "https://api.bizchain.co.ke/v1/storage-facilities";
 const SUMMARY_API_URL = "https://api.bizchain.co.ke/v1/cards";
@@ -24,6 +26,9 @@ const StorageFacilityLayer = () => {
   const [isSummaryLoading, setIsSummaryLoading] = useState(false);
   const [error, setError] = useState(null);
   const [summaryError, setSummaryError] = useState(null);
+
+  // Date range for cards
+  const { dateRange, PredefinedDateRanges: DatePicker } = useDateRange();
 
   const fetchFacilities = useCallback(async (page = 1, searchQuery = '') => {
     setIsLoading(true);
@@ -63,9 +68,17 @@ const StorageFacilityLayer = () => {
     setSummaryError(null);
     try {
       const token = sessionStorage.getItem('token');
+      const params = {
+        _t: new Date().getTime(),
+      };
+      // Add date range parameters if defined
+      if (dateRange.start && dateRange.end) {
+        params.startDate = moment(dateRange.start).format('YYYY-MM-DD');
+        params.endDate = moment(dateRange.end).format('YYYY-MM-DD');
+      }
       const response = await axios.get(SUMMARY_API_URL, {
         headers: { Authorization: `Bearer ${token}` },
-        params: { _t: new Date().getTime() },
+        params,
       });
 
       const responseData = response.data;
@@ -85,7 +98,7 @@ const StorageFacilityLayer = () => {
     } finally {
       setIsSummaryLoading(false);
     }
-  }, []);
+  }, [dateRange]); // Add dateRange to dependencies
 
   useEffect(() => {
     fetchFacilities(currentPage, query);
@@ -106,7 +119,7 @@ const StorageFacilityLayer = () => {
       });
       setFacilityToDelete(null);
       fetchFacilities(currentPage, query);
-      fetchSummary(); 
+      fetchSummary();
     } catch (error) {
       console.error('Error deleting facility:', error);
       setError(error.response?.data?.status?.message || "Failed to delete facility.");
@@ -129,6 +142,9 @@ const StorageFacilityLayer = () => {
     <div className="h-100 p-0">
       {/* Header */}
       <div className="mt-3" style={{ width: "100%" }}>
+        <div className="d-flex justify-content-end mb-3 align-items-center gap-2">
+          <div>{DatePicker}</div>
+        </div>
         {error && <div className="alert alert-danger">{error}</div>}
         {summaryError && <div className="alert alert-danger">{summaryError}</div>}
 

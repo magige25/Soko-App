@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast, { Toaster } from "react-hot-toast";
 import AddImage from "./AddImage";
-import { Icon } from "@iconify/react/dist/iconify.js";
+import { Icon } from "@iconify/react";
 
 const API_URL = "https://api.bizchain.co.ke/v1/products";
 const BRAND_API = "https://api.bizchain.co.ke/v1/brands";
@@ -55,7 +55,7 @@ const EditProduct = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Memoized fetch functions
+  
   const fetchBrands = useCallback(async () => {
     try {
       const token = sessionStorage.getItem("token");
@@ -133,7 +133,7 @@ const EditProduct = () => {
     setEditProduct(prev => {
       const newData = { ...prev, [name]: value };
       if (name === "category") {
-        newData.subCategory = ""; // Reset subcategory when category changes
+        newData.subCategory = "";
       }
       return newData;
     });
