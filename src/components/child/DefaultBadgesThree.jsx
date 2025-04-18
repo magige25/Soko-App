@@ -7,7 +7,7 @@ const DefaultBadgesThree = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Default Badges</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex flex-wrap align-items-center gap-3">
                         <span className="badge text-sm fw-semibold w-32-px h-32-px d-flex justify-content-center align-items-center rounded-circle bg-primary-600  text-white">
                             1

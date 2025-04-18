@@ -155,13 +155,13 @@ const StockRequestLayer = () => {
         </div>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Depot</th>
                 <th scope="col" className="text-start py-3 px-4">Order Code</th>
                 <th scope="col" className="text-start py-3 px-4">No. Products</th>
@@ -213,15 +213,17 @@ const StockRequestLayer = () => {
                                 to="/stock-request/view"
                                 state={{ requestId: request.id }}
                               >
-                                View Details
+                                <Icon icon="ri-eye-line" />
+                                View
                               </Link>
                             </li>
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to="/stock-request/edit"
+                                to="/stock-request/edit-product"
                                 state={{ requestId: request.id }}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -238,7 +240,10 @@ const StockRequestLayer = () => {
                                     aria-hidden="true"
                                   ></span>
                                 ) : (
-                                  "Approve"
+                                  <>
+                                  <Icon icon="ri-checkbox-circle-line" />
+                                  Approve
+                                  </>
                                 )}
                               </button>
                             </li>
@@ -249,6 +254,7 @@ const StockRequestLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

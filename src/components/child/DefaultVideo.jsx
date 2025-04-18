@@ -11,7 +11,7 @@ const DefaultVideo = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Default Video</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="position-relative">
                         <img
                             src="assets/images/videos/video-img1.png"

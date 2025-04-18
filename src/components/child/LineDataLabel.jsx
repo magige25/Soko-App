@@ -12,7 +12,7 @@ const LineDataLabel = () => {
                         Line Chart with Data Labels
                     </h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <ReactApexChart id="lineDataLabel" options={lineDataLabelOptions} series={lineDataLabelSeries} type="line"
                         height={264} />
                 </div>

@@ -78,12 +78,12 @@ const CreditorsRequestLayer = () => {
         </div>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Name</th>
                 <th scope="col" className="text-start py-3 px-4">Phone No.</th>
                 <th scope="col" className="text-start py-3 px-4">Pricing Category</th>
@@ -132,6 +132,7 @@ const CreditorsRequestLayer = () => {
                                 data-bs-target="#viewModal"
                                 onClick={() => handleViewClick(creditorRequest)}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </button>
                             </li>
@@ -140,6 +141,7 @@ const CreditorsRequestLayer = () => {
                                 className="dropdown-item"
                                 onClick={() => handleApproveClick(creditorRequest)}
                               >
+                                <Icon icon="ri-checkbox-circle-line" />
                                 Approve
                               </button>
                             </li>
@@ -148,7 +150,8 @@ const CreditorsRequestLayer = () => {
                                 className="dropdown-item text-danger"
                                 onClick={() => handleRejectClick(creditorRequest)}
                               >
-                                Reject
+                                <Icon icon="ri-close-circle-line" />
+                                Reject                                
                               </button>
                             </li>
                           </ul>

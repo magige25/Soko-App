@@ -9,7 +9,7 @@ const SalesStatisticTwo = () => {
     return (
         <div className="col-xxl-4">
             <div className="card h-100 radius-8 border-0">
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <h6 className="mb-2 fw-bold text-lg">Statistic</h6>
                     <div className="mt-24">
                         <div className="d-flex align-items-center gap-1 justify-content-between mb-44">

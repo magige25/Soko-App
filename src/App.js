@@ -3,6 +3,7 @@ import { AuthProvider } from "./context/AuthContext";
 import PrivateRouteLayer from "./components/PrivateRouteLayer";
 import OtpRoutePage from "./pages/OtpRoutePage";
 import HomePageOne from "./pages/HomePageOne";
+import SuppliesPage from "./pages/SuppliesPage";
 import EmailPage from "./pages/EmailPage";
 import AddUserPage from "./pages/AddUserPage";
 import AlertPage from "./pages/AlertPage";
@@ -103,6 +104,8 @@ import AddRoutePage from "./pages/AddRoutePage";
 import EditRoutePage from "./pages/EditRoutePage";
 import AddUsersPage from "./pages/AddUsersPage";
 import RolesListPage from "./pages/RolesListPage";
+import AddRolesPage from "./pages/AddRolesPage";
+import EditRolesPage from "./pages/EditRolesPage";
 import SuppliersPage from "./pages/SuppliersPage";
 import PaginationTablePage from "./pages/PaginationTablePage";
 import InvoiceRegisterPage from "./pages/InvoiceRegisterPage";
@@ -203,6 +206,7 @@ function App() {
           {/* Protected Routes */}
           <Route element={<PrivateRouteLayer />}>
             <Route path="/dashboard" element={<HomePageOne />} />
+            <Route path="/supplies" element={<SuppliesPage />} />
             <Route path="/add-user" element={<AddUserPage />} />
             <Route path="/alert" element={<AlertPage />} />
             <Route path="/assign-role" element={<AssignRolePage />} />
@@ -214,7 +218,7 @@ function App() {
             <Route path="/card" element={<CardPage />} />
             <Route path="/carousel" element={<CarouselPage />} />
             <Route path="/chat-empty" element={<ChatEmptyPage />} />
-            <Route path="/chat-message" element={<ChatMessagePage />} />
+            <Route path="/chat" element={<ChatMessagePage />} />
             <Route path="/chat-profile" element={<ChatProfilePage />} />
             <Route path="/code-generator" element={<CodeGeneratorPage />} />
             <Route path="/regions" element={<RegionsPage />} />
@@ -247,15 +251,17 @@ function App() {
             <Route path="/depot/add-depot" element={<AddDepotPage />} />
             <Route path="/depot/edit-depot" element={<EditDepotPage />} />
             <Route path="/stock-request" element={<StockRequestPage />} />
-            <Route path="/stock-request/edit" element={<EditStockRequestPage />} />
-            <Route path="/stock-request/edit/add-product" element={<AddProductStockRequestPage />} />
+            <Route path="/stock-request/edit-product" element={<EditStockRequestPage />} />
+            <Route path="/stock-request/edit-product/add-product" element={<AddProductStockRequestPage />} />
             <Route path="/stock-request/view" element={<ViewStockRequestPage />} />
             <Route path="/depot/request-stock" element={<AddStockRequestPage />} />
             <Route path="/approved-stock" element={<ApprovedStockPage />} />
             <Route path="/approved-stock/stock-details" element={<ApprovedStockDetailsPage />} />
             <Route path="/delivered-order" element={<DeliveredOrderPage />} />
             <Route path="/batch" element={<BatchPage />} />
-            <Route path="/roles-list" element={<RolesListPage />} />
+            <Route path="/roles" element={<RolesListPage />} />
+            <Route path="/roles/add-role" element={<AddRolesPage />} />
+            <Route path="/roles/edit-role" element={<EditRolesPage />} />
             <Route path="/suppliers" element={<SuppliersPage />} />
             <Route path="/suppliers/add-supplier" element={<AddSuppliersPage />} />
             <Route path="/suppliers/details" element={<SuppliersDetailsPage />} />
@@ -271,9 +277,9 @@ function App() {
             <Route path="/deliveries/add-delivery" element={<AddDeliveryPage />} />
             <Route path="/products/add-product" element={<AddProductPage />} />
             <Route path="/products/edit-product" element={<EditProductPage />} />
-            <Route path="/products/view" element={<ProductDetailsPage />} />
+            <Route path="/products/product-details" element={<ProductDetailsPage />} />
             <Route path="/brands/edit" element={<EditBrandPage />} />
-            <Route path="/brands/add" element={<AddBrandPage />} />
+            <Route path="/brands/add-brands" element={<AddBrandPage />} />
             <Route path="/supply-residence" element={<SupplyResidencePage />} />          
             <Route path="/category" element={<CategoryPage />} />
             <Route path="/category/add-category" element={<AddCategoryPage/>} />

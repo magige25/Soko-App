@@ -187,13 +187,13 @@ const CustomersLayer = () => {
         </div>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Name</th>
                 <th scope="col" className="text-start py-3 px-4">Phone No.</th>
                 <th scope="col" className="text-start py-3 px-4">Pricing Category</th>
@@ -216,7 +216,7 @@ const CustomersLayer = () => {
                     <td className="text-center small-text py-3 px-6">
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
-                    <td className="text-start small-text py-3 px-4">{customer.firstName}</td>
+                    <td className="text-start small-text py-3 px-4">{customer.name}</td>
                     <td className="text-start small-text py-3 px-4">{customer.phoneNo}</td>
                     <td className="text-start small-text py-3 px-4">{customer.pricingCategory}</td>
                     <td className="text-start small-text py-3 px-4">{customer.customerCategory}</td>
@@ -241,6 +241,7 @@ const CustomersLayer = () => {
                                 to="/customers/orders"
                                 state={{ customerId: customer.id }}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </Link>
                             </li>
@@ -250,6 +251,7 @@ const CustomersLayer = () => {
                                 to="/customers/edit"
                                 state={{ customerId: customer.id }}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -260,6 +262,7 @@ const CustomersLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

@@ -8,7 +8,7 @@ const DefaultAlerts = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Default Alerts</h6>
                 </div>
-                <div className="card-body p-24 d-flex flex-column gap-4">
+                <div className="card-body-table p-24 d-flex flex-column gap-4">
                     <div
                         className="alert alert-primary bg-primary-50 text-primary-600 border-primary-50 px-24 py-11 mb-0 fw-semibold text-lg radius-8 d-flex align-items-center justify-content-between"
                         role="alert"

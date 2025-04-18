@@ -129,13 +129,13 @@ const UsersListLayer = () => {
         </Link>
       </div>
       
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">First Name</th>
                 <th scope="col" className="text-start py-3 px-4">Last Name</th>
                 <th scope="col" className="text-start py-3 px-4">Email</th>
@@ -185,7 +185,8 @@ const UsersListLayer = () => {
                                 to="/users/details"
                                 state={{ userId: user.id }}
                               >
-                                Details
+                                <Icon icon="ri-eye-line" />
+                                view
                               </Link>
                             </li>
                             <li>
@@ -194,6 +195,7 @@ const UsersListLayer = () => {
                                 to="/users/edit-user"
                                 state={{ userId: user.id }}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -204,6 +206,7 @@ const UsersListLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteUserModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

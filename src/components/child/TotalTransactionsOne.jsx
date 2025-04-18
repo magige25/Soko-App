@@ -7,7 +7,7 @@ const TotalTransactionsOne = () => {
     return (
         <div className="col-xxl-4">
             <div className="card h-100">
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between mb-20">
                         <h6 className="mb-2 fw-bold text-lg">Total Transactions </h6>
                         <div className="">

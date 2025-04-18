@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import axios from "axios";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate, formatCurrency } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/stock-batches";
 
@@ -9,7 +10,6 @@ const BatchLayer = () => {
   const [batches, setBatches] = useState([]);
   const [query, setQuery] = useState("");
   const [batchToDelete, setBatchToDelete] = useState(null);
-  const [batchToView, setBatchToView] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
@@ -80,34 +80,9 @@ const BatchLayer = () => {
     }
   };
 
-  const handleViewClick = (batch) => {
-    setBatchToView(batch);
-  };
-
   const handleSearchInputChange = (e) => {
     setQuery(e.target.value);
     setCurrentPage(1);
-  };
-
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(value || 0);
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
   };
 
   const formatLitres = (value) => {
@@ -137,13 +112,13 @@ const BatchLayer = () => {
         </div>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Batch Number</th>
                 <th scope="col" className="text-start py-3 px-4">Amount</th>
                 <th scope="col" className="text-start py-3 px-4">Litres on Production</th>
@@ -183,21 +158,12 @@ const BatchLayer = () => {
                           <ul className="dropdown-menu">
                             <li>
                               <button
-                                className="dropdown-item"
-                                data-bs-toggle="modal"
-                                data-bs-target="#viewModal"
-                                onClick={() => handleViewClick(batch)}
-                              >
-                                Details
-                              </button>
-                            </li>
-                            <li>
-                              <button
                                 className="dropdown-item text-danger"
                                 onClick={() => handleDeleteClick(batch)}
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>
@@ -272,44 +238,6 @@ const BatchLayer = () => {
             </nav>
           </div>
         )}
-      </div>
-
-      {/* Batch Details Modal */}
-      <div className="modal fade" id="viewModal" tabIndex={-1} aria-hidden="true">
-        <div className="modal-dialog modal-md modal-dialog-centered">
-          <div className="modal-content">
-            <div className="modal-body">
-              <h6 className="modal-title d-flex justify-content-between align-items-center w-100 fs-5">
-                Batch Details
-                <button type="button" className="btn-close" data-bs-dismiss="modal"></button>
-              </h6>
-              {batchToView && (
-                <div className="mt-3">
-                  <p>
-                    <strong>Batch Number:</strong> {batchToView.batchNo}
-                  </p>
-                  <p>
-                    <strong>Amount:</strong> {formatCurrency(batchToView.amount)}
-                  </p>
-                  <p>
-                    <strong>Litres on Production:</strong> {formatLitres(batchToView.productionAmount)}
-                  </p>
-                  <p>
-                    <strong>Remaining Litres:</strong> {formatLitres(batchToView.remainingAmount)}
-                  </p>
-                  <p>
-                    <strong>Date Created:</strong> {formatDate(batchToView.dateCreated)}
-                  </p>
-                </div>
-              )}
-              <div className="d-flex justify-content-end gap-2 mt-3">
-                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Delete Confirmation Modal */}

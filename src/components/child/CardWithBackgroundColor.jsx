@@ -10,7 +10,7 @@ const CardWithBackgroundColor = () => {
             <div className="row gy-4">
                 <div className="col-xxl-3 col-sm-6">
                     <div className="card h-100 radius-12 bg-gradient-purple">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div className="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-lilac-600 text-white mb-16 radius-12">
                                 <Icon
                                     icon="solar:medal-ribbons-star-bold"
@@ -37,7 +37,7 @@ const CardWithBackgroundColor = () => {
                 </div>
                 <div className="col-xxl-3 col-sm-6">
                     <div className="card h-100 radius-12 bg-gradient-primary text-center">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div className="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-primary-600 text-white mb-16 radius-12">
                                 <Icon icon="ri:computer-fill" className="h5 mb-0" />
                             </div>
@@ -61,7 +61,7 @@ const CardWithBackgroundColor = () => {
                 </div>
                 <div className="col-xxl-3 col-sm-6">
                     <div className="card h-100 radius-12 bg-gradient-success text-end">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div className="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-success-600 text-white mb-16 radius-12">
                                 <Icon
                                     icon="fluent:toolbox-20-filled"
@@ -88,7 +88,7 @@ const CardWithBackgroundColor = () => {
                 </div>
                 <div className="col-xxl-3 col-sm-6">
                     <div className="card h-100 radius-12 bg-gradient-danger text-center">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div className="w-64-px h-64-px d-inline-flex align-items-center justify-content-center bg-danger-600 text-white mb-16 radius-12">
                                 <Icon icon="ph:code-fill" className="h5 mb-0" />
                             </div>

@@ -127,15 +127,9 @@ const AddDelivery = () => {
   const handleCancel = () => navigate("/deliveries");
 
   return (
-    <div className="page-wrapper">
-      <Toaster 
-            position="top-center" 
-            reverseOrder={false}
-            />
-      <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
+          <Toaster position="top-center" reverseOrder={false}/>
           <div className="card-body">
-            <h6 className="fs-6 mb-4">Add Delivery</h6>
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleAddDelivery}>
               <div className="row mb-3">
@@ -144,7 +138,7 @@ const AddDelivery = () => {
                     Supplier <span className="text-danger">*</span>
                   </label>
                   <select
-                    className="form-control"
+                    className="form-control form-select"
                     value={newDelivery.supplier}
                     onChange={(e) =>
                       setNewDelivery({ ...newDelivery, supplier: e.target.value })
@@ -198,7 +192,7 @@ const AddDelivery = () => {
                     Storage Facility <span className="text-danger">*</span>
                   </label>
                   <select
-                    className="form-control"
+                    className="form-control form-select"
                     value={newDelivery.storageFacilityId}
                     onChange={(e) =>
                       setNewDelivery({ ...newDelivery, storageFacilityId: e.target.value })
@@ -231,8 +225,6 @@ const AddDelivery = () => {
             </form>
           </div>
         </div>
-      </div>
-    </div>
   );
 };
 

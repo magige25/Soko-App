@@ -7,7 +7,7 @@ const FocusTabs = () => {
                 <div className="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
                     <h6 className="text-lg mb-0">Focus Tabs </h6>
                 </div>
-                <div className="card-body p-24 pt-10">
+                <div className="card-body-table p-24 pt-10">
                     <ul
                         className="nav focus-tab nav-pills mb-16"
                         id="pills-tab-two"

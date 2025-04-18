@@ -13,10 +13,10 @@ const RouteDetails = () => {
   const [totalItems, setTotalItems] = useState({ customers: 0, orders: 0, salesPersons: 0 }); // Total items from API
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
-  const [page, setPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(getItemsPerPage()); // Dynamic items per page
-  const [searchQuery, setSearchQuery] = useState("");
+  
+  const [page] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [searchQuery] = useState("");
 
   const [selectedTable, setSelectedTable] = useState("customers");
   const [selectedStatus, setSelectedStatus] = useState("All");
@@ -110,7 +110,7 @@ const RouteDetails = () => {
     };
 
     fetchData();
-  }, [location.state, page, itemsPerPage, searchQuery, token]);
+  }, [location.state, page, searchQuery, itemsPerPage, token]);
 
   const stats = route ? [
     { 

@@ -63,7 +63,7 @@ const OrderDetailsLayer = () => {
   if (isLoading) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24 text-center">
+        <div className="card-body-table p-24 text-center">
           <Spinner />
         </div>
       </div>
@@ -73,7 +73,7 @@ const OrderDetailsLayer = () => {
   if (error) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24">
+        <div className="card-body-table p-24">
           <div className="alert alert-danger">{error}</div>
         </div>
       </div>
@@ -86,7 +86,7 @@ const OrderDetailsLayer = () => {
       <div className="card-header border-bottom bg-base py-16 px-24">
         <h6 className="mb-0 fs-6">Products Ordered</h6>
       </div>
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         <div className="mb-5">
           {orderItems.length > 0 ? (
             <div className="table-responsive">

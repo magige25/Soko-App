@@ -24,7 +24,7 @@ const CourseActivityOne = () => {
                         </Link>
                     </div>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <ul className="d-flex flex-wrap align-items-center justify-content-center my-3 gap-3">
                         <li className="d-flex align-items-center gap-2">
                             <span className="w-12-px h-12-px rounded-circle bg-warning-600" />

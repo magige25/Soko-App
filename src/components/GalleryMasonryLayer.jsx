@@ -3,7 +3,7 @@ import React from "react";
 const GalleryMasonryLayer = () => {
   return (
     <div className='card h-100 p-0 radius-12 overflow-hidden gallery-scale'>
-      <div className='card-body p-24'>
+      <div className='card-body-table p-24'>
         <div className='masonry-wrapper'>
           <div className='hover-scale-img border radius-16 overflow-hidden p-8'>
             <a

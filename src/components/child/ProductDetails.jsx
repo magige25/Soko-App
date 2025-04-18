@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { Spinner } from "../../hook/spinner-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/products";
 
@@ -41,10 +42,8 @@ const ProductDetails = () => {
     new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
 
   return (
-    <div className="page-wrapper">
       <div className="card shadow-sm mt-3" style={{ width: "100%" }}>
         <div className="card-body">
-          <h6 className="mb-4">Product Details</h6>
           {error && <div className="alert alert-danger">{error}</div>}
           {productToView ? (
             <div>
@@ -98,12 +97,11 @@ const ProductDetails = () => {
               </div>
             </div>
           ) : (
-            <p>Loading product details...</p>
+            <p> < Spinner /> </p>
           )}
         </div>
       </div>
-    </div>
-  );
+        );
 };
 
 export default ProductDetails;

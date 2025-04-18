@@ -8,7 +8,7 @@ const ListIconsLabel = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">List Icons &amp; label</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <ul className="list-group radius-8">
                         <li className="list-group-item d-flex align-items-center justify-content-between border text-secondary-light p-16 bg-base border-bottom-0">
                             <div className="d-flex align-items-center gap-2">

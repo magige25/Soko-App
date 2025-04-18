@@ -109,7 +109,7 @@ const BrandsLayer = () => {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   const handleAddBrandClick = () => {
-    navigate("/brands/add");
+    navigate("/brands/add-brands");
   };
 
   return (
@@ -146,15 +146,14 @@ const BrandsLayer = () => {
         </button>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Name</th>
-                {/* <th scope="col" className="text-start py-3 px-4">Products</th> */}
                 <th scope="col" className="text-start py-3 px-4">Date Created</th>
                 <th scope="col" className="text-start py-3 px-4">Action</th>
               </tr>
@@ -173,9 +172,6 @@ const BrandsLayer = () => {
                       {(currentPage - 1) * itemsPerPage + index + 1}
                     </td>
                     <td className="text-start small-text py-3 px-4">{brand.name}</td>
-                    {/* <td className="text-start small-text py-3 px-4">
-                      {brand.products != null ? brand.products : "N/A"}
-                    </td> */}
                     <td className="text-start small-text py-3 px-4">{formatDate(brand.dateCreated)}</td>
                     <td className="text-start small-text py-3 px-4">
                       <div className="action-dropdown">
@@ -193,6 +189,7 @@ const BrandsLayer = () => {
                                 className="dropdown-item"
                                 onClick={() => navigate(`/brands/${brand.id}`, { state: { brand } })}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </button>
                             </li>
@@ -201,6 +198,7 @@ const BrandsLayer = () => {
                                 className="dropdown-item"
                                 onClick={() => navigate("/brands/edit", { state: { brand } })}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </button>
                             </li>
@@ -211,6 +209,7 @@ const BrandsLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

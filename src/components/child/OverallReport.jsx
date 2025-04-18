@@ -19,7 +19,7 @@ const OverallReport = () => {
             </select>
           </div>
         </div>
-        <div className='card-body p-24'>
+        <div className='card-body-table p-24'>
           <div className='mt-32'>
             <div
               id='userOverviewDonutChart'

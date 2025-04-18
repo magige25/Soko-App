@@ -21,7 +21,7 @@ const ColorsLayer = () => {
             <ToastContainer />
             <div className="col-12">
                 <div className="card">
-                    <div className="card-body p-24">
+                    <div className="card-body-table p-24">
                         {/* Shade Start */}
                         <div className="mb-32">
                             <h6 className="text-md mb-24">Shades</h6>

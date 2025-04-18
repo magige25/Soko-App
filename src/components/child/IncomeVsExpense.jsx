@@ -7,7 +7,7 @@ const IncomeVsExpense = () => {
   return (
     <div className='col-xxl-8'>
       <div className='card h-100'>
-        <div className='card-body p-24 mb-8'>
+        <div className='card-body-table p-24 mb-8'>
           <div className='d-flex align-items-center flex-wrap gap-2 justify-content-between'>
             <h6 className='mb-2 fw-bold text-lg mb-0'>Income Vs Expense </h6>
             <select className='form-select form-select-sm w-auto bg-base border text-secondary-light'>

@@ -5,6 +5,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { formatDate } from "../../hook/format-utils";
+import { Spinner } from "../../hook/spinner-utils";
 
 const STOCK_REQUEST_API_URL = "https://api.bizchain.co.ke/v1/stock-requests";
 const UPDATE_QUANTITY_API_URL = "https://api.bizchain.co.ke/v1/stock-requests/product";
@@ -91,7 +92,6 @@ const EditStockRequest = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
   
-      // Use the response if needed (example)
       if (response.data.status?.code === 0) {
         setProductList(
           productList.map((p) =>
@@ -134,7 +134,7 @@ const EditStockRequest = () => {
   if (isLoading) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24 text-center">Loading stock request details...</div>
+        <div className="card-body-table p-24 text-center"> <Spinner /> </div>
       </div>
     );
   }
@@ -142,7 +142,7 @@ const EditStockRequest = () => {
   if (error) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24">
+        <div className="card-body-table p-24">
           <div className="alert alert-danger">{error}</div>
         </div>
       </div>
@@ -153,17 +153,17 @@ const EditStockRequest = () => {
     <div className="card h-100 p-0 radius-12">
       <ToastContainer position="top-center" autoClose={3000} />
       <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
-        <h6 className="mb-0 fs-5">Edit Stock Request: {stockRequest?.orderCode || "N/A"}</h6>
+        <h6 className="mb-0 fs-16">Order Code: {stockRequest?.orderCode || "N/A"}</h6>
         <div className="d-flex gap-2">
           <button
             className="btn btn-sm btn-primary radius-8 d-flex align-items-center gap-1"
-            onClick={() => navigate("/stock-request/edit/add-product", { state: { depotStockRequestId: requestId } })}
+            onClick={() => navigate("/stock-request/edit-product/add-product", { state: { depotStockRequestId: requestId } })}
           >
             <Icon icon="mdi:plus" className="text-xl" /> Add Product
           </button>
         </div>
       </div>
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         <div className="mb-5">
           {/* <h6 className="fw-semibold fs-5 text-primary-light mb-4 mt-3">Products</h6> */}
           {productList.length > 0 ? (

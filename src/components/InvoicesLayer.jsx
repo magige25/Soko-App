@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import axios from "axios";
 import { Icon } from "@iconify/react/dist/iconify.js";
 import { Spinner } from "../hook/spinner-utils";
+import { formatDate, formatCurrency } from "../hook/format-utils";
 
 const API_URL = "https://api.bizchain.co.ke/v1/invoice";
 
@@ -41,7 +42,8 @@ const InvoicesLayer = () => {
           }));
         console.log("Invoiced Data with Total Litres:", invoicedOnly);
         setInvoices(invoicedOnly);
-        setTotalItems(responseData.totalElements || invoicedOnly.length);
+        // Set totalItems to the count of pending invoices only
+        setTotalItems(invoicedOnly.length);
       } else {
         throw new Error(responseData.status.message);
       }
@@ -64,27 +66,7 @@ const InvoicesLayer = () => {
     setCurrentPage(1);
   };
 
-  const formatCurrency = (amount) =>
-    new Intl.NumberFormat("en-KE", { style: "currency", currency: "KES" }).format(amount);
-
-  const formatDate = (dateString) => {
-    if (!dateString || isNaN(new Date(dateString).getTime())) return "";
-    const date = new Date(dateString);
-    const day = date.getDate();
-    const month = date.toLocaleString("en-GB", { month: "long" });
-    const year = date.getFullYear();
-    const suffix =
-      day % 10 === 1 && day !== 11
-        ? "st"
-        : day % 10 === 2 && day !== 12
-        ? "nd"
-        : day % 10 === 3 && day !== 13
-        ? "rd"
-        : "th";
-    return `${day}${suffix} ${month} ${year}`;
-  };
-
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(totalItems / itemsPerPage));
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -98,7 +80,7 @@ const InvoicesLayer = () => {
               type="text"
               className="bg-base h-40-px w-auto"
               name="search"
-              placeholder="Search by supplier, invoice number, etc."
+              placeholder="Search supplier, invoice number, etc."
               value={query}
               onChange={handleSearchInputChange}
             />
@@ -107,13 +89,13 @@ const InvoicesLayer = () => {
         </div>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Supplier</th>
                 <th scope="col" className="text-start py-3 px-4">Invoice Number</th>
                 <th scope="col" className="text-start py-3 px-4">Volume(Litres)</th>
@@ -180,6 +162,7 @@ const InvoicesLayer = () => {
                                 to="/pending-invoices/invoice"
                                 state={{ invoiceId: invoice.id }}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </Link>
                             </li>
@@ -204,12 +187,12 @@ const InvoicesLayer = () => {
           <div className="d-flex justify-content-between align-items-center mt-3">
             <div className="text-muted" style={{ fontSize: "13px" }}>
               <span>
-                Showing {(currentPage - 1) * itemsPerPage + 1} to{" "}
-                {Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
+                Showing {totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1} to{" "}
+                {totalItems === 0 ? 0 : Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} entries
               </span>
             </div>
             <nav aria-label="Page navigation">
-              <ul className="pagination mb-0" style={{ gap: "6px" }}>
+              <ul personally className="pagination mb-0" style={{ gap: "6px" }}>
                 <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                   <button
                     className="page-link btn btn-outline-primary rounded-circle d-flex align-items-center justify-content-center"

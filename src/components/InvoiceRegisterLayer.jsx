@@ -260,13 +260,13 @@ const InvoiceRegisterLayer = () => {
         </div>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Litres</th>
                 <th scope="col" className="text-start py-3 px-4">Total Amount</th>
                 <th scope="col" className="text-start py-3 px-4">Status</th>
@@ -315,9 +315,10 @@ const InvoiceRegisterLayer = () => {
                             <li>
                               <Link
                                 className="dropdown-item"
-                                to={`/invoices/${invoice.id}`}
+                                to={`/invoices-/${invoice.id}`}
                                 state={{ invoice }}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </Link>
                             </li>
@@ -329,6 +330,7 @@ const InvoiceRegisterLayer = () => {
                                 data-bs-target="#editModal"
                                 onClick={() => handleEditClick(invoice)}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -338,6 +340,7 @@ const InvoiceRegisterLayer = () => {
                                   className="dropdown-item text-success"
                                   onClick={() => handlePayInvoice(invoice.id)}
                                 >
+                                  <Icon icon="ri-money-dollar-circle-line" />
                                   Pay
                                 </button>
                               </li>
@@ -349,6 +352,7 @@ const InvoiceRegisterLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

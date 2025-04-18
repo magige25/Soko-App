@@ -8,7 +8,7 @@ const SwitchHorizontal = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Switch Horizontal</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-center flex-wrap gap-28">
                         <div className="form-switch switch-primary d-flex align-items-center gap-3">
                             <input

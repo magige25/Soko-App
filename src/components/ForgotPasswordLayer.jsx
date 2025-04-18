@@ -210,6 +210,7 @@ const ForgotPasswordLayer = () => {
                                         value={formData.email}
                                         onChange={handleEmailChange}
                                         required
+                                        disabled={loading}
                                         style={{
                                             paddingLeft: "20px",
                                             paddingRight: "20px",

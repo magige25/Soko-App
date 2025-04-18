@@ -10,7 +10,7 @@ const DonutChart = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Donut Chart</h6>
                 </div>
-                <div className="card-body p-24 text-center d-flex flex-wrap align-items-start gap-5 justify-content-center">
+                <div className="card-body-table p-24 text-center d-flex flex-wrap align-items-start gap-5 justify-content-center">
                     <div className="position-relative">
                         <ReactApexChart id="basicDonutChart" className="w-auto d-inline-block" options={basicDonutChartOptions} series={basicDonutChartSeries} type="donut"
                             height={264} />

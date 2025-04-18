@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { DatePicker } from "antd";
+import dayjs from "dayjs";
+import toast, { Toaster } from "react-hot-toast"; 
 
 const API_URL = "https://api.bizchain.co.ke/v1/targets";
 const TARGET_TYPES_API_URL = "https://api.bizchain.co.ke/v1/targets/types";
@@ -19,13 +22,12 @@ const AddTargetsLayer = () => {
   const [salesperson, setSalesperson] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState(""); // Added for success feedback
 
   useEffect(() => {
     const fetchData = async () => {
       const token = sessionStorage.getItem("token");
       if (!token) {
-        setErrors({ submit: "No authentication token found. Please log in." });
+        toast.error("No authentication token found. Please log in.");
         return;
       }
 
@@ -38,17 +40,17 @@ const AddTargetsLayer = () => {
         if (targetTypesRes.data.status.code === 0) {
           setTargetTypes(targetTypesRes.data.data);
         } else {
-          setErrors({ submit: "Failed to load target types data. Please try again." });
+          toast.error("Failed to load target types data. Please try again.");
         }
 
         if (salespersonRes.data.status.code === 0) {
           setSalesperson(salespersonRes.data.data);
         } else {
-          setErrors({ submit: "Failed to load salesperson data. Please try again." });
+          toast.error("Failed to load salesperson data. Please try again.");
         }
       } catch (err) {
         console.error("Error fetching data:", err.response?.data || err.message);
-        setErrors({ submit: "Failed to load dropdown data. Please try again." });
+        toast.error(err.response?.data?.message || "Failed to load dropdown data. Please try again.");
       }
     };
     fetchData();
@@ -76,10 +78,22 @@ const AddTargetsLayer = () => {
     }));
   };
 
+  const handleDateChange = (field, date, dateString) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: dateString,
+    }));
+    const error = validateField(field, dateString);
+    setErrors((prev) => ({
+      ...prev,
+      [field]: error,
+    }));
+  };
+
   const formatDateForServer = (dateString) => {
     if (!dateString) return "";
-    const [year, month, day] = dateString.split("-"); // Assuming input type="date" gives YYYY-MM-DD
-    return `${day}/${month}/${year}`; // Convert to DD/MM/YYYY
+    const [year, month, day] = dateString.split("-");
+    return `${day}/${month}/${year}`;
   };
 
   const handleSubmit = async (e) => {
@@ -93,16 +107,19 @@ const AddTargetsLayer = () => {
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      Object.values(newErrors).forEach((error) => {
+        if (error) toast.error(error); 
+      });
       return;
     }
 
     try {
       setIsLoading(true);
       setErrors({});
-      setSuccessMessage(""); // Reset success message
       const token = sessionStorage.getItem("token");
       if (!token) {
-        throw new Error("No authentication token found");
+        toast.error("No authentication token found. Please log in.");
+        return;
       }
 
       const payload = {
@@ -122,22 +139,21 @@ const AddTargetsLayer = () => {
         },
       });
 
-      console.log("Server response:", response.data); // Log server response
+      console.log("Server response:", response.data);
 
       if (response.data.status.code === 0) {
-        setSuccessMessage("Target added successfully! Redirecting...");
-        setTimeout(() => navigate("/targets"), 1500); // Delay navigation for feedback
+        toast.success("Target added successfully!");
+        setTimeout(() => navigate("/targets"), 1500);
       } else {
         throw new Error(response.data.status.message || "Unknown server error");
       }
     } catch (error) {
       console.error("Error adding target:", error.response?.data || error.message);
-      setErrors({
-        submit:
-          error.response?.data?.message ||
+      toast.error(
+        error.response?.data?.message ||
           error.message ||
-          "Failed to add target. Please check your connection and try again.",
-      });
+          "Failed to add target. Please check your connection and try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -145,10 +161,15 @@ const AddTargetsLayer = () => {
 
   return (
     <div className="card h-100 p-0 radius-12">
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          success: { style: { background: "#d4edda", color: "#155724" } },
+          error: { style: { background: "#f8d7da", color: "#721c24" } },
+        }}
+      />
       <div className="card-body">
-        {errors.submit && <div className="alert alert-danger">{errors.submit}</div>}
-        {successMessage && <div className="alert alert-success">{successMessage}</div>}
-
         <form onSubmit={handleSubmit}>
           <div className="row gx-3">
             {/* First Column */}
@@ -170,22 +191,6 @@ const AddTargetsLayer = () => {
               </select>
               {errors.salesperson && <div className="invalid-feedback">{errors.salesperson}</div>}
             </div>
-
-            <div className="col-md-4 mb-3">
-              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
-                Target Amount <span className="text-danger">*</span>
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                className={`form-control radius-4 ${errors.target ? "is-invalid" : ""}`}
-                placeholder="Enter Target Amount"
-                value={formData.target}
-                onChange={(e) => handleInputChange("target", e.target.value)}
-              />
-              {errors.target && <div className="invalid-feedback">{errors.target}</div>}
-            </div>
-
             <div className="col-md-4 mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">
                 Target Type <span className="text-danger">*</span>
@@ -204,32 +209,56 @@ const AddTargetsLayer = () => {
               </select>
               {errors.targetType && <div className="invalid-feedback">{errors.targetType}</div>}
             </div>
+            <div className="col-md-4 mb-3">
+              <label className="form-label fw-semibold text-primary-light text-sm mb-2">
+                Target Amount <span className="text-danger">*</span>
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                className={`form-control radius-4 ${errors.target ? "is-invalid" : ""}`}
+                placeholder="Enter Target Amount"
+                value={formData.target}
+                onChange={(e) => handleInputChange("target", e.target.value)}
+              />
+              {errors.target && <div className="invalid-feedback">{errors.target}</div>}
+            </div>
 
             {/* Second Column */}
             <div className="col-md-4 mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">
                 Start Date <span className="text-danger">*</span>
               </label>
-              <input
-                type="date"
-                className={`form-control radius-4 ${errors.startDate ? "is-invalid" : ""}`}
-                value={formData.startDate}
-                onChange={(e) => handleInputChange("startDate", e.target.value)}
+              <DatePicker
+                value={formData.startDate ? dayjs(formData.startDate) : null}
+                format="YYYY-MM-DD"
+                onChange={(date, dateString) => handleDateChange("startDate", date, dateString)}
+                className={`h-40-px ${errors.startDate ? "is-invalid" : ""}`}
+                style={{ width: "100%" }}
               />
-              {errors.startDate && <div className="invalid-feedback">{errors.startDate}</div>}
+              {errors.startDate && (
+                <div className="invalid-feedback" style={{ display: "block" }}>
+                  {errors.startDate}
+                </div>
+              )}
             </div>
 
             <div className="col-md-4 mb-3">
               <label className="form-label fw-semibold text-primary-light text-sm mb-2">
                 End Date <span className="text-danger">*</span>
               </label>
-              <input
-                type="date"
-                className={`form-control radius-8 ${errors.endDate ? "is-invalid" : ""}`}
-                value={formData.endDate}
-                onChange={(e) => handleInputChange("endDate", e.target.value)}
+              <DatePicker
+                value={formData.endDate ? dayjs(formData.endDate) : null}
+                format="YYYY-MM-DD"
+                onChange={(date, dateString) => handleDateChange("endDate", date, dateString)}
+                className={`h-40-px ${errors.endDate ? "is-invalid" : ""}`}
+                style={{ width: "100%" }}
               />
-              {errors.endDate && <div className="invalid-feedback">{errors.endDate}</div>}
+              {errors.endDate && (
+                <div className="invalid-feedback" style={{ display: "block" }}>
+                  {errors.endDate}
+                </div>
+              )}
             </div>
           </div>
 

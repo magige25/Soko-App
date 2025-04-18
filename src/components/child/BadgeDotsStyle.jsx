@@ -7,7 +7,7 @@ const BadgeDotsStyle = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Badge Dots Style </h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex flex-wrap align-items-center gap-4">
                         <div className="d-flex align-items-center gap-2">
                             <span className="w-8-px h-8-px bg-primary-600 rounded-circle" />

@@ -115,7 +115,7 @@ const ViewProfileLayer = () => {
             </div>
             <div className="col-lg-8">
                 <div className="card h-100">
-                    <div className="card-body p-24">
+                    <div className="card-body-table p-24">
                         <ul
                             className="nav border-gradient-tab nav-pills mb-20 d-inline-flex"
                             id="pills-tab"

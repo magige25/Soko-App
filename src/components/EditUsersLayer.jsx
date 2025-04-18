@@ -252,7 +252,6 @@ const EditUsersLayer = () => {
   };
 
   return (
-    <div className="page-wrapper">
       <div className="card shadow-sm mt-3" style={{ width: "100%" }}>
         <div className="card-body">
           {error && <div className="alert alert-danger">{error}</div>}
@@ -372,7 +371,7 @@ const EditUsersLayer = () => {
                                       const isChecked = formData.userPermissions
                                         .find((p) => p.moduleId === module.moduleId)?.permissionsCodes.includes(perm.code) || false;
                                       return (
-                                        <div key={perm.code} className="form-check" style={{ display: 'flex', alignItems: 'center' }}>
+                                        <div key={perm.code} className="form-check style-check" style={{ display: 'flex', alignItems: 'center' }}>
                                           <input
                                             type="checkbox"
                                             className="form-check-input me-2"
@@ -416,7 +415,6 @@ const EditUsersLayer = () => {
           )}
         </div>
       </div>
-    </div>
   );
 };
 

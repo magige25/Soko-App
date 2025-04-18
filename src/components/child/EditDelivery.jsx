@@ -13,8 +13,6 @@ const EditDelivery = () => {
   const [storageFacilities, setStorageFacilities] = useState([]);
   const [fetchingStorageFacilities, setFetchingStorageFacilities] = useState(true);
  
-
-  // Initialize state with delivery data or fallback values
   const [editDelivery, setEditDelivery] = useState(
     delivery
       ? {
@@ -106,17 +104,14 @@ const EditDelivery = () => {
   const handleCancel = () => navigate("/deliveries");
 
   return (
-    <div className="page-wrapper">
-      <Toaster position="top-center" 
-      reverseOrder={false}
-      toastOptions={{
-        success: { style: { background: "#d4edda", color: "#155724" } },
-        error: { style: { background: "#f8d7da", color: "#721c24" } },
-      }} />
-      <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
+          <Toaster position="top-center" 
+            reverseOrder={false}
+            toastOptions={{
+            success: { style: { background: "#d4edda", color: "#155724" } },
+            error: { style: { background: "#f8d7da", color: "#721c24" } },
+          }} />
           <div className="card-body">
-            <h6 className="fs-6 mb-4">Edit Delivery</h6>
             <form onSubmit={handleEditSubmit}>
               <div className="row mb-3">
                 <div className="col-md-6">
@@ -125,7 +120,7 @@ const EditDelivery = () => {
                   </label>
                   <input
                     type="text"
-                    className="form-control"
+                    className="form-control form-select"
                     value={editDelivery.supplierName}
                     readOnly
                   />
@@ -164,7 +159,7 @@ const EditDelivery = () => {
                     Storage Facility <span className="text-danger">*</span>
                   </label>
                   <select                    
-                    className="form-control"
+                    className="form-control form-select"
                     value={editDelivery.storageFacility}
                     onChange={(e) =>
                       setEditDelivery({ ...editDelivery, storageFacility: e.target.value })
@@ -196,8 +191,6 @@ const EditDelivery = () => {
             </form>
           </div>
         </div>
-      </div>
-    </div>
   );
 };
 

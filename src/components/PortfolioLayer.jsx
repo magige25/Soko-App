@@ -9,7 +9,7 @@ const PortfolioLayer = () => {
     let { timeSeriesChartSeriesTwo, timeSeriesChartOptionsTwo } = useReactApexChart();
     return (
         <div className="card h-100 p-0 radius-12">
-            <div className="card-body p-24">
+            <div className="card-body-table p-24">
                 {/* Card Top Start */}
                 <div className="d-flex flex-wrap align-items-center justify-content-between mb-36">
                     <div className="">

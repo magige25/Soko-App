@@ -133,7 +133,7 @@ const EditProduct = () => {
     setEditProduct(prev => {
       const newData = { ...prev, [name]: value };
       if (name === "category") {
-        newData.subCategory = "";
+        newData.subCategory = ""; 
       }
       return newData;
     });
@@ -224,10 +224,8 @@ const EditProduct = () => {
   const handleCancel = () => navigate("/products");
 
   return (
-    <div className="page-wrapper">
-      <Toaster position="top-center" reverseOrder={false} />
-      <div className="row">
         <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
+          <Toaster position="top-center" reverseOrder={false} />
           <div className="card-body">
             <h6 className="fs-6 mb-4">Edit Product</h6>
             {error && <div className="alert alert-danger">{error}</div>}
@@ -312,7 +310,7 @@ const EditProduct = () => {
                       Category <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="form-control"
+                      className="form-control form-select"
                       name="category"
                       value={editProduct.category}
                       onChange={handleChange}
@@ -347,7 +345,7 @@ const EditProduct = () => {
                       Brand <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="form-control"
+                      className="form-control form-select"
                       name="brand"
                       value={editProduct.brand}
                       onChange={handleChange}
@@ -367,7 +365,7 @@ const EditProduct = () => {
                       Sub-category <span className="text-danger">*</span>
                     </label>
                     <select
-                      className="form-control"
+                      className="form-control form-select"
                       name="subCategory"
                       value={editProduct.subCategory}
                       onChange={handleChange}
@@ -470,8 +468,6 @@ const EditProduct = () => {
             </form>
           </div>
         </div>
-      </div>
-    </div>
   );
 };
 

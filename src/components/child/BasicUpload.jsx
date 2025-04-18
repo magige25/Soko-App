@@ -8,7 +8,7 @@ const BasicUpload = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Basic Upload</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <label
                         htmlFor="basic-upload"
                         className="border border-primary-600 fw-medium text-primary-600 px-16 py-12 radius-12 d-inline-flex align-items-center gap-2 bg-hover-primary-50"

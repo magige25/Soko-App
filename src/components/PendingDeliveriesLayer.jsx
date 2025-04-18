@@ -77,12 +77,12 @@ const PendingOrdersLayer = () => {
         </div>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
             <thead>
               <tr>
-                <th scope="col" className="text-center py-3 px-6">#</th>
+                <th scope="col" className="text-center py-3 px-6">ID</th>
                 <th scope="col" className="text-start py-3 px-4">Order Number</th>
                 <th scope="col" className="text-start py-3 px-4">Customer</th>
                 <th scope="col" className="text-start py-3 px-4">Outlet Name</th>
@@ -127,6 +127,7 @@ const PendingOrdersLayer = () => {
                                 data-bs-target="#viewModal"
                                 onClick={() => handleViewClick(pendingOrder)}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </button>
                             </li>
@@ -138,6 +139,7 @@ const PendingOrdersLayer = () => {
                                 data-bs-target="#editModal"
                                 onClick={() => handleEditClick(pendingOrder)}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </Link>
                             </li>
@@ -148,6 +150,7 @@ const PendingOrdersLayer = () => {
                                 data-bs-toggle="modal"
                                 data-bs-target="#deleteModal"
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

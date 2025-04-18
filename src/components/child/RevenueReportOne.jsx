@@ -10,7 +10,7 @@ const RevenueReportOne = () => {
             <div className="card radius-8 border-0">
                 <div className="row">
                     <div className="col-xxl-6 pe-xxl-0">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between">
                                 <h6 className="mb-2 fw-bold text-lg">Revenue Report</h6>
                                 <div className="">
@@ -48,7 +48,7 @@ const RevenueReportOne = () => {
                     <div className="col-xxl-6">
                         <div className="row h-100 g-0">
                             <div className="col-6 p-0 m-0">
-                                <div className="card-body p-24 h-100 d-flex flex-column justify-content-center border border-top-0">
+                                <div className="card-body-table p-24 h-100 d-flex flex-column justify-content-center border border-top-0">
                                     <div className="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                                         <div>
                                             <span className="mb-12 w-44-px h-44-px text-primary-600 bg-primary-light border border-primary-light-white flex-shrink-0 d-flex justify-content-center align-items-center radius-8 h6 mb-12">
@@ -70,7 +70,7 @@ const RevenueReportOne = () => {
                                 </div>
                             </div>
                             <div className="col-6 p-0 m-0">
-                                <div className="card-body p-24 h-100 d-flex flex-column justify-content-center border border-top-0 border-start-0 border-end-0">
+                                <div className="card-body-table p-24 h-100 d-flex flex-column justify-content-center border border-top-0 border-start-0 border-end-0">
                                     <div className="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                                         <div>
                                             <span className="mb-12 w-44-px h-44-px text-yellow bg-yellow-light border border-yellow-light-white flex-shrink-0 d-flex justify-content-center align-items-center radius-8 h6 mb-12">
@@ -97,7 +97,7 @@ const RevenueReportOne = () => {
                                 </div>
                             </div>
                             <div className="col-6 p-0 m-0">
-                                <div className="card-body p-24 h-100 d-flex flex-column justify-content-center border border-top-0 border-bottom-0">
+                                <div className="card-body-table p-24 h-100 d-flex flex-column justify-content-center border border-top-0 border-bottom-0">
                                     <div className="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                                         <div>
                                             <span className="mb-12 w-44-px h-44-px text-lilac bg-lilac-light border border-lilac-light-white flex-shrink-0 d-flex justify-content-center align-items-center radius-8 h6 mb-12">
@@ -124,7 +124,7 @@ const RevenueReportOne = () => {
                                 </div>
                             </div>
                             <div className="col-6 p-0 m-0">
-                                <div className="card-body p-24 h-100 d-flex flex-column justify-content-center border border-top-0 border-start-0 border-end-0 border-bottom-0">
+                                <div className="card-body-table p-24 h-100 d-flex flex-column justify-content-center border border-top-0 border-start-0 border-end-0 border-bottom-0">
                                     <div className="d-flex flex-wrap align-items-center justify-content-between gap-1 mb-8">
                                         <div>
                                             <span className="mb-12 w-44-px h-44-px text-pink bg-pink-light border border-pink-light-white flex-shrink-0 d-flex justify-content-center align-items-center radius-8 h6 mb-12">

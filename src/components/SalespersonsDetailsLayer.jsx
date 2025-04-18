@@ -113,7 +113,7 @@ const SalespersonsDetailsLayer = () => {
     return (
       <div className="page-wrapper">
         <div className="row">
-          <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
+          <div className="card d-flex p-0 radius-8 h-44-px justify-content-center align-items-center">
             <Spinner />
           </div>
         </div>
@@ -137,10 +137,8 @@ const SalespersonsDetailsLayer = () => {
   }
 
   return (
-    <div className="page-wrapper">
-      <div className="row">
-        <div className="card shadow-sm mt-3 full-width-card" style={{ width: "100%" }}>
-          <div className="card-body">
+        <div className="card shadow-sm mt-2 full-width-card" style={{ width: "100%" }}>
+          <div className="card-body" style={{ borderColor: "white" }}>
             <div className="row">
               <div className="col-md-6">
                 <div className="mb-3">
@@ -181,9 +179,7 @@ const SalespersonsDetailsLayer = () => {
               </button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
+        </div>      
   );
 };
 

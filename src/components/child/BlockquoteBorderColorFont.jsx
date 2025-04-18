@@ -7,7 +7,7 @@ const BlockquoteBorderColorFont = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Blockquote Border Color</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="row gy-4">
                         <div className="col-lg-4 col-sm-6">
                             <div className="p-16 bg-transparent radius-8 border border-start-width-3-px border-cyan">

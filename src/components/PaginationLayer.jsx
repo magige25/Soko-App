@@ -10,7 +10,7 @@ const PaginationLayer = () => {
                     <div className="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
                         <h6 className="text-lg mb-0">Default Solid</h6>
                     </div>
-                    <div className="card-body p-24">
+                    <div className="card-body-table p-24">
                         <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center">
                             <li className="page-item">
                                 <Link
@@ -153,7 +153,7 @@ const PaginationLayer = () => {
                     <div className="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
                         <h6 className="text-lg mb-0">Outline</h6>
                     </div>
-                    <div className="card-body p-24">
+                    <div className="card-body-table p-24">
                         <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center">
                             <li className="page-item">
                                 <Link
@@ -296,7 +296,7 @@ const PaginationLayer = () => {
                     <div className="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
                         <h6 className="text-lg mb-0">Square with icon</h6>
                     </div>
-                    <div className="card-body p-24">
+                    <div className="card-body-table p-24">
                         <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center">
                             <li className="page-item">
                                 <Link
@@ -430,7 +430,7 @@ const PaginationLayer = () => {
                     <div className="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
                         <h6 className="text-lg mb-0">Rounded with icon</h6>
                     </div>
-                    <div className="card-body p-24">
+                    <div className="card-body-table p-24">
                         <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center">
                             <li className="page-item">
                                 <Link
@@ -564,7 +564,7 @@ const PaginationLayer = () => {
                     <div className="card-header py-16 px-24 bg-base border border-end-0 border-start-0 border-top-0">
                         <h6 className="text-lg mb-0">Default Solid</h6>
                     </div>
-                    <div className="card-body p-24 text-center">
+                    <div className="card-body-table p-24 text-center">
                         <div className="p-24 bg-primary-50 d-inline-block radius-12 bg-primary-success-gradient justify-content-center mx-auto">
                             <ul className="pagination d-flex flex-wrap align-items-center gap-2 justify-content-center">
                                 <li className="page-item">

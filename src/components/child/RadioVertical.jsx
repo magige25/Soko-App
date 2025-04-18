@@ -7,7 +7,7 @@ const RadioVertical = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Radio Vertical</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-start flex-column flex-wrap gap-3">
                         <div className="form-check checked-primary d-flex align-items-center gap-2">
                             <input

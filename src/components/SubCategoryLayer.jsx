@@ -224,7 +224,7 @@ const SubCategoryLayer = () => {
         </Link>
       </div>
 
-      <div className="card-body p-24">
+      <div className="card-body-table p-24">
         {error && <div className="alert alert-danger">{error}</div>}
         <div className="table-responsive scroll-sm">
           <table className="table table-borderless sm-table mb-0">
@@ -270,6 +270,7 @@ const SubCategoryLayer = () => {
                                 to={`/sub-category/${subCategory.id}`}
                                 state={{ subCategory }}
                               >
+                                <Icon icon="ri-eye-line" />
                                 View
                               </Link>
                             </li>
@@ -278,6 +279,7 @@ const SubCategoryLayer = () => {
                                 className="dropdown-item"
                                 onClick={() => handleEditClick(subCategory)}
                               >
+                                <Icon icon="ri-edit-line" />
                                 Edit
                               </button>
                             </li>
@@ -286,6 +288,7 @@ const SubCategoryLayer = () => {
                                 className="dropdown-item text-danger"
                                 onClick={() => handleDeleteClick(subCategory)}
                               >
+                                <Icon icon="mdi:trash-can" />
                                 Delete
                               </button>
                             </li>

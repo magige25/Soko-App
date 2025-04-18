@@ -8,7 +8,7 @@ const RevenueGrowthOne = () => {
     return (
         <div className="col-xxl-4">
             <div className="card h-100 radius-8 border">
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between">
                         <div>
                             <h6 className="mb-2 fw-bold text-lg">Revenue Growth</h6>

@@ -141,8 +141,8 @@ const ApprovedStockDetailsLayer = () => {
 
   if (isLoading) {
     return (
-      <div className="d-flex justify-content-center align-items-center">
-        <Spinner />
+      <div className="card h-100 p-0 radius-12">
+        <div className="card-body-table p-24 text-center"> <Spinner /> </div>
       </div>
     );
   }
@@ -150,7 +150,7 @@ const ApprovedStockDetailsLayer = () => {
   if (error) {
     return (
       <div className="card h-100 p-0 radius-12">
-        <div className="card-body p-24">
+        <div className="card-body-table p-24">
           <div className="alert alert-danger">{error}</div>
         </div>
       </div>
@@ -160,8 +160,7 @@ const ApprovedStockDetailsLayer = () => {
   return (
     <div className="card h-100 p-0 radius-12">
       <ToastContainer position="top-right" autoClose={3000} />
-      <div className="card-header border-bottom bg-base py-16 px-24 d-flex align-items-center justify-content-between">
-        <h6 className="mb-0 fs-5">Stock: {approvedStock?.orderCode || "N/A"}</h6>
+      <div className="card-header d-flex justify-content-center gap-2">
         <div className="d-flex gap-2">
           <button
             onClick={handleDownload}
@@ -177,12 +176,11 @@ const ApprovedStockDetailsLayer = () => {
           </button>
         </div>
       </div>
-      <div className="card-body p-24" id="approved-stock-details">
+      <div className="card-body-table p-24" id="approved-stock-details">
         {/* Basic Approved Stock Information */}
         <div className="mb-4">
-          <h6 className="fw-semibold text-primary-light mb-3">Basic Information</h6>
           <div className="row">
-            <div className="col-md-6">
+            <div className="col-md-6 text-primary-light">
               <p><strong>Order Code:</strong> {approvedStock?.orderCode || "N/A"}</p>
               <p><strong>Depot:</strong> {approvedStock?.depot?.name || "N/A"}</p>
               <p><strong>Number of Products:</strong> {approvedStock?.products || 0}</p>
@@ -200,7 +198,7 @@ const ApprovedStockDetailsLayer = () => {
 
         {/* Product Details */}
         <div className="mb-5">
-          <h6 className="fw-semibold fs-5 text-primary-light mb-3 mt-3">Product Details</h6>
+          <h6 className="fw-semibold fs-5 text-primary-light mb-3 mt-3">Products</h6>
           {approvedStock?.productModelList?.length > 0 ? (
             <div className="table-responsive">
               <table className="table table-borderless sm-table mb-0">

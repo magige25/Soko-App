@@ -6,7 +6,7 @@ const BlogLayer = () => {
     <div className='row gy-4'>
       <div className='col-xxl-3 col-lg-4 col-sm-6'>
         <div className='card h-100 p-0 radius-12 overflow-hidden'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <Link
               to='/blog-details'
               className='w-100 max-h-194-px radius-8 overflow-hidden'
@@ -57,7 +57,7 @@ const BlogLayer = () => {
       </div>
       <div className='col-xxl-3 col-lg-4 col-sm-6'>
         <div className='card h-100 p-0 radius-12 overflow-hidden'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <Link
               to='/blog-details'
               className='w-100 max-h-194-px radius-8 overflow-hidden'
@@ -108,7 +108,7 @@ const BlogLayer = () => {
       </div>
       <div className='col-xxl-3 col-lg-4 col-sm-6'>
         <div className='card h-100 p-0 radius-12 overflow-hidden'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <Link
               to='/blog-details'
               className='w-100 max-h-194-px radius-8 overflow-hidden'
@@ -158,7 +158,7 @@ const BlogLayer = () => {
       </div>
       <div className='col-xxl-3 col-lg-4 col-sm-6'>
         <div className='card h-100 p-0 radius-12 overflow-hidden'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <Link
               to='/blog-details'
               className='w-100 max-h-194-px radius-8 overflow-hidden'
@@ -414,7 +414,7 @@ const BlogLayer = () => {
       {/* Style Three */}
       <div className='col-xxl-3 col-lg-4 col-sm-6'>
         <div className='card h-100 p-0 radius-12 overflow-hidden'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <h6 className='mb-16'>
               <Link
                 to='/blog-details'
@@ -476,7 +476,7 @@ const BlogLayer = () => {
       </div>
       <div className='col-xxl-3 col-lg-4 col-sm-6'>
         <div className='card h-100 p-0 radius-12 overflow-hidden'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <h6 className='mb-16'>
               <Link
                 to='/blog-details'
@@ -538,7 +538,7 @@ const BlogLayer = () => {
       </div>
       <div className='col-xxl-3 col-lg-4 col-sm-6'>
         <div className='card h-100 p-0 radius-12 overflow-hidden'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <h6 className='mb-16'>
               <Link
                 to='/blog-details'
@@ -599,7 +599,7 @@ const BlogLayer = () => {
       </div>
       <div className='col-xxl-3 col-lg-4 col-sm-6'>
         <div className='card h-100 p-0 radius-12 overflow-hidden'>
-          <div className='card-body p-24'>
+          <div className='card-body-table p-24'>
             <h6 className='mb-16'>
               <Link
                 to='/blog-details'

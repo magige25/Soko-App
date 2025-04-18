@@ -5,7 +5,7 @@ const TotalBalanceOne = () => {
     return (
         <div className="col-xxl-12 col-lg-6">
             <div className="card h-100">
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <span className="mb-4 text-sm text-secondary-light">
                         Total Balance
                     </span>

@@ -5,8 +5,8 @@ import { Link } from 'react-router-dom'
 const LatestRegisteredOne = () => {
     return (
         <div className="col-xxl-9 col-xl-12">
-            <div className="card h-100">
-                <div className="card-body p-24">
+            <div className="card h-100 p-0 radius-12">
+                <div className="card-body-table p-24">
                     <div className="d-flex flex-wrap align-items-center gap-1 justify-content-between mb-16">
                         <ul
                             className="nav border-gradient-tab nav-pills mb-0"
@@ -72,17 +72,15 @@ const LatestRegisteredOne = () => {
                                 <table className="table table-borderless sm-table mb-0">
                                     <thead>
                                         <tr>
-                                            <th scope="col">Users </th>
-                                            <th scope="col">Registered On</th>
-                                            <th scope="col">Plan</th>
-                                            <th scope="col" className="text-center">
-                                                Status
-                                            </th>
+                                            <th scope="col" className="text-start py-3 px-4">Users</th>
+                                            <th scope="col" className="text-start py-3 px-4">Registered On</th>
+                                            <th scope="col" className="text-start py-3 px-4">Plan</th>
+                                            <th scope="col" className="text-start py-3 px-4">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user1.png"
@@ -99,16 +97,16 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Free</td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Free</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user2.png"
@@ -125,16 +123,16 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Basic</td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Basic</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user3.png"
@@ -151,16 +149,16 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Standard</td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Standard</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user4.png"
@@ -169,7 +167,7 @@ const LatestRegisteredOne = () => {
                                                     />
                                                     <div className="flex-grow-1">
                                                         <h6 className="text-md mb-0 fw-medium">
-                                                            Bessie Cooper{" "}
+                                                            Bessie Cooper
                                                         </h6>
                                                         <span className="text-sm text-secondary-light fw-medium">
                                                             igerrin@gmail.com
@@ -177,16 +175,16 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Business</td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Business</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user5.png"
@@ -203,10 +201,10 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Enterprise </td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Enterprise</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>
@@ -226,17 +224,15 @@ const LatestRegisteredOne = () => {
                                 <table className="table table-borderless sm-table mb-0">
                                     <thead>
                                         <tr>
-                                            <th scope="col">Users </th>
-                                            <th scope="col">Registered On</th>
-                                            <th scope="col">Plan</th>
-                                            <th scope="col" className="text-center">
-                                                Status
-                                            </th>
+                                            <th scope="col" className="text-start py-3 px-4">Users</th>
+                                            <th scope="col" className="text-start py-3 px-4">Registered On</th>
+                                            <th scope="col" className="text-start py-3 px-4">Plan</th>
+                                            <th scope="col" className="text-start py-3 px-4">Status</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user1.png"
@@ -253,16 +249,16 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Free</td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Free</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user2.png"
@@ -279,16 +275,16 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Basic</td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Basic</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user3.png"
@@ -305,16 +301,16 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Standard</td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Standard</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user4.png"
@@ -323,7 +319,7 @@ const LatestRegisteredOne = () => {
                                                     />
                                                     <div className="flex-grow-1">
                                                         <h6 className="text-md mb-0 fw-medium">
-                                                            Bessie Cooper{" "}
+                                                            Bessie Cooper
                                                         </h6>
                                                         <span className="text-sm text-secondary-light fw-medium">
                                                             igerrin@gmail.com
@@ -331,16 +327,16 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Business</td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Business</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>
+                                            <td className="text-start small-text py-3 px-4">
                                                 <div className="d-flex align-items-center">
                                                     <img
                                                         src="assets/images/users/user5.png"
@@ -357,10 +353,10 @@ const LatestRegisteredOne = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td>27 Mar 2024</td>
-                                            <td>Enterprise </td>
-                                            <td className="text-center">
-                                                <span className="bg-success-focus text-success-main px-24 py-4 rounded-pill fw-medium text-sm">
+                                            <td className="text-start small-text py-3 px-4">27 Mar 2024</td>
+                                            <td className="text-start small-text py-3 px-4">Enterprise</td>
+                                            <td className="text-start small-text py-3 px-4">
+                                                <span className="bg-success-focus text-success-600 px-24 py-4 radius-8 fw-medium text-sm">
                                                     Active
                                                 </span>
                                             </td>

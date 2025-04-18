@@ -8,7 +8,7 @@ const CoinAnalyticsOne = () => {
     return (
         <div className="col-12">
             <div className="card h-100 radius-8 border-0">
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-center flex-wrap gap-2 justify-content-between">
                         <h6 className="mb-2 fw-bold text-lg">Coin Analytics</h6>
                         <div className="d-flex flex-wrap align-items-center gap-4">

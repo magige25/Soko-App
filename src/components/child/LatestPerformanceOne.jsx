@@ -50,7 +50,7 @@ const LatestPerformanceOne = () => {
                         <Icon icon="solar:alt-arrow-right-linear" className="icon" />
                     </Link>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="tab-content" id="pills-tabContent">
                         <div
                             className="tab-pane fade show active"

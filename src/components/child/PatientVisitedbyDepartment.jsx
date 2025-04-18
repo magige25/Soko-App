@@ -15,7 +15,7 @@ const PatientVisitedDepartment = () => {
             </h6>
           </div>
         </div>
-        <div className='card-body p-24 d-flex align-items-center gap-16'>
+        <div className='card-body-table p-24 d-flex align-items-center gap-16'>
           <div id='radialMultipleBar'>
             <ReactApexChart
               options={radialMultipleBarOptions}

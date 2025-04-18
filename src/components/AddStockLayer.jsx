@@ -249,7 +249,7 @@ const AddStockLayer = () => {
             </p>
           </div>
         )}
-        <div className="card-body p-24">
+        <div className="card-body-table p-24">
           <form onSubmit={isDrawCodeValid ? handleSubmit : handleDrawCodeSearch}>
             {/* Draw Code Search - Always Visible */}
             <div className="d-flex justify-content-center mb-24">

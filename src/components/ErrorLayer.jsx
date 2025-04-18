@@ -10,7 +10,7 @@ const ErrorLayer = () => {
         <p className='text-secondary-light'>
           Sorry, the page you are looking for doesn’t exist{" "}
         </p>
-        <Link to='/dashboard' className='btn btn-primary-600 radius-8 px-20 py-11'>
+        <Link to='/' className='btn btn-primary-600 radius-8 px-20 py-11'>
           Back to Home
         </Link>
       </div>

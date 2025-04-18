@@ -33,7 +33,7 @@ const CalendarMainLayer = () => {
             <div className="row gy-4">
                 <div className="col-xxl-3 col-lg-4">
                     <div className="card h-100 p-0">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <button
                                 type="button"
                                 className="btn btn-primary text-sm btn-sm px-12 py-12 w-100 radius-8 d-flex align-items-center gap-2 mb-32"
@@ -398,7 +398,7 @@ const CalendarMainLayer = () => {
                 </div>
                 <div className="col-xxl-9 col-lg-8">
                     <div className="card h-100 p-0">
-                        <div className="card-body p-24">
+                        <div className="card-body-table p-24">
                             <div id="wrap">
                                 <div id="calendar" />
                                 <div style={{ clear: "both" }} />

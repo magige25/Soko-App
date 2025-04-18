@@ -84,7 +84,7 @@ const SettledInvoicesPreviewLayer = () => {
     });
   };
 
-  if (!invoice) return <Spinner />;
+  if (!invoice) return <div className="card d-flex p-0 radius-8 h-44-px justify-content-center align-items-center"> <Spinner /> </div>;
 
   return (
     <div className="card">
@@ -128,7 +128,7 @@ const SettledInvoicesPreviewLayer = () => {
               <div className="py-28 px-20">
                 <div className="d-flex justify-content-between align-items-end">
                   <div>
-                    <h6 className="text-md">Issued For:</h6>
+                    <h6 className="text-md">Issued To:</h6>
                     <table className="text-sm text-secondary-light">
                       <tbody>
                         <tr><td>Name:</td><td className="ps-8">{invoice.supplier.name}</td></tr>

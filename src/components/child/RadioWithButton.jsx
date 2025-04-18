@@ -7,7 +7,7 @@ const RadioWithButton = () => {
                 <div className="card-header border-bottom bg-base py-16 px-24">
                     <h6 className="text-lg fw-semibold mb-0">Radio With Button</h6>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="d-flex align-items-center flex-wrap gap-24">
                         <div className="bg-primary-50 px-20 py-12 radius-8">
                             <span className="form-check checked-primary d-flex align-items-center gap-2">

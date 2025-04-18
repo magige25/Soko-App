@@ -26,7 +26,7 @@ const Paypal = () => {
                         />
                     </div>
                 </div>
-                <div className="card-body p-24">
+                <div className="card-body-table p-24">
                     <div className="row gy-3">
                         <div className="col-sm-6">
                             <span className="form-label fw-semibold text-primary-light text-md mb-8">
